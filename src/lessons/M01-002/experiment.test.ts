@@ -19,6 +19,9 @@ describe('二维向量数学', () => {
     expect(magnitude(vector(2, -1)) * 2).toBeCloseTo(2 * Math.sqrt(5));
   });
   it('拒绝非法参数和溢出', () => {
+    expect(() => magnitude(vector(Number.MAX_VALUE, Number.MAX_VALUE))).toThrow();
+    expect(() => scale(vector(0, 0), NaN)).toThrow();
+    expect(scale(vector(3, 4), 0)).toEqual({ x: 0, y: 0 });
     expect(() => vector(NaN, 0)).toThrow(RangeError);
     expect(() => add({ x: Infinity, y: 0 }, vector(0, 0))).toThrow();
     expect(() => scale(vector(1, 2), Infinity)).toThrow();
