@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "types": ["node", "vite/client", "vite-plugin-pwa/client"]
+  },
+  "include": [
+    "scripts/**/*.ts",
+    "*.config.ts",
+    "src/lib/**/*.ts",
+    "src/lessons/**/*.ts",
+    "curriculum/**/*.json"
+  ]
+}

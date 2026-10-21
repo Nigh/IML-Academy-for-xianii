@@ -1,0 +1,61 @@
+{
+  "name": "iml-academy-for-xianii",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Interactive Machine Learning Academy for xianii",
+  "packageManager": "pnpm@11.5.2",
+  "engines": {
+    "node": ">=24.9.0 <25"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "validate:curriculum": "node --import tsx scripts/validate-curriculum.ts",
+    "validate:lessons": "node --import tsx scripts/validate-lessons.ts",
+    "tasks:generate": "node --import tsx scripts/generate-task-specs.ts",
+    "tasks:check": "node --import tsx scripts/generate-task-specs.ts --check",
+    "docs:generate": "node --import tsx scripts/generate-curriculum-docs.ts",
+    "docs:check": "node --import tsx scripts/generate-curriculum-docs.ts --check",
+    "scope:check": "node --import tsx scripts/check-lesson-scope.ts",
+    "test": "vitest run",
+    "build": "pnpm validate:curriculum && pnpm validate:lessons && vite build",
+    "test:e2e": "playwright test",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@xianii/design-system": "2.4.0",
+    "katex": "^0.16.22",
+    "svelte": "^5.57.2",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@eslint/js": "^9.39.0",
+    "@playwright/test": "^1.56.0",
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "@tailwindcss/vite": "^4.1.0",
+    "@testing-library/svelte": "^5.2.0",
+    "@types/katex": "^0.16.7",
+    "@types/node": "^24.0.0",
+    "daisyui": "^5.5.0",
+    "eslint": "^9.39.0",
+    "eslint-plugin-svelte": "^3.12.0",
+    "globals": "^16.5.0",
+    "jsdom": "^27.0.0",
+    "prettier": "^3.6.0",
+    "prettier-plugin-svelte": "^3.4.0",
+    "svelte-check": "^4.3.0",
+    "tailwindcss": "^4.1.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.46.0",
+    "vite": "^8.3.5",
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.0.0",
+    "workbox-window": "^7.4.1"
+  }
+}

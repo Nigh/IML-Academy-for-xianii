@@ -1,0 +1,86 @@
+[
+  {
+    "id": "M01",
+    "title": "线性代数与几何直觉",
+    "slug": "math/linear-algebra",
+    "description": "从向量和线性变换建立几何直觉，连接标定、拟合和张量计算。",
+    "order": 1
+  },
+  {
+    "id": "M02",
+    "title": "概率论与统计推断",
+    "slug": "math/probability",
+    "description": "理解随机性、推断、误差和模型不确定性。",
+    "order": 2
+  },
+  {
+    "id": "M03",
+    "title": "微积分与数值优化",
+    "slug": "math/optimization",
+    "description": "从局部变化率到可复现的优化算法，重视数值稳定性。",
+    "order": 3
+  },
+  {
+    "id": "M04",
+    "title": "统计学习基础",
+    "slug": "learning/foundations",
+    "description": "建立正确的数据划分、评价和泛化意识。",
+    "order": 4
+  },
+  {
+    "id": "M05",
+    "title": "经典机器学习算法",
+    "slug": "learning/classical",
+    "description": "理解经典模型的目标函数、归纳偏好和选择方法。",
+    "order": 5
+  },
+  {
+    "id": "M06",
+    "title": "深度学习基础",
+    "slug": "learning/deep-learning",
+    "description": "从神经元与反向传播理解卷积、注意力和训练机制。",
+    "order": 6
+  },
+  {
+    "id": "M07",
+    "title": "时序信号与系统辨识",
+    "slug": "engineering/time-series",
+    "description": "从采样和频谱走向动态模型、异常检测与漂移。",
+    "order": 7
+  },
+  {
+    "id": "M08",
+    "title": "计算机视觉与多模态基础",
+    "slug": "engineering/vision",
+    "description": "理解图像任务、测量误差和跨模态表示。",
+    "order": 8
+  },
+  {
+    "id": "M09",
+    "title": "模型部署与边缘 ML",
+    "slug": "engineering/deployment",
+    "description": "将模型转换为可测量、可复现、受资源约束的推理系统。",
+    "order": 9
+  },
+  {
+    "id": "M10",
+    "title": "强化学习与序贯决策",
+    "slug": "learning/reinforcement",
+    "description": "从 MDP、价值迭代走向策略学习、机器人与部分可观测决策。",
+    "order": 10
+  },
+  {
+    "id": "M11",
+    "title": "LLM 与现代模型工程",
+    "slug": "engineering/llm",
+    "description": "连接语言建模、适配、检索与 Agent 评测。",
+    "order": 11
+  },
+  {
+    "id": "M12",
+    "title": "工程综合实验",
+    "slug": "labs",
+    "description": "在用户自行管理的本地环境中完成可复现工程实验。",
+    "order": 12
+  }
+]

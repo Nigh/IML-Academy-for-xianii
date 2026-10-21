@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="xianii">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="面向工程师的交互式机器学习自学课程：从数学直觉到真实工程。" />
+    <title>Interactive Machine Learning Academy for xianii</title>
+    <script>
+      try {
+        const preference = localStorage.getItem('iml-theme') || 'system';
+        const light =
+          preference === 'light' ||
+          (preference === 'system' && matchMedia('(prefers-color-scheme: light)').matches);
+        document.documentElement.dataset.theme = light ? 'xianii-light' : 'xianii';
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

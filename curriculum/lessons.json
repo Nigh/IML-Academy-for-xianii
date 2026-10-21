@@ -1,0 +1,4942 @@
+[
+  {
+    "id": "M01-001",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/scalars-vectors",
+    "title": "标量与向量表示",
+    "summary": "区分有单位的标量和具有方向的向量",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": [],
+    "objectives": [
+      "解释标量与向量表示中的数学对象、假设与适用条件",
+      "区分有单位的标量和具有方向的向量",
+      "通过对照实验识别常见误区：向量分量不是脱离坐标系的绝对量"
+    ],
+    "tags": ["标量", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-002",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/vector-addition",
+    "title": "向量加法与数乘",
+    "summary": "用逐分量相加与首尾相接解释位移或力的合成",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-001"],
+    "objectives": [
+      "解释向量加法与数乘中的数学对象、假设与适用条件",
+      "用逐分量相加与首尾相接解释位移或力的合成",
+      "通过对照实验识别常见误区：合向量的长度通常不等于长度之和"
+    ],
+    "tags": ["向量加法", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-003",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/tensor-shapes",
+    "title": "张量、阶数与形状",
+    "summary": "用批次、时间、通道解释张量各轴的含义",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-001"],
+    "objectives": [
+      "解释张量、阶数与形状中的数学对象、假设与适用条件",
+      "用批次、时间、通道解释张量各轴的含义",
+      "通过对照实验识别常见误区：元素总数相同不代表轴语义相同"
+    ],
+    "tags": ["张量、阶数", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-004",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/vector-spaces",
+    "title": "向量空间",
+    "summary": "检查集合对加法和数乘的封闭性",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-002"],
+    "objectives": [
+      "解释向量空间中的数学对象、假设与适用条件",
+      "检查集合对加法和数乘的封闭性",
+      "通过对照实验识别常见误区：任意几何平面都一定是线性子空间"
+    ],
+    "tags": ["向量空间", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-005",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/span",
+    "title": "线性组合与张成",
+    "summary": "用基向量系数生成张成集合",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-004"],
+    "objectives": [
+      "解释线性组合与张成中的数学对象、假设与适用条件",
+      "用基向量系数生成张成集合",
+      "通过对照实验识别常见误区：增加向量数量必然增加张成空间维数"
+    ],
+    "tags": ["线性组合", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-006",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/basis",
+    "title": "线性相关与基",
+    "summary": "用非平凡零组合识别冗余方向",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-005"],
+    "objectives": [
+      "解释线性相关与基中的数学对象、假设与适用条件",
+      "用非平凡零组合识别冗余方向",
+      "通过对照实验识别常见误区：基的向量个数可以超过空间维数"
+    ],
+    "tags": ["线性相关", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-007",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/dot-product",
+    "title": "向量内积与夹角",
+    "summary": "连接内积、方向相似性和夹角",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-002"],
+    "objectives": [
+      "解释向量内积与夹角中的数学对象、假设与适用条件",
+      "连接内积、方向相似性和夹角",
+      "通过对照实验识别常见误区：内积大就意味着夹角一定小，不需要考虑长度"
+    ],
+    "tags": ["向量内积", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-008",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/norm-distance",
+    "title": "范数与距离",
+    "summary": "比较 L1、L2 和不同量纲下的距离",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-007"],
+    "objectives": [
+      "解释范数与距离中的数学对象、假设与适用条件",
+      "比较 L1、L2 和不同量纲下的距离",
+      "通过对照实验识别常见误区：不同单位的特征可以直接等权计算距离"
+    ],
+    "tags": ["范数", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-009",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/projection",
+    "title": "投影",
+    "summary": "求向量在指定非零方向的最接近分量",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-007"],
+    "objectives": [
+      "解释投影中的数学对象、假设与适用条件",
+      "求向量在指定非零方向的最接近分量",
+      "通过对照实验识别常见误区：投影公式允许方向向量为零"
+    ],
+    "tags": ["投影", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-010",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/orthogonal-decomposition",
+    "title": "正交分解",
+    "summary": "将观测分成可解释部分与正交残差",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-009"],
+    "objectives": [
+      "解释正交分解中的数学对象、假设与适用条件",
+      "将观测分成可解释部分与正交残差",
+      "通过对照实验识别常见误区：分解后的残差可以与投影方向任意相关"
+    ],
+    "tags": ["正交分解", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-011",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/matrix-multiplication",
+    "title": "矩阵表示与矩阵乘法",
+    "summary": "通过形状和行列内积解释矩阵乘法",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-002"],
+    "objectives": [
+      "解释矩阵表示与矩阵乘法中的数学对象、假设与适用条件",
+      "通过形状和行列内积解释矩阵乘法",
+      "通过对照实验识别常见误区：矩阵乘法就是逐元素乘法且总满足交换律"
+    ],
+    "tags": ["矩阵表示", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-012",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/linear-transforms",
+    "title": "矩阵作为线性变换",
+    "summary": "观察网格、基向量与几何图形经过矩阵的变化",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-011"],
+    "objectives": [
+      "解释矩阵作为线性变换中的数学对象、假设与适用条件",
+      "观察网格、基向量与几何图形经过矩阵的变化",
+      "通过对照实验识别常见误区：线性变换可以把原点移动到任意位置"
+    ],
+    "tags": ["矩阵作为线性变换", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-013",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/rank",
+    "title": "矩阵的秩",
+    "summary": "从输出空间维度判断信息压缩",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-006", "M01-012"],
+    "objectives": [
+      "解释矩阵的秩中的数学对象、假设与适用条件",
+      "从输出空间维度判断信息压缩",
+      "通过对照实验识别常见误区：数值软件中的秩不依赖容差"
+    ],
+    "tags": ["矩阵的秩", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-014",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/null-space",
+    "title": "零空间与解空间",
+    "summary": "理解被线性变换消除的输入方向",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-013"],
+    "objectives": [
+      "解释零空间与解空间中的数学对象、假设与适用条件",
+      "理解被线性变换消除的输入方向",
+      "通过对照实验识别常见误区：存在零空间就意味着所有方程都无解"
+    ],
+    "tags": ["零空间", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-015",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/inverse-systems",
+    "title": "线性方程组与逆矩阵",
+    "summary": "区分唯一解、无解和无穷多解",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-014"],
+    "objectives": [
+      "解释线性方程组与逆矩阵中的数学对象、假设与适用条件",
+      "区分唯一解、无解和无穷多解",
+      "通过对照实验识别常见误区：每个方阵都存在逆矩阵"
+    ],
+    "tags": ["线性方程组", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-016",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/pseudoinverse",
+    "title": "伪逆",
+    "summary": "用最小残差和最小范数处理非方阵系统",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-015", "M01-010"],
+    "objectives": [
+      "解释伪逆中的数学对象、假设与适用条件",
+      "用最小残差和最小范数处理非方阵系统",
+      "通过对照实验识别常见误区：伪逆总能令 Ax 精确等于 b"
+    ],
+    "tags": ["伪逆", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-017",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/eigenvectors",
+    "title": "特征值与特征向量",
+    "summary": "识别变换中保持方向的向量",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-012"],
+    "objectives": [
+      "解释特征值与特征向量中的数学对象、假设与适用条件",
+      "识别变换中保持方向的向量",
+      "通过对照实验识别常见误区：每个实矩阵都有实数特征向量基"
+    ],
+    "tags": ["特征值", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 17,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-018",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/svd",
+    "title": "奇异值分解 SVD",
+    "summary": "用旋转、拉伸、旋转解释任意矩阵作用",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-017", "M01-010"],
+    "objectives": [
+      "解释奇异值分解 SVD中的数学对象、假设与适用条件",
+      "用旋转、拉伸、旋转解释任意矩阵作用",
+      "通过对照实验识别常见误区：奇异值可以为负或必须等于特征值"
+    ],
+    "tags": ["奇异值分解 SVD", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 18,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-019",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/low-rank",
+    "title": "低秩近似",
+    "summary": "观察截断奇异值带来的压缩与重构误差",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-018"],
+    "objectives": [
+      "解释低秩近似中的数学对象、假设与适用条件",
+      "观察截断奇异值带来的压缩与重构误差",
+      "通过对照实验识别常见误区：低秩近似能无损保留所有细节"
+    ],
+    "tags": ["低秩近似", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 19,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-020",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/least-squares",
+    "title": "最小二乘的几何解释",
+    "summary": "将模型拟合看成观测在列空间上的投影",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-016", "M01-010"],
+    "objectives": [
+      "解释最小二乘的几何解释中的数学对象、假设与适用条件",
+      "将模型拟合看成观测在列空间上的投影",
+      "通过对照实验识别常见误区：最小二乘会令每个观测误差分别最小"
+    ],
+    "tags": ["最小二乘的几何解释", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 20,
+    "relatedLessons": []
+  },
+  {
+    "id": "M01-021",
+    "moduleId": "M01",
+    "slug": "math/linear-algebra/broadcasting",
+    "title": "张量运算与 Broadcasting",
+    "summary": "从尾轴兼容规则理解广播与形状错误",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-003", "M01-011"],
+    "objectives": [
+      "解释张量运算与 Broadcasting中的数学对象、假设与适用条件",
+      "从尾轴兼容规则理解广播与形状错误",
+      "通过对照实验识别常见误区：广播会自动理解批次与通道的业务语义"
+    ],
+    "tags": ["张量运算", "M01", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 21,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-001",
+    "moduleId": "M02",
+    "slug": "math/probability/events",
+    "title": "概率空间与事件",
+    "summary": "用有限样本空间和事件集合建立概率公理",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": [],
+    "objectives": [
+      "解释概率空间与事件中的数学对象、假设与适用条件",
+      "用有限样本空间和事件集合建立概率公理",
+      "通过对照实验识别常见误区：两个事件的概率总能直接相加"
+    ],
+    "tags": ["概率空间", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-002",
+    "moduleId": "M02",
+    "slug": "math/probability/conditional-probability",
+    "title": "条件概率",
+    "summary": "用条件筛选后的样本空间计算概率",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-001"],
+    "objectives": [
+      "解释条件概率中的数学对象、假设与适用条件",
+      "用条件筛选后的样本空间计算概率",
+      "通过对照实验识别常见误区：P(A给定B) 总等于 P(B给定A)"
+    ],
+    "tags": ["条件概率", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-003",
+    "moduleId": "M02",
+    "slug": "math/probability/bayes-rule",
+    "title": "全概率公式与 Bayes 定理",
+    "summary": "比较先验、似然与后验的作用",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-002"],
+    "objectives": [
+      "解释全概率公式与 Bayes 定理中的数学对象、假设与适用条件",
+      "比较先验、似然与后验的作用",
+      "通过对照实验识别常见误区：检测准确率可以直接作为阳性后验"
+    ],
+    "tags": ["全概率公式", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-004",
+    "moduleId": "M02",
+    "slug": "math/probability/random-variables",
+    "title": "随机变量与分布函数",
+    "summary": "从样本映射到数值并累计概率",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-001"],
+    "objectives": [
+      "解释随机变量与分布函数中的数学对象、假设与适用条件",
+      "从样本映射到数值并累计概率",
+      "通过对照实验识别常见误区：随机变量与某次观测值是同一个对象"
+    ],
+    "tags": ["随机变量", "M02", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-005",
+    "moduleId": "M02",
+    "slug": "math/probability/pmf-pdf",
+    "title": "离散概率质量与连续概率密度",
+    "summary": "区分点概率、密度高度与区间概率",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-004"],
+    "objectives": [
+      "解释离散概率质量与连续概率密度中的数学对象、假设与适用条件",
+      "区分点概率、密度高度与区间概率",
+      "通过对照实验识别常见误区：概率密度不能大于 1"
+    ],
+    "tags": ["离散概率质量", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-006",
+    "moduleId": "M02",
+    "slug": "math/probability/bernoulli-binomial",
+    "title": "Bernoulli 与 Binomial 分布",
+    "summary": "从一次二元试验到独立重复计数",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-005"],
+    "objectives": [
+      "解释Bernoulli 与 Binomial 分布中的数学对象、假设与适用条件",
+      "从一次二元试验到独立重复计数",
+      "通过对照实验识别常见误区：有相关性的重复试验仍必然服从 Binomial"
+    ],
+    "tags": ["Bernoulli ", "M02", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-007",
+    "moduleId": "M02",
+    "slug": "math/probability/uniform",
+    "title": "Uniform 分布与均匀采样",
+    "summary": "解释等长区间等概率及有限样本波动",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-005"],
+    "objectives": [
+      "解释Uniform 分布与均匀采样中的数学对象、假设与适用条件",
+      "解释等长区间等概率及有限样本波动",
+      "通过对照实验识别常见误区：均匀采样保证每个小区间样本数完全相等"
+    ],
+    "tags": ["Uniform 分布", "M02", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-008",
+    "moduleId": "M02",
+    "slug": "math/probability/normal",
+    "title": "Normal 分布",
+    "summary": "分别观察位置参数和尺度参数对密度的影响",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-005"],
+    "objectives": [
+      "解释Normal 分布中的数学对象、假设与适用条件",
+      "分别观察位置参数和尺度参数对密度的影响",
+      "通过对照实验识别常见误区：正态分布的所有观测都在三倍标准差内"
+    ],
+    "tags": ["Normal 分布", "M02", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-009",
+    "moduleId": "M02",
+    "slug": "math/probability/expectation",
+    "title": "期望",
+    "summary": "将期望理解为概率加权平均",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-005"],
+    "objectives": [
+      "解释期望中的数学对象、假设与适用条件",
+      "将期望理解为概率加权平均",
+      "通过对照实验识别常见误区：期望一定是最可能出现的观测"
+    ],
+    "tags": ["期望", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-010",
+    "moduleId": "M02",
+    "slug": "math/probability/variance",
+    "title": "方差与标准差",
+    "summary": "区分离散程度、平方单位和原始单位",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-009"],
+    "objectives": [
+      "解释方差与标准差中的数学对象、假设与适用条件",
+      "区分离散程度、平方单位和原始单位",
+      "通过对照实验识别常见误区：标准差与方差具有相同单位"
+    ],
+    "tags": ["方差", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-011",
+    "moduleId": "M02",
+    "slug": "math/probability/joint-marginal",
+    "title": "联合分布与边缘分布",
+    "summary": "用二维概率表求边缘分布",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-005"],
+    "objectives": [
+      "解释联合分布与边缘分布中的数学对象、假设与适用条件",
+      "用二维概率表求边缘分布",
+      "通过对照实验识别常见误区：知道两个边缘就唯一确定联合分布"
+    ],
+    "tags": ["联合分布", "M02", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-012",
+    "moduleId": "M02",
+    "slug": "math/probability/conditional-distribution",
+    "title": "条件分布",
+    "summary": "对联合表固定一个条件并重新归一化",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-011", "M02-002"],
+    "objectives": [
+      "解释条件分布中的数学对象、假设与适用条件",
+      "对联合表固定一个条件并重新归一化",
+      "通过对照实验识别常见误区：条件分布可以不归一化"
+    ],
+    "tags": ["条件分布", "M02", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-013",
+    "moduleId": "M02",
+    "slug": "math/probability/independence",
+    "title": "独立性与条件独立性",
+    "summary": "用联合分布分解识别独立与条件独立",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-012"],
+    "objectives": [
+      "解释独立性与条件独立性中的数学对象、假设与适用条件",
+      "用联合分布分解识别独立与条件独立",
+      "通过对照实验识别常见误区：条件独立等价于无条件独立"
+    ],
+    "tags": ["独立性", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-014",
+    "moduleId": "M02",
+    "slug": "math/probability/covariance",
+    "title": "协方差",
+    "summary": "测量两个变量共同偏离均值的方向",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-011", "M02-010"],
+    "objectives": [
+      "解释协方差中的数学对象、假设与适用条件",
+      "测量两个变量共同偏离均值的方向",
+      "通过对照实验识别常见误区：零协方差意味着独立"
+    ],
+    "tags": ["协方差", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-015",
+    "moduleId": "M02",
+    "slug": "math/probability/correlation",
+    "title": "相关系数及其局限",
+    "summary": "区分线性关联、尺度无关性和因果关系",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-014"],
+    "objectives": [
+      "解释相关系数及其局限中的数学对象、假设与适用条件",
+      "区分线性关联、尺度无关性和因果关系",
+      "通过对照实验识别常见误区：高相关证明因果关系"
+    ],
+    "tags": ["相关系数及其局限", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-016",
+    "moduleId": "M02",
+    "slug": "math/probability/law-large-numbers",
+    "title": "大数定律",
+    "summary": "观察独立重复平均随样本量增大的稳定性",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-009", "M02-013"],
+    "objectives": [
+      "解释大数定律中的数学对象、假设与适用条件",
+      "观察独立重复平均随样本量增大的稳定性",
+      "通过对照实验识别常见误区：样本均值每一步都会更接近期望"
+    ],
+    "tags": ["大数定律", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-017",
+    "moduleId": "M02",
+    "slug": "math/probability/central-limit",
+    "title": "中心极限定理",
+    "summary": "观察有限方差独立样本均值的标准化分布",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-008", "M02-010", "M02-013"],
+    "objectives": [
+      "解释中心极限定理中的数学对象、假设与适用条件",
+      "观察有限方差独立样本均值的标准化分布",
+      "通过对照实验识别常见误区：原始数据必须正态才能使用中心极限定理"
+    ],
+    "tags": ["中心极限定理", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 17,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-018",
+    "moduleId": "M02",
+    "slug": "math/probability/estimation",
+    "title": "参数估计与估计误差",
+    "summary": "通过重复数据集区分参数、估计值与估计误差",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-016", "M02-010"],
+    "objectives": [
+      "解释参数估计与估计误差中的数学对象、假设与适用条件",
+      "通过重复数据集区分参数、估计值与估计误差",
+      "通过对照实验识别常见误区：一次估计接近真值就证明估计器总是可靠"
+    ],
+    "tags": ["参数估计", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 18,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-019",
+    "moduleId": "M02",
+    "slug": "math/probability/maximum-likelihood",
+    "title": "最大似然估计",
+    "summary": "通过似然曲线寻找最能解释观测的参数",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-018"],
+    "objectives": [
+      "解释最大似然估计中的数学对象、假设与适用条件",
+      "通过似然曲线寻找最能解释观测的参数",
+      "通过对照实验识别常见误区：似然是参数的概率分布且必须对参数积分为 1"
+    ],
+    "tags": ["最大似然估计", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 19,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-020",
+    "moduleId": "M02",
+    "slug": "math/probability/confidence-intervals",
+    "title": "置信区间",
+    "summary": "在已知方差正态均值模型中解释重复覆盖率",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-018", "M02-017"],
+    "objectives": [
+      "解释置信区间中的数学对象、假设与适用条件",
+      "在已知方差正态均值模型中解释重复覆盖率",
+      "通过对照实验识别常见误区：某个已计算区间有 95% 概率包含固定参数"
+    ],
+    "tags": ["置信区间", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 20,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-021",
+    "moduleId": "M02",
+    "slug": "math/probability/bootstrap",
+    "title": "Bootstrap",
+    "summary": "用有放回重采样近似估计量分布",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-018"],
+    "objectives": [
+      "解释Bootstrap中的数学对象、假设与适用条件",
+      "用有放回重采样近似估计量分布",
+      "通过对照实验识别常见误区：Bootstrap 能补救所有采样偏差"
+    ],
+    "tags": ["Bootstrap", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 21,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-022",
+    "moduleId": "M02",
+    "slug": "math/probability/hypothesis-testing",
+    "title": "假设检验与 p 值",
+    "summary": "解释零假设下统计量尾概率与多重检验",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-020"],
+    "objectives": [
+      "解释假设检验与 p 值中的数学对象、假设与适用条件",
+      "解释零假设下统计量尾概率与多重检验",
+      "通过对照实验识别常见误区：p 值是零假设为真的概率"
+    ],
+    "tags": ["假设检验", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 22,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-023",
+    "moduleId": "M02",
+    "slug": "math/probability/bayesian-inference",
+    "title": "贝叶斯推断：先验与后验",
+    "summary": "用 Beta-Binomial 模型追踪证据更新",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-003", "M02-019"],
+    "objectives": [
+      "解释贝叶斯推断：先验与后验中的数学对象、假设与适用条件",
+      "用 Beta-Binomial 模型追踪证据更新",
+      "通过对照实验识别常见误区：加入数据后先验影响必然立刻消失"
+    ],
+    "tags": ["贝叶斯推断：先验", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 23,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-024",
+    "moduleId": "M02",
+    "slug": "math/probability/entropy",
+    "title": "熵与交叉熵",
+    "summary": "区分真实分布的不确定性与预测编码代价",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-009"],
+    "objectives": [
+      "解释熵与交叉熵中的数学对象、假设与适用条件",
+      "区分真实分布的不确定性与预测编码代价",
+      "通过对照实验识别常见误区：交叉熵与分类准确率完全等价"
+    ],
+    "tags": ["熵", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 24,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-025",
+    "moduleId": "M02",
+    "slug": "math/probability/kl-divergence",
+    "title": "KL 散度",
+    "summary": "比较两分布的相对信息差异与方向性",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-024"],
+    "objectives": [
+      "解释KL 散度中的数学对象、假设与适用条件",
+      "比较两分布的相对信息差异与方向性",
+      "通过对照实验识别常见误区：KL 是对称且满足三角不等式的距离"
+    ],
+    "tags": ["KL 散度", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 25,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-026",
+    "moduleId": "M02",
+    "slug": "math/probability/experimental-design",
+    "title": "采样偏差、混杂与实验设计",
+    "summary": "用分层与随机分配区分相关、选择偏差和因果效应",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-015", "M02-018"],
+    "objectives": [
+      "解释采样偏差、混杂与实验设计中的数学对象、假设与适用条件",
+      "用分层与随机分配区分相关、选择偏差和因果效应",
+      "通过对照实验识别常见误区：增加有偏样本数量会消除系统偏差"
+    ],
+    "tags": ["采样偏差、混杂", "M02", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 26,
+    "relatedLessons": []
+  },
+  {
+    "id": "M02-027",
+    "moduleId": "M02",
+    "slug": "math/probability/calibration",
+    "title": "预测不确定性与概率校准",
+    "summary": "用可靠性图区分准确率与概率可信度",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-012", "M02-020"],
+    "objectives": [
+      "解释预测不确定性与概率校准中的数学对象、假设与适用条件",
+      "用可靠性图区分准确率与概率可信度",
+      "通过对照实验识别常见误区：准确率高意味着概率输出一定校准"
+    ],
+    "tags": ["预测不确定性", "M02", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 27,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-001",
+    "moduleId": "M03",
+    "slug": "math/optimization/derivatives",
+    "title": "导数与局部变化率",
+    "summary": "用割线趋近切线理解局部灵敏度",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": [],
+    "objectives": [
+      "解释导数与局部变化率中的数学对象、假设与适用条件",
+      "用割线趋近切线理解局部灵敏度",
+      "通过对照实验识别常见误区：差分步长越小数值结果就必然越好"
+    ],
+    "tags": ["导数", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-002",
+    "moduleId": "M03",
+    "slug": "math/optimization/partial-derivatives",
+    "title": "偏导数",
+    "summary": "在其他坐标固定时测量单个变量的影响",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-001"],
+    "objectives": [
+      "解释偏导数中的数学对象、假设与适用条件",
+      "在其他坐标固定时测量单个变量的影响",
+      "通过对照实验识别常见误区：偏导时其他变量也应同时随意变化"
+    ],
+    "tags": ["偏导数", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-003",
+    "moduleId": "M03",
+    "slug": "math/optimization/gradient-fields",
+    "title": "梯度与梯度场",
+    "summary": "用等高线和方向导数观察最陡上升方向",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-002", "M01-007"],
+    "objectives": [
+      "解释梯度与梯度场中的数学对象、假设与适用条件",
+      "用等高线和方向导数观察最陡上升方向",
+      "通过对照实验识别常见误区：负梯度总是直接指向全局最优点"
+    ],
+    "tags": ["梯度", "M03", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-004",
+    "moduleId": "M03",
+    "slug": "math/optimization/chain-rule",
+    "title": "链式法则",
+    "summary": "将复合函数的局部变化率相乘",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-002"],
+    "objectives": [
+      "解释链式法则中的数学对象、假设与适用条件",
+      "将复合函数的局部变化率相乘",
+      "通过对照实验识别常见误区：只求最外层导数即可得到复合函数导数"
+    ],
+    "tags": ["链式法则", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-005",
+    "moduleId": "M03",
+    "slug": "math/optimization/jacobian",
+    "title": "Jacobian",
+    "summary": "将向量函数在工作点附近线性化",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-004", "M01-011"],
+    "objectives": [
+      "解释Jacobian中的数学对象、假设与适用条件",
+      "将向量函数在工作点附近线性化",
+      "通过对照实验识别常见误区：Jacobian 的形状与输入输出维度无关"
+    ],
+    "tags": ["Jacobian", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-006",
+    "moduleId": "M03",
+    "slug": "math/optimization/hessian",
+    "title": "Hessian",
+    "summary": "用二阶变化区分曲率、极小值与鞍点",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-003", "M03-005"],
+    "objectives": [
+      "解释Hessian中的数学对象、假设与适用条件",
+      "用二阶变化区分曲率、极小值与鞍点",
+      "通过对照实验识别常见误区：梯度为零就一定是极小值"
+    ],
+    "tags": ["Hessian", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-007",
+    "moduleId": "M03",
+    "slug": "math/optimization/taylor",
+    "title": "一阶 Taylor 近似",
+    "summary": "比较局部线性预测与真实函数值",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-003"],
+    "objectives": [
+      "解释一阶 Taylor 近似中的数学对象、假设与适用条件",
+      "比较局部线性预测与真实函数值",
+      "通过对照实验识别常见误区：一阶近似在任意远处都同样准确"
+    ],
+    "tags": ["一阶 Taylor 近似", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-008",
+    "moduleId": "M03",
+    "slug": "math/optimization/convexity",
+    "title": "凸集与凸函数",
+    "summary": "通过线段判定凸性及其优化意义",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-002"],
+    "objectives": [
+      "解释凸集与凸函数中的数学对象、假设与适用条件",
+      "通过线段判定凸性及其优化意义",
+      "通过对照实验识别常见误区：所有看起来像碗的局部曲面都全局凸"
+    ],
+    "tags": ["凸集", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-009",
+    "moduleId": "M03",
+    "slug": "math/optimization/optimality",
+    "title": "优化问题与最优性条件",
+    "summary": "区分目标、可行域和局部全局最优",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-003", "M03-008"],
+    "objectives": [
+      "解释优化问题与最优性条件中的数学对象、假设与适用条件",
+      "区分目标、可行域和局部全局最优",
+      "通过对照实验识别常见误区：所有最优点的梯度必须为零"
+    ],
+    "tags": ["优化问题", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-010",
+    "moduleId": "M03",
+    "slug": "math/optimization/gradient-descent",
+    "title": "梯度下降",
+    "summary": "逐步执行负梯度更新并检查损失变化",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-007", "M03-009"],
+    "objectives": [
+      "解释梯度下降中的数学对象、假设与适用条件",
+      "逐步执行负梯度更新并检查损失变化",
+      "通过对照实验识别常见误区：只要沿负梯度走，任意步长都会下降"
+    ],
+    "tags": ["梯度下降", "M03", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-011",
+    "moduleId": "M03",
+    "slug": "math/optimization/learning-rate",
+    "title": "学习率与收敛性",
+    "summary": "用二次模型观察收敛、振荡与发散",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-010", "M03-006"],
+    "objectives": [
+      "解释学习率与收敛性中的数学对象、假设与适用条件",
+      "用二次模型观察收敛、振荡与发散",
+      "通过对照实验识别常见误区：振荡一定意味着算法无法收敛"
+    ],
+    "tags": ["学习率", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-012",
+    "moduleId": "M03",
+    "slug": "math/optimization/sgd",
+    "title": "随机梯度下降 SGD",
+    "summary": "比较单样本更新与全数据梯度",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-010", "M02-009"],
+    "objectives": [
+      "解释随机梯度下降 SGD中的数学对象、假设与适用条件",
+      "比较单样本更新与全数据梯度",
+      "通过对照实验识别常见误区：SGD 的每一步都会降低全数据损失"
+    ],
+    "tags": ["随机梯度下降 SGD", "M03", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-013",
+    "moduleId": "M03",
+    "slug": "math/optimization/minibatch",
+    "title": "Mini-batch 与梯度噪声",
+    "summary": "测量 batch 大小对梯度估计波动的影响",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-012", "M02-010"],
+    "objectives": [
+      "解释Mini-batch 与梯度噪声中的数学对象、假设与适用条件",
+      "测量 batch 大小对梯度估计波动的影响",
+      "通过对照实验识别常见误区：batch 翻倍必然让训练速度翻倍"
+    ],
+    "tags": ["Mini-batch ", "M03", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-014",
+    "moduleId": "M03",
+    "slug": "math/optimization/momentum",
+    "title": "Momentum",
+    "summary": "用速度累积解释惯性与谷底振荡",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-012"],
+    "objectives": [
+      "解释Momentum中的数学对象、假设与适用条件",
+      "用速度累积解释惯性与谷底振荡",
+      "通过对照实验识别常见误区：动量只使用当前梯度而没有历史信息"
+    ],
+    "tags": ["Momentum", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-015",
+    "moduleId": "M03",
+    "slug": "math/optimization/adam",
+    "title": "Adam",
+    "summary": "解释一二阶矩、偏差修正和逐坐标缩放",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-014", "M03-013"],
+    "objectives": [
+      "解释Adam中的数学对象、假设与适用条件",
+      "解释一二阶矩、偏差修正和逐坐标缩放",
+      "通过对照实验识别常见误区：Adam 不需要选择学习率或处理数值稳定性"
+    ],
+    "tags": ["Adam", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-016",
+    "moduleId": "M03",
+    "slug": "math/optimization/floating-point",
+    "title": "浮点数与舍入误差",
+    "summary": "观察有限表示、舍入和运算顺序",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": [],
+    "objectives": [
+      "解释浮点数与舍入误差中的数学对象、假设与适用条件",
+      "观察有限表示、舍入和运算顺序",
+      "通过对照实验识别常见误区：浮点加法严格满足结合律"
+    ],
+    "tags": ["浮点数", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-017",
+    "moduleId": "M03",
+    "slug": "math/optimization/numerical-stability",
+    "title": "数值稳定性",
+    "summary": "用等价变形避免溢出、下溢和灾难性消减",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-016"],
+    "objectives": [
+      "解释数值稳定性中的数学对象、假设与适用条件",
+      "用等价变形避免溢出、下溢和灾难性消减",
+      "通过对照实验识别常见误区：数学等价的公式在浮点计算中同样可靠"
+    ],
+    "tags": ["数值稳定性", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 17,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-018",
+    "moduleId": "M03",
+    "slug": "math/optimization/computation-graphs",
+    "title": "计算图",
+    "summary": "将表达式拆成节点并追踪局部导数",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-004"],
+    "objectives": [
+      "解释计算图中的数学对象、假设与适用条件",
+      "将表达式拆成节点并追踪局部导数",
+      "通过对照实验识别常见误区：同一变量的多条路径只保留其中一条梯度"
+    ],
+    "tags": ["计算图", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 18,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-019",
+    "moduleId": "M03",
+    "slug": "math/optimization/autodiff",
+    "title": "自动微分",
+    "summary": "比较前向模式、反向模式和数值差分",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-018", "M03-005"],
+    "objectives": [
+      "解释自动微分中的数学对象、假设与适用条件",
+      "比较前向模式、反向模式和数值差分",
+      "通过对照实验识别常见误区：自动微分就是对函数做很小步长的数值差分"
+    ],
+    "tags": ["自动微分", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 19,
+    "relatedLessons": []
+  },
+  {
+    "id": "M03-020",
+    "moduleId": "M03",
+    "slug": "math/optimization/lagrange",
+    "title": "约束优化与 Lagrange 乘子",
+    "summary": "用等式约束理解目标梯度与约束梯度关系",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-009", "M03-004"],
+    "objectives": [
+      "解释约束优化与 Lagrange 乘子中的数学对象、假设与适用条件",
+      "用等式约束理解目标梯度与约束梯度关系",
+      "通过对照实验识别常见误区：不检查约束资格和可行性就能直接套乘子法"
+    ],
+    "tags": ["约束优化", "M03", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 20,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-001",
+    "moduleId": "M04",
+    "slug": "learning/foundations/learning-paradigms",
+    "title": "监督学习与无监督学习",
+    "summary": "区分有标签预测与无标签结构发现",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": [],
+    "objectives": [
+      "解释监督学习与无监督学习中的数学对象、假设与适用条件",
+      "区分有标签预测与无标签结构发现",
+      "通过对照实验识别常见误区：无监督学习不需要评价标准"
+    ],
+    "tags": ["监督学习", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-002",
+    "moduleId": "M04",
+    "slug": "learning/foundations/prediction-targets",
+    "title": "回归、分类与预测目标",
+    "summary": "根据输出含义选择回归或分类目标",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-001"],
+    "objectives": [
+      "解释回归、分类与预测目标中的数学对象、假设与适用条件",
+      "根据输出含义选择回归或分类目标",
+      "通过对照实验识别常见误区：数字标签一定意味着回归问题"
+    ],
+    "tags": ["回归、分类", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-003",
+    "moduleId": "M04",
+    "slug": "learning/foundations/datasets",
+    "title": "数据集、标签与特征",
+    "summary": "定义样本单位、特征生成时刻与标签可用性",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-002"],
+    "objectives": [
+      "解释数据集、标签与特征中的数学对象、假设与适用条件",
+      "定义样本单位、特征生成时刻与标签可用性",
+      "通过对照实验识别常见误区：把采样点数当作独立设备数不会影响评估"
+    ],
+    "tags": ["数据集、标签", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-004",
+    "moduleId": "M04",
+    "slug": "learning/foundations/data-splits",
+    "title": "训练、验证与测试划分",
+    "summary": "为参数拟合、模型选择与最终报告分配独立数据",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-003"],
+    "objectives": [
+      "解释训练、验证与测试划分中的数学对象、假设与适用条件",
+      "为参数拟合、模型选择与最终报告分配独立数据",
+      "通过对照实验识别常见误区：测试集可以无限次参与模型选择"
+    ],
+    "tags": ["训练、验证", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-005",
+    "moduleId": "M04",
+    "slug": "learning/foundations/empirical-risk",
+    "title": "经验风险与期望风险",
+    "summary": "区分训练样本平均损失与目标分布上的期望",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-004", "M02-009"],
+    "objectives": [
+      "解释经验风险与期望风险中的数学对象、假设与适用条件",
+      "区分训练样本平均损失与目标分布上的期望",
+      "通过对照实验识别常见误区：训练误差就是部署误差"
+    ],
+    "tags": ["经验风险", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-006",
+    "moduleId": "M04",
+    "slug": "learning/foundations/under-overfitting",
+    "title": "欠拟合与过拟合",
+    "summary": "通过模型复杂度观察训练与验证误差",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-005"],
+    "objectives": [
+      "解释欠拟合与过拟合中的数学对象、假设与适用条件",
+      "通过模型复杂度观察训练与验证误差",
+      "通过对照实验识别常见误区：训练误差越小模型就越好"
+    ],
+    "tags": ["欠拟合", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-007",
+    "moduleId": "M04",
+    "slug": "learning/foundations/bias-variance",
+    "title": "偏差—方差分解",
+    "summary": "通过重复训练集分解平方预测误差",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-006", "M02-010"],
+    "objectives": [
+      "解释偏差—方差分解中的数学对象、假设与适用条件",
+      "通过重复训练集分解平方预测误差",
+      "通过对照实验识别常见误区：偏差与方差能对所有指标直接使用同一分解"
+    ],
+    "tags": ["偏差—方差分解", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-008",
+    "moduleId": "M04",
+    "slug": "learning/foundations/generalization",
+    "title": "泛化误差",
+    "summary": "比较训练分布、样本规模和模型选择对泛化的影响",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-007"],
+    "objectives": [
+      "解释泛化误差中的数学对象、假设与适用条件",
+      "比较训练分布、样本规模和模型选择对泛化的影响",
+      "通过对照实验识别常见误区：样本数很大就能消除分布偏移"
+    ],
+    "tags": ["泛化误差", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-009",
+    "moduleId": "M04",
+    "slug": "learning/foundations/data-leakage",
+    "title": "数据泄漏",
+    "summary": "识别未来信息、全数据预处理与重复样本泄漏",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-004"],
+    "objectives": [
+      "解释数据泄漏中的数学对象、假设与适用条件",
+      "识别未来信息、全数据预处理与重复样本泄漏",
+      "通过对照实验识别常见误区：无标签预处理就绝不可能泄漏"
+    ],
+    "tags": ["数据泄漏", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-010",
+    "moduleId": "M04",
+    "slug": "learning/foundations/cross-validation",
+    "title": "交叉验证",
+    "summary": "在每折内重新拟合完整处理流水线",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-004", "M04-009"],
+    "objectives": [
+      "解释交叉验证中的数学对象、假设与适用条件",
+      "在每折内重新拟合完整处理流水线",
+      "通过对照实验识别常见误区：交叉验证总能替代最终独立测试"
+    ],
+    "tags": ["交叉验证", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-011",
+    "moduleId": "M04",
+    "slug": "learning/foundations/group-validation",
+    "title": "分组验证",
+    "summary": "按设备、用户或采集批次隔离相关样本",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-010"],
+    "objectives": [
+      "解释分组验证中的数学对象、假设与适用条件",
+      "按设备、用户或采集批次隔离相关样本",
+      "通过对照实验识别常见误区：同一设备的重复测量可以视作完全独立样本"
+    ],
+    "tags": ["分组验证", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-012",
+    "moduleId": "M04",
+    "slug": "learning/foundations/feature-scaling",
+    "title": "特征缩放",
+    "summary": "比较标准化、范围缩放与零方差处理",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-003", "M02-010"],
+    "objectives": [
+      "解释特征缩放中的数学对象、假设与适用条件",
+      "比较标准化、范围缩放与零方差处理",
+      "通过对照实验识别常见误区：标准化应对每个测试批次重新拟合"
+    ],
+    "tags": ["特征缩放", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-013",
+    "moduleId": "M04",
+    "slug": "learning/foundations/categorical-encoding",
+    "title": "类别特征编码",
+    "summary": "区分类别身份、顺序和编码带来的假设",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-003"],
+    "objectives": [
+      "解释类别特征编码中的数学对象、假设与适用条件",
+      "区分类别身份、顺序和编码带来的假设",
+      "通过对照实验识别常见误区：任意类别编码为整数都不会影响模型"
+    ],
+    "tags": ["类别特征编码", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-014",
+    "moduleId": "M04",
+    "slug": "learning/foundations/missing-values",
+    "title": "缺失值处理",
+    "summary": "区分缺失机制、填补值与缺失指示特征",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-003", "M04-009"],
+    "objectives": [
+      "解释缺失值处理中的数学对象、假设与适用条件",
+      "区分缺失机制、填补值与缺失指示特征",
+      "通过对照实验识别常见误区：填补后就可以忽略缺失机制"
+    ],
+    "tags": ["缺失值处理", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-015",
+    "moduleId": "M04",
+    "slug": "learning/foundations/feature-engineering",
+    "title": "特征工程与工程假设",
+    "summary": "把物理假设变成可在推理时计算的特征",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-012", "M04-013", "M04-014"],
+    "objectives": [
+      "解释特征工程与工程假设中的数学对象、假设与适用条件",
+      "把物理假设变成可在推理时计算的特征",
+      "通过对照实验识别常见误区：任何提升离线分数的特征都可部署"
+    ],
+    "tags": ["特征工程", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-016",
+    "moduleId": "M04",
+    "slug": "learning/foundations/regression-errors",
+    "title": "MAE、MSE 与 RMSE",
+    "summary": "比较误差单位与离群点敏感性",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-002", "M02-009"],
+    "objectives": [
+      "解释MAE、MSE 与 RMSE中的数学对象、假设与适用条件",
+      "比较误差单位与离群点敏感性",
+      "通过对照实验识别常见误区：同一 MAE 意味着误差分布相同"
+    ],
+    "tags": ["MAE、MSE ", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-017",
+    "moduleId": "M04",
+    "slug": "learning/foundations/r-squared",
+    "title": "R² 与回归基线",
+    "summary": "相对均值预测器解释模型效果及负值",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-016", "M02-010"],
+    "objectives": [
+      "解释R² 与回归基线中的数学对象、假设与适用条件",
+      "相对均值预测器解释模型效果及负值",
+      "通过对照实验识别常见误区：R² 必须介于 0 与 1"
+    ],
+    "tags": ["R² ", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 17,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-018",
+    "moduleId": "M04",
+    "slug": "learning/foundations/confusion-matrix",
+    "title": "混淆矩阵",
+    "summary": "固定行列语义并统计分类错误类型",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-002"],
+    "objectives": [
+      "解释混淆矩阵中的数学对象、假设与适用条件",
+      "固定行列语义并统计分类错误类型",
+      "通过对照实验识别常见误区：所有工具的混淆矩阵行列定义都相同"
+    ],
+    "tags": ["混淆矩阵", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 18,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-019",
+    "moduleId": "M04",
+    "slug": "learning/foundations/precision-recall",
+    "title": "Precision、Recall 与 F1",
+    "summary": "连接漏检、误报和分母为零时的约定",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-018"],
+    "objectives": [
+      "解释Precision、Recall 与 F1中的数学对象、假设与适用条件",
+      "连接漏检、误报和分母为零时的约定",
+      "通过对照实验识别常见误区：F1 高意味着真负例表现也一定好"
+    ],
+    "tags": ["Precision、Recall ", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 19,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-020",
+    "moduleId": "M04",
+    "slug": "learning/foundations/roc-auc",
+    "title": "ROC 与 AUC",
+    "summary": "随阈值变化绘制真阳性率与假阳性率",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-019"],
+    "objectives": [
+      "解释ROC 与 AUC中的数学对象、假设与适用条件",
+      "随阈值变化绘制真阳性率与假阳性率",
+      "通过对照实验识别常见误区：AUC 高就保证某个指定阈值的误报率低"
+    ],
+    "tags": ["ROC ", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 20,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-021",
+    "moduleId": "M04",
+    "slug": "learning/foundations/pr-curves",
+    "title": "PR 曲线与类别比例",
+    "summary": "用稀有正例解释 PR 与 ROC 的差异",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-019"],
+    "objectives": [
+      "解释PR 曲线与类别比例中的数学对象、假设与适用条件",
+      "用稀有正例解释 PR 与 ROC 的差异",
+      "通过对照实验识别常见误区：PR 曲线可以脱离类别比例直接跨数据集比较"
+    ],
+    "tags": ["PR 曲线", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 21,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-022",
+    "moduleId": "M04",
+    "slug": "learning/foundations/baselines",
+    "title": "基线模型",
+    "summary": "先建立常数、规则和简单模型的可复现基准",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-004", "M04-016", "M04-019"],
+    "objectives": [
+      "解释基线模型中的数学对象、假设与适用条件",
+      "先建立常数、规则和简单模型的可复现基准",
+      "通过对照实验识别常见误区：没有简单基线也能判断复杂模型是否值得"
+    ],
+    "tags": ["基线模型", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 22,
+    "relatedLessons": []
+  },
+  {
+    "id": "M04-023",
+    "moduleId": "M04",
+    "slug": "learning/foundations/ablation",
+    "title": "消融实验",
+    "summary": "控制变量评估模块的增量价值",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-022", "M02-026"],
+    "objectives": [
+      "解释消融实验中的数学对象、假设与适用条件",
+      "控制变量评估模块的增量价值",
+      "通过对照实验识别常见误区：单次去掉组件后分数变化就证明其因果贡献"
+    ],
+    "tags": ["消融实验", "M04", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 23,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-001",
+    "moduleId": "M05",
+    "slug": "learning/classical/linear-regression",
+    "title": "线性回归",
+    "summary": "用平方损失拟合线性预测器并检查残差",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-020", "M04-005"],
+    "objectives": [
+      "解释线性回归中的数学对象、假设与适用条件",
+      "用平方损失拟合线性预测器并检查残差",
+      "通过对照实验识别常见误区：线性回归不能使用非线性的输入特征"
+    ],
+    "tags": ["线性回归", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-002",
+    "moduleId": "M05",
+    "slug": "learning/classical/ridge",
+    "title": "Ridge 回归",
+    "summary": "观察 L2 惩罚对共线特征和系数稳定性的影响",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-001"],
+    "objectives": [
+      "解释Ridge 回归中的数学对象、假设与适用条件",
+      "观察 L2 惩罚对共线特征和系数稳定性的影响",
+      "通过对照实验识别常见误区：Ridge 会自动完成稀疏特征选择"
+    ],
+    "tags": ["Ridge 回归", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-003",
+    "moduleId": "M05",
+    "slug": "learning/classical/lasso",
+    "title": "Lasso 回归",
+    "summary": "用软阈值理解稀疏系数",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-001", "M03-010"],
+    "objectives": [
+      "解释Lasso 回归中的数学对象、假设与适用条件",
+      "用软阈值理解稀疏系数",
+      "通过对照实验识别常见误区：稀疏系数证明被删除特征在物理上无用"
+    ],
+    "tags": ["Lasso 回归", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-004",
+    "moduleId": "M05",
+    "slug": "learning/classical/elastic-net",
+    "title": "Elastic Net",
+    "summary": "连接稀疏选择和相关特征的共同收缩",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-002", "M05-003"],
+    "objectives": [
+      "解释Elastic Net中的数学对象、假设与适用条件",
+      "连接稀疏选择和相关特征的共同收缩",
+      "通过对照实验识别常见误区：混合正则化无需重新选择惩罚强度"
+    ],
+    "tags": ["Elastic Net", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-005",
+    "moduleId": "M05",
+    "slug": "learning/classical/logistic-regression",
+    "title": "Logistic Regression",
+    "summary": "用 sigmoid 与交叉熵建立线性概率分类器",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-005", "M02-024", "M03-010"],
+    "objectives": [
+      "解释Logistic Regression中的数学对象、假设与适用条件",
+      "用 sigmoid 与交叉熵建立线性概率分类器",
+      "通过对照实验识别常见误区：Logistic Regression 是连续目标的普通回归"
+    ],
+    "tags": ["Logistic Regression", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-006",
+    "moduleId": "M05",
+    "slug": "learning/classical/knn",
+    "title": "kNN",
+    "summary": "观察距离、邻居数和尺度对局部预测的影响",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-008", "M04-012"],
+    "objectives": [
+      "解释kNN中的数学对象、假设与适用条件",
+      "观察距离、邻居数和尺度对局部预测的影响",
+      "通过对照实验识别常见误区：kNN 不训练参数就没有模型选择问题"
+    ],
+    "tags": ["kNN", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-007",
+    "moduleId": "M05",
+    "slug": "learning/classical/decision-trees",
+    "title": "决策树",
+    "summary": "用候选阈值分裂降低节点不纯度",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-005", "M02-024"],
+    "objectives": [
+      "解释决策树中的数学对象、假设与适用条件",
+      "用候选阈值分裂降低节点不纯度",
+      "通过对照实验识别常见误区：更深的树必然有更好泛化"
+    ],
+    "tags": ["决策树", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-008",
+    "moduleId": "M05",
+    "slug": "learning/classical/random-forest",
+    "title": "Random Forest",
+    "summary": "观察自助采样、随机特征和树间相关性",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-007", "M04-007"],
+    "objectives": [
+      "解释Random Forest中的数学对象、假设与适用条件",
+      "观察自助采样、随机特征和树间相关性",
+      "通过对照实验识别常见误区：树的数量越多就能消除所有偏差"
+    ],
+    "tags": ["Random Forest", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-009",
+    "moduleId": "M05",
+    "slug": "learning/classical/gradient-boosting",
+    "title": "Gradient Boosting",
+    "summary": "用逐轮拟合负梯度解释加法模型",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-007", "M03-003"],
+    "objectives": [
+      "解释Gradient Boosting中的数学对象、假设与适用条件",
+      "用逐轮拟合负梯度解释加法模型",
+      "通过对照实验识别常见误区：Boosting 中所有树互相独立训练"
+    ],
+    "tags": ["Gradient Boosting", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-010",
+    "moduleId": "M05",
+    "slug": "learning/classical/xgboost",
+    "title": "XGBoost 的工程机制",
+    "summary": "用二阶统计、正则化和缺失分支解释分裂打分",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-009", "M03-006"],
+    "objectives": [
+      "解释XGBoost 的工程机制中的数学对象、假设与适用条件",
+      "用二阶统计、正则化和缺失分支解释分裂打分",
+      "通过对照实验识别常见误区：XGBoost 只是给任意决策树增加并行执行"
+    ],
+    "tags": ["XGBoost 的工程机制", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-011",
+    "moduleId": "M05",
+    "slug": "learning/classical/svm",
+    "title": "支持向量机 SVM",
+    "summary": "连接间隔、hinge loss 和软间隔惩罚",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-007", "M03-020"],
+    "objectives": [
+      "解释支持向量机 SVM中的数学对象、假设与适用条件",
+      "连接间隔、hinge loss 和软间隔惩罚",
+      "通过对照实验识别常见误区：所有训练样本都等量决定 SVM 边界"
+    ],
+    "tags": ["支持向量机 SVM", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-012",
+    "moduleId": "M05",
+    "slug": "learning/classical/kernels",
+    "title": "Kernel 方法",
+    "summary": "用隐式特征映射解释非线性决策边界",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-011"],
+    "objectives": [
+      "解释Kernel 方法中的数学对象、假设与适用条件",
+      "用隐式特征映射解释非线性决策边界",
+      "通过对照实验识别常见误区：任意相似度函数都自动是有效核"
+    ],
+    "tags": ["Kernel 方法", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-013",
+    "moduleId": "M05",
+    "slug": "learning/classical/k-means",
+    "title": "K-Means",
+    "summary": "逐步执行分配与均值更新",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-008", "M04-001"],
+    "objectives": [
+      "解释K-Means中的数学对象、假设与适用条件",
+      "逐步执行分配与均值更新",
+      "通过对照实验识别常见误区：K-Means 一定找到全局最优且适合任意簇形状"
+    ],
+    "tags": ["K-Means", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-014",
+    "moduleId": "M05",
+    "slug": "learning/classical/pca",
+    "title": "PCA",
+    "summary": "连接最大方差方向与最小重构误差",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-018", "M02-014"],
+    "objectives": [
+      "解释PCA中的数学对象、假设与适用条件",
+      "连接最大方差方向与最小重构误差",
+      "通过对照实验识别常见误区：最大方差方向一定最能区分类别"
+    ],
+    "tags": ["PCA", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-015",
+    "moduleId": "M05",
+    "slug": "learning/classical/gmm",
+    "title": "Gaussian Mixture Model",
+    "summary": "用软归属表示多个高斯生成机制",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M02-008", "M02-011"],
+    "objectives": [
+      "解释Gaussian Mixture Model中的数学对象、假设与适用条件",
+      "用软归属表示多个高斯生成机制",
+      "通过对照实验识别常见误区：混合模型中的每个样本只能归属一个分量"
+    ],
+    "tags": ["Gaussian Mixture Model", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-016",
+    "moduleId": "M05",
+    "slug": "learning/classical/expectation-maximization",
+    "title": "EM 算法",
+    "summary": "交替估计隐变量责任度和模型参数",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-015", "M02-019", "M02-012"],
+    "objectives": [
+      "解释EM 算法中的数学对象、假设与适用条件",
+      "交替估计隐变量责任度和模型参数",
+      "通过对照实验识别常见误区：EM 保证找到全局最大似然"
+    ],
+    "tags": ["EM 算法", "M05", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-017",
+    "moduleId": "M05",
+    "slug": "learning/classical/isolation-forest",
+    "title": "Isolation Forest",
+    "summary": "用随机切分下的隔离路径长度判断异常",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-007"],
+    "objectives": [
+      "解释Isolation Forest中的数学对象、假设与适用条件",
+      "用随机切分下的隔离路径长度判断异常",
+      "通过对照实验识别常见误区：所有罕见点都是应当报警的故障"
+    ],
+    "tags": ["Isolation Forest", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 17,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-018",
+    "moduleId": "M05",
+    "slug": "learning/classical/anomaly-thresholds",
+    "title": "异常分数与阈值选择",
+    "summary": "结合误报成本和验证数据选择阈值",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-017", "M04-021"],
+    "objectives": [
+      "解释异常分数与阈值选择中的数学对象、假设与适用条件",
+      "结合误报成本和验证数据选择阈值",
+      "通过对照实验识别常见误区：异常分数天然就是故障概率"
+    ],
+    "tags": ["异常分数", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 18,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-019",
+    "moduleId": "M05",
+    "slug": "learning/classical/hyperparameter-search",
+    "title": "超参数搜索",
+    "summary": "比较网格、随机搜索与预算约束",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-010"],
+    "objectives": [
+      "解释超参数搜索中的数学对象、假设与适用条件",
+      "比较网格、随机搜索与预算约束",
+      "通过对照实验识别常见误区：搜索越多就能保证最终测试表现更好"
+    ],
+    "tags": ["超参数搜索", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 19,
+    "relatedLessons": []
+  },
+  {
+    "id": "M05-020",
+    "moduleId": "M05",
+    "slug": "learning/classical/model-selection",
+    "title": "模型选择与选择偏差",
+    "summary": "用重复选择解释验证集上的乐观偏差",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M05-019", "M04-008", "M04-009"],
+    "objectives": [
+      "解释模型选择与选择偏差中的数学对象、假设与适用条件",
+      "用重复选择解释验证集上的乐观偏差",
+      "通过对照实验识别常见误区：获胜模型的验证分数是不偏的最终表现估计"
+    ],
+    "tags": ["模型选择", "M05", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 20,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-001",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/neurons",
+    "title": "人工神经元与感知机",
+    "summary": "从加权和与阈值建立决策边界",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-007", "M04-002"],
+    "objectives": [
+      "解释人工神经元与感知机中的数学对象、假设与适用条件",
+      "从加权和与阈值建立决策边界",
+      "通过对照实验识别常见误区：单个线性阈值神经元可以表示任意分类边界"
+    ],
+    "tags": ["人工神经元", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-002",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/mlp",
+    "title": "MLP 与函数近似",
+    "summary": "比较多层组合与隐藏单元的表达能力",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-001", "M01-011"],
+    "objectives": [
+      "解释MLP 与函数近似中的数学对象、假设与适用条件",
+      "比较多层组合与隐藏单元的表达能力",
+      "通过对照实验识别常见误区：通用近似定理保证有限数据训练成功"
+    ],
+    "tags": ["MLP ", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-003",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/activations",
+    "title": "激活函数与梯度",
+    "summary": "比较 sigmoid、tanh、ReLU 的输出与导数",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-001", "M03-001"],
+    "objectives": [
+      "解释激活函数与梯度中的数学对象、假设与适用条件",
+      "比较 sigmoid、tanh、ReLU 的输出与导数",
+      "通过对照实验识别常见误区：所有激活函数在每一点都可微"
+    ],
+    "tags": ["激活函数", "M06", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-004",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/loss-functions",
+    "title": "损失函数的选择",
+    "summary": "根据预测目标选择平方损失与交叉熵",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-005", "M02-024"],
+    "objectives": [
+      "解释损失函数的选择中的数学对象、假设与适用条件",
+      "根据预测目标选择平方损失与交叉熵",
+      "通过对照实验识别常见误区：训练损失和业务评价指标必须完全相同"
+    ],
+    "tags": ["损失函数的选择", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-005",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/backpropagation",
+    "title": "反向传播",
+    "summary": "用链式法则计算每层参数梯度",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-002", "M06-003", "M06-004", "M03-019"],
+    "objectives": [
+      "解释反向传播中的数学对象、假设与适用条件",
+      "用链式法则计算每层参数梯度",
+      "通过对照实验识别常见误区：反向传播会自动决定采用哪种优化器"
+    ],
+    "tags": ["反向传播", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-006",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/initialization",
+    "title": "参数初始化",
+    "summary": "观察尺度与对称性对激活和梯度的影响",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-005", "M02-010"],
+    "objectives": [
+      "解释参数初始化中的数学对象、假设与适用条件",
+      "观察尺度与对称性对激活和梯度的影响",
+      "通过对照实验识别常见误区：所有网络统一初始化为零最稳定"
+    ],
+    "tags": ["参数初始化", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-007",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/training-units",
+    "title": "Batch、Epoch 与 Optimizer",
+    "summary": "区分样本遍历、参数更新和优化器状态",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-005", "M03-013"],
+    "objectives": [
+      "解释Batch、Epoch 与 Optimizer中的数学对象、假设与适用条件",
+      "区分样本遍历、参数更新和优化器状态",
+      "通过对照实验识别常见误区：一个 epoch 就是一次参数更新"
+    ],
+    "tags": ["Batch、Epoch ", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-008",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/batchnorm",
+    "title": "BatchNorm",
+    "summary": "区分 batch 统计、可学习缩放与推理运行统计",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-007", "M02-010"],
+    "objectives": [
+      "解释BatchNorm中的数学对象、假设与适用条件",
+      "区分 batch 统计、可学习缩放与推理运行统计",
+      "通过对照实验识别常见误区：训练与推理模式的 BatchNorm 完全相同"
+    ],
+    "tags": ["BatchNorm", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-009",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/layernorm",
+    "title": "LayerNorm",
+    "summary": "在单样本特征轴归一化并对比 BatchNorm",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-002", "M02-010"],
+    "objectives": [
+      "解释LayerNorm中的数学对象、假设与适用条件",
+      "在单样本特征轴归一化并对比 BatchNorm",
+      "通过对照实验识别常见误区：LayerNorm 默认在 batch 维求均值"
+    ],
+    "tags": ["LayerNorm", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-010",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/dropout",
+    "title": "Dropout",
+    "summary": "用随机屏蔽理解训练期正则化与期望缩放",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-002", "M04-006"],
+    "objectives": [
+      "解释Dropout中的数学对象、假设与适用条件",
+      "用随机屏蔽理解训练期正则化与期望缩放",
+      "通过对照实验识别常见误区：推理时也应随机丢弃同等比例神经元"
+    ],
+    "tags": ["Dropout", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-011",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/weight-decay",
+    "title": "Weight Decay",
+    "summary": "区分参数收缩与不同优化器中的 L2 惩罚",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-007", "M05-002"],
+    "objectives": [
+      "解释Weight Decay中的数学对象、假设与适用条件",
+      "区分参数收缩与不同优化器中的 L2 惩罚",
+      "通过对照实验识别常见误区：Weight Decay 在所有优化器里都等价于 L2 正则"
+    ],
+    "tags": ["Weight Decay", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-012",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/early-stopping",
+    "title": "Early Stopping",
+    "summary": "用验证监控与最佳检查点控制过拟合",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-007", "M04-004"],
+    "objectives": [
+      "解释Early Stopping中的数学对象、假设与适用条件",
+      "用验证监控与最佳检查点控制过拟合",
+      "通过对照实验识别常见误区：停止时的最后一组参数必然就是最佳参数"
+    ],
+    "tags": ["Early Stopping", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-013",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/loss-curves",
+    "title": "训练与验证损失曲线",
+    "summary": "结合模式差异、数据分布和噪声诊断训练",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-007", "M04-006"],
+    "objectives": [
+      "解释训练与验证损失曲线中的数学对象、假设与适用条件",
+      "结合模式差异、数据分布和噪声诊断训练",
+      "通过对照实验识别常见误区：验证损失低于训练损失一定说明数据泄漏"
+    ],
+    "tags": ["训练", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-014",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/gradient-pathologies",
+    "title": "梯度消失与梯度爆炸",
+    "summary": "通过 Jacobian 连乘解释深层梯度尺度",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-005", "M06-006"],
+    "objectives": [
+      "解释梯度消失与梯度爆炸中的数学对象、假设与适用条件",
+      "通过 Jacobian 连乘解释深层梯度尺度",
+      "通过对照实验识别常见误区：梯度裁剪可以从根本上解决所有梯度消失"
+    ],
+    "tags": ["梯度消失", "M06", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-015",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/convolutions",
+    "title": "卷积运算与 CNN",
+    "summary": "解释局部连接、权重共享和常见互相关约定",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-002", "M01-021"],
+    "objectives": [
+      "解释卷积运算与 CNN中的数学对象、假设与适用条件",
+      "解释局部连接、权重共享和常见互相关约定",
+      "通过对照实验识别常见误区：深度学习框架中的卷积必然翻转卷积核"
+    ],
+    "tags": ["卷积运算", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-016",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/receptive-fields",
+    "title": "池化、步幅与感受野",
+    "summary": "逐层计算输出尺寸和理论感受野",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-015"],
+    "objectives": [
+      "解释池化、步幅与感受野中的数学对象、假设与适用条件",
+      "逐层计算输出尺寸和理论感受野",
+      "通过对照实验识别常见误区：理论感受野覆盖的每个位置实际影响一样大"
+    ],
+    "tags": ["池化、步幅", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-017",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/residuals",
+    "title": "残差连接",
+    "summary": "观察恒等路径对信息和梯度传播的影响",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-014"],
+    "objectives": [
+      "解释残差连接中的数学对象、假设与适用条件",
+      "观察恒等路径对信息和梯度传播的影响",
+      "通过对照实验识别常见误区：残差相加允许忽略张量形状"
+    ],
+    "tags": ["残差连接", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 17,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-018",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/embeddings",
+    "title": "Embedding",
+    "summary": "将离散 ID 映射到可学习向量并解释距离",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-002", "M04-013"],
+    "objectives": [
+      "解释Embedding中的数学对象、假设与适用条件",
+      "将离散 ID 映射到可学习向量并解释距离",
+      "通过对照实验识别常见误区：类别 ID 的数值差本身就是语义距离"
+    ],
+    "tags": ["Embedding", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 18,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-019",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/attention",
+    "title": "Attention",
+    "summary": "通过查询键相似度对值做加权聚合",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-018", "M01-011"],
+    "objectives": [
+      "解释Attention中的数学对象、假设与适用条件",
+      "通过查询键相似度对值做加权聚合",
+      "通过对照实验识别常见误区：注意力权重天然就是可靠的因果解释"
+    ],
+    "tags": ["Attention", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 19,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-020",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/self-attention",
+    "title": "Self-Attention",
+    "summary": "理解同一序列生成查询、键和值的上下文交互",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-019"],
+    "objectives": [
+      "解释Self-Attention中的数学对象、假设与适用条件",
+      "理解同一序列生成查询、键和值的上下文交互",
+      "通过对照实验识别常见误区：Self-Attention 自带绝对位置信息"
+    ],
+    "tags": ["Self-Attention", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 20,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-021",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/causal-mask",
+    "title": "Causal Mask",
+    "summary": "禁止当前位置读取未来 token",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-020"],
+    "objectives": [
+      "解释Causal Mask中的数学对象、假设与适用条件",
+      "禁止当前位置读取未来 token",
+      "通过对照实验识别常见误区：训练时使用完整序列就不需要 causal mask"
+    ],
+    "tags": ["Causal Mask", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 21,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-022",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/positional-encoding",
+    "title": "位置编码",
+    "summary": "用位置特征区分顺序并比较绝对相对方案",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-020"],
+    "objectives": [
+      "解释位置编码中的数学对象、假设与适用条件",
+      "用位置特征区分顺序并比较绝对相对方案",
+      "通过对照实验识别常见误区：加入位置编码就保证任意长序列外推可靠"
+    ],
+    "tags": ["位置编码", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 22,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-023",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/transformer",
+    "title": "Transformer 基本结构",
+    "summary": "组合注意力、前馈层、归一化与残差",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-009", "M06-017", "M06-020", "M06-022"],
+    "objectives": [
+      "解释Transformer 基本结构中的数学对象、假设与适用条件",
+      "组合注意力、前馈层、归一化与残差",
+      "通过对照实验识别常见误区：所有 Transformer 都采用完全相同的 block 顺序"
+    ],
+    "tags": ["Transformer 基本结构", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 23,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-024",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/transfer-learning",
+    "title": "迁移学习",
+    "summary": "比较从头学习和预训练表示的迁移",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-002", "M04-004"],
+    "objectives": [
+      "解释迁移学习中的数学对象、假设与适用条件",
+      "比较从头学习和预训练表示的迁移",
+      "通过对照实验识别常见误区：预训练模型必然比从头训练好"
+    ],
+    "tags": ["迁移学习", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 24,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-025",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/finetuning",
+    "title": "微调与冻结参数",
+    "summary": "比较全量微调、冻结骨干和分层学习率",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-024", "M06-007"],
+    "objectives": [
+      "解释微调与冻结参数中的数学对象、假设与适用条件",
+      "比较全量微调、冻结骨干和分层学习率",
+      "通过对照实验识别常见误区：设置某层学习率为零等价于取消所有训练期开销"
+    ],
+    "tags": ["微调", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 25,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-026",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/capacity",
+    "title": "模型容量",
+    "summary": "区分表达能力、有效容量与训练可达性",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-002", "M04-008"],
+    "objectives": [
+      "解释模型容量中的数学对象、假设与适用条件",
+      "区分表达能力、有效容量与训练可达性",
+      "通过对照实验识别常见误区：参数量完全决定泛化能力"
+    ],
+    "tags": ["模型容量", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 26,
+    "relatedLessons": []
+  },
+  {
+    "id": "M06-027",
+    "moduleId": "M06",
+    "slug": "learning/deep-learning/compute-complexity",
+    "title": "参数量与计算复杂度",
+    "summary": "估算参数、激活和算术操作并区分真实延迟",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-015", "M06-023", "M01-021"],
+    "objectives": [
+      "解释参数量与计算复杂度中的数学对象、假设与适用条件",
+      "估算参数、激活和算术操作并区分真实延迟",
+      "通过对照实验识别常见误区：FLOPs 更低必然意味着任何设备上延迟更低"
+    ],
+    "tags": ["参数量", "M06", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 27,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-001",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/sampling",
+    "title": "离散时间信号与采样",
+    "summary": "连接连续时间、采样间隔和离散索引",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": [],
+    "objectives": [
+      "解释离散时间信号与采样中的数学对象、假设与适用条件",
+      "连接连续时间、采样间隔和离散索引",
+      "通过对照实验识别常见误区：离散索引本身具有秒的单位"
+    ],
+    "tags": ["离散时间信号", "M07", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-002",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/aliasing",
+    "title": "混叠与采样条件",
+    "summary": "用可分辨频率解释混叠与采样前抗混叠",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-001"],
+    "objectives": [
+      "解释混叠与采样条件中的数学对象、假设与适用条件",
+      "用可分辨频率解释混叠与采样前抗混叠",
+      "通过对照实验识别常见误区：采样后低通总能恢复已经混叠的信息"
+    ],
+    "tags": ["混叠", "M07", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-003",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/noise-snr",
+    "title": "噪声模型与信噪比",
+    "summary": "比较白噪声、偏置和功率比",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-001", "M02-010"],
+    "objectives": [
+      "解释噪声模型与信噪比中的数学对象、假设与适用条件",
+      "比较白噪声、偏置和功率比",
+      "通过对照实验识别常见误区：所有噪声都可通过简单平均消除"
+    ],
+    "tags": ["噪声模型", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-004",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/correlation-functions",
+    "title": "自相关与互相关",
+    "summary": "用延迟扫描识别周期与相对时移",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-003", "M02-014"],
+    "objectives": [
+      "解释自相关与互相关中的数学对象、假设与适用条件",
+      "用延迟扫描识别周期与相对时移",
+      "通过对照实验识别常见误区：相关峰证明信号间存在直接因果作用"
+    ],
+    "tags": ["自相关", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-005",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/fft",
+    "title": "DFT、FFT 与频谱",
+    "summary": "区分变换定义、FFT 算法与频率轴",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-001", "M01-007"],
+    "objectives": [
+      "解释DFT、FFT 与频谱中的数学对象、假设与适用条件",
+      "区分变换定义、FFT 算法与频率轴",
+      "通过对照实验识别常见误区：FFT 输出索引不需要采样率就代表真实频率"
+    ],
+    "tags": ["DFT、FFT ", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-006",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/spectral-leakage",
+    "title": "频谱特征与频谱泄漏",
+    "summary": "比较截断、窗函数和幅度分辨能力",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-005", "M07-002"],
+    "objectives": [
+      "解释频谱特征与频谱泄漏中的数学对象、假设与适用条件",
+      "比较截断、窗函数和幅度分辨能力",
+      "通过对照实验识别常见误区：FFT 点数变多总能分开任意近的频率"
+    ],
+    "tags": ["频谱特征", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-007",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/stft",
+    "title": "STFT 与时频分析",
+    "summary": "用滑窗比较时间与频率分辨率",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-006"],
+    "objectives": [
+      "解释STFT 与时频分析中的数学对象、假设与适用条件",
+      "用滑窗比较时间与频率分辨率",
+      "通过对照实验识别常见误区：可以同时无限提高时间与频率分辨率"
+    ],
+    "tags": ["STFT ", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-008",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/windows",
+    "title": "滑动窗口与时序特征",
+    "summary": "定义窗口、步长和在线可用特征",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-001", "M04-015"],
+    "objectives": [
+      "解释滑动窗口与时序特征中的数学对象、假设与适用条件",
+      "定义窗口、步长和在线可用特征",
+      "通过对照实验识别常见误区：窗口数等于独立实验样本数"
+    ],
+    "tags": ["滑动窗口", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-009",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/temporal-validation",
+    "title": "时序切分与验证",
+    "summary": "用时间边界与隔离间隙防止窗口重叠泄漏",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-008", "M04-009", "M04-011"],
+    "objectives": [
+      "解释时序切分与验证中的数学对象、假设与适用条件",
+      "用时间边界与隔离间隙防止窗口重叠泄漏",
+      "通过对照实验识别常见误区：时序任务可以总用随机 K 折"
+    ],
+    "tags": ["时序切分", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-010",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/autoregression",
+    "title": "自回归预测",
+    "summary": "用滞后特征预测并区分一步与滚动多步",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-004", "M07-009", "M05-001"],
+    "objectives": [
+      "解释自回归预测中的数学对象、假设与适用条件",
+      "用滞后特征预测并区分一步与滚动多步",
+      "通过对照实验识别常见误区：一步预测优秀就保证长期滚动稳定"
+    ],
+    "tags": ["自回归预测", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-011",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/temporal-cnn",
+    "title": "一维 CNN 时序模型",
+    "summary": "用局部模式识别比较因果卷积与未来信息",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-008", "M06-016"],
+    "objectives": [
+      "解释一维 CNN 时序模型中的数学对象、假设与适用条件",
+      "用局部模式识别比较因果卷积与未来信息",
+      "通过对照实验识别常见误区：任意 padding 都适合实时因果预测"
+    ],
+    "tags": ["一维 CNN 时序模型", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-012",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/rnn",
+    "title": "RNN 与循环状态",
+    "summary": "通过隐藏状态理解序列记忆与截断反传",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-005", "M07-001"],
+    "objectives": [
+      "解释RNN 与循环状态中的数学对象、假设与适用条件",
+      "通过隐藏状态理解序列记忆与截断反传",
+      "通过对照实验识别常见误区：RNN 的隐藏状态应跨所有无关样本永久保留"
+    ],
+    "tags": ["RNN ", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-013",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/gated-rnn",
+    "title": "LSTM 与 GRU",
+    "summary": "用门控路径解释信息保留与遗忘",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-012", "M06-014"],
+    "objectives": [
+      "解释LSTM 与 GRU中的数学对象、假设与适用条件",
+      "用门控路径解释信息保留与遗忘",
+      "通过对照实验识别常见误区：门控结构保证无限长度无损记忆"
+    ],
+    "tags": ["LSTM ", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-014",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/autoencoders",
+    "title": "Autoencoder 与重构误差",
+    "summary": "区分压缩表示和复制输入的平凡解",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-002", "M06-004"],
+    "objectives": [
+      "解释Autoencoder 与重构误差中的数学对象、假设与适用条件",
+      "区分压缩表示和复制输入的平凡解",
+      "通过对照实验识别常见误区：重构误差低就证明表示对所有下游任务有用"
+    ],
+    "tags": ["Autoencoder ", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-015",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/reconstruction-anomalies",
+    "title": "Autoencoder 异常检测",
+    "summary": "以正常训练集和验证阈值评估重构分数",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-014", "M07-009", "M05-018"],
+    "objectives": [
+      "解释Autoencoder 异常检测中的数学对象、假设与适用条件",
+      "以正常训练集和验证阈值评估重构分数",
+      "通过对照实验识别常见误区：异常样本一定拥有最高重构误差"
+    ],
+    "tags": ["Autoencoder 异常检测", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-016",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/event-evaluation",
+    "title": "类别不平衡与事件级评估",
+    "summary": "区分点级指标、事件命中、延迟与误报时间",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-009", "M04-021"],
+    "objectives": [
+      "解释类别不平衡与事件级评估中的数学对象、假设与适用条件",
+      "区分点级指标、事件命中、延迟与误报时间",
+      "通过对照实验识别常见误区：点级 F1 可以完整代表实时异常检测效果"
+    ],
+    "tags": ["类别不平衡", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-017",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/state-space",
+    "title": "状态空间模型",
+    "summary": "区分内部状态、输入与可测输出",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-001", "M01-011"],
+    "objectives": [
+      "解释状态空间模型中的数学对象、假设与适用条件",
+      "区分内部状态、输入与可测输出",
+      "通过对照实验识别常见误区：状态必须都是传感器直接测量的量"
+    ],
+    "tags": ["状态空间模型", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 17,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-018",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/kalman",
+    "title": "Kalman Filter",
+    "summary": "连接预测不确定性与测量不确定性的融合权重",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-017", "M02-023", "M02-014"],
+    "objectives": [
+      "解释Kalman Filter中的数学对象、假设与适用条件",
+      "连接预测不确定性与测量不确定性的融合权重",
+      "通过对照实验识别常见误区：Kalman Filter 对任意非线性非高斯系统都最优"
+    ],
+    "tags": ["Kalman Filter", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 18,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-019",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/system-identification",
+    "title": "参数化系统辨识",
+    "summary": "从输入输出估计动态参数并检查激励与可辨识性",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-017", "M05-001", "M07-009"],
+    "objectives": [
+      "解释参数化系统辨识中的数学对象、假设与适用条件",
+      "从输入输出估计动态参数并检查激励与可辨识性",
+      "通过对照实验识别常见误区：拟合残差小就证明所有物理参数都被准确辨识"
+    ],
+    "tags": ["参数化系统辨识", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 19,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-020",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/hybrid-models",
+    "title": "残差学习与混合物理模型",
+    "summary": "保留物理基线并学习未建模部分",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-019", "M06-002"],
+    "objectives": [
+      "解释残差学习与混合物理模型中的数学对象、假设与适用条件",
+      "保留物理基线并学习未建模部分",
+      "通过对照实验识别常见误区：加入物理模型后系统天然安全可靠"
+    ],
+    "tags": ["残差学习", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 20,
+    "relatedLessons": []
+  },
+  {
+    "id": "M07-021",
+    "moduleId": "M07",
+    "slug": "engineering/time-series/drift",
+    "title": "数据漂移与概念漂移",
+    "summary": "区分输入分布变化与条件关系变化",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M07-009", "M04-008"],
+    "objectives": [
+      "解释数据漂移与概念漂移中的数学对象、假设与适用条件",
+      "区分输入分布变化与条件关系变化",
+      "通过对照实验识别常见误区：输入分布未变就不可能发生概念漂移"
+    ],
+    "tags": ["数据漂移", "M07", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 21,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-001",
+    "moduleId": "M08",
+    "slug": "engineering/vision/image-representation",
+    "title": "图像表示与采样",
+    "summary": "区分空间尺寸、通道、动态范围与采样",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M01-003"],
+    "objectives": [
+      "解释图像表示与采样中的数学对象、假设与适用条件",
+      "区分空间尺寸、通道、动态范围与采样",
+      "通过对照实验识别常见误区：像素数足够大就能避免任何混叠"
+    ],
+    "tags": ["图像表示", "M08", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-002",
+    "moduleId": "M08",
+    "slug": "engineering/vision/color-spaces",
+    "title": "颜色空间",
+    "summary": "区分线性 RGB、编码 RGB 与亮度近似的适用条件",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-001"],
+    "objectives": [
+      "解释颜色空间中的数学对象、假设与适用条件",
+      "区分线性 RGB、编码 RGB 与亮度近似的适用条件",
+      "通过对照实验识别常见误区：RGB 编码数值可在任何场景直接当作线性光强"
+    ],
+    "tags": ["颜色空间", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-003",
+    "moduleId": "M08",
+    "slug": "engineering/vision/image-features",
+    "title": "卷积与图像特征",
+    "summary": "复用卷积原语观察边缘、平滑与纹理响应",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-001", "M06-015"],
+    "objectives": [
+      "解释卷积与图像特征中的数学对象、假设与适用条件",
+      "复用卷积原语观察边缘、平滑与纹理响应",
+      "通过对照实验识别常见误区：同一滤波核对所有方向的边缘响应相同"
+    ],
+    "tags": ["卷积", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-004",
+    "moduleId": "M08",
+    "slug": "engineering/vision/image-classification",
+    "title": "图像分类",
+    "summary": "连接图像级标签、类别概率和错误分析",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-003", "M04-019"],
+    "objectives": [
+      "解释图像分类中的数学对象、假设与适用条件",
+      "连接图像级标签、类别概率和错误分析",
+      "通过对照实验识别常见误区：分类标签就包含物体的位置"
+    ],
+    "tags": ["图像分类", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-005",
+    "moduleId": "M08",
+    "slug": "engineering/vision/object-detection",
+    "title": "目标检测",
+    "summary": "区分边框、类别、置信度与多目标输出",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-004"],
+    "objectives": [
+      "解释目标检测中的数学对象、假设与适用条件",
+      "区分边框、类别、置信度与多目标输出",
+      "通过对照实验识别常见误区：检测置信度必然等于框定位准确度"
+    ],
+    "tags": ["目标检测", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-006",
+    "moduleId": "M08",
+    "slug": "engineering/vision/segmentation",
+    "title": "语义分割",
+    "summary": "理解逐像素类别预测与边界误差",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-003", "M04-018"],
+    "objectives": [
+      "解释语义分割中的数学对象、假设与适用条件",
+      "理解逐像素类别预测与边界误差",
+      "通过对照实验识别常见误区：语义分割自动区分每个独立实例身份"
+    ],
+    "tags": ["语义分割", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-007",
+    "moduleId": "M08",
+    "slug": "engineering/vision/augmentation",
+    "title": "图像数据增强",
+    "summary": "检查变换是否保持标签或同步更新几何标注",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-001", "M04-009"],
+    "objectives": [
+      "解释图像数据增强中的数学对象、假设与适用条件",
+      "检查变换是否保持标签或同步更新几何标注",
+      "通过对照实验识别常见误区：所有视觉变换都天然保持标签"
+    ],
+    "tags": ["图像数据增强", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-008",
+    "moduleId": "M08",
+    "slug": "engineering/vision/vision-transfer",
+    "title": "视觉迁移学习",
+    "summary": "在图像任务中比较冻结特征与全量微调",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-004", "M06-025"],
+    "objectives": [
+      "解释视觉迁移学习中的数学对象、假设与适用条件",
+      "在图像任务中比较冻结特征与全量微调",
+      "通过对照实验识别常见误区：自然图预训练特征对任何工业图都同样有效"
+    ],
+    "tags": ["视觉迁移学习", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-009",
+    "moduleId": "M08",
+    "slug": "engineering/vision/iou",
+    "title": "IoU 与定位误差",
+    "summary": "量化框重叠并理解尺度敏感性",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-005"],
+    "objectives": [
+      "解释IoU 与定位误差中的数学对象、假设与适用条件",
+      "量化框重叠并理解尺度敏感性",
+      "通过对照实验识别常见误区：像素偏移相同就意味着 IoU 相同"
+    ],
+    "tags": ["IoU ", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-010",
+    "moduleId": "M08",
+    "slug": "engineering/vision/mean-average-precision",
+    "title": "检测指标与 mAP",
+    "summary": "明确匹配阈值、排序、重复检测与平均方式",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-009", "M04-021"],
+    "objectives": [
+      "解释检测指标与 mAP中的数学对象、假设与适用条件",
+      "明确匹配阈值、排序、重复检测与平均方式",
+      "通过对照实验识别常见误区：不同评估协议的 mAP 数字可以直接比较"
+    ],
+    "tags": ["检测指标", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-011",
+    "moduleId": "M08",
+    "slug": "engineering/vision/camera-calibration",
+    "title": "视觉测量与几何标定",
+    "summary": "区分像素坐标、内参外参和物理尺度",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-001", "M01-020"],
+    "objectives": [
+      "解释视觉测量与几何标定中的数学对象、假设与适用条件",
+      "区分像素坐标、内参外参和物理尺度",
+      "通过对照实验识别常见误区：像素距离总能直接换算成毫米"
+    ],
+    "tags": ["视觉测量", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-012",
+    "moduleId": "M08",
+    "slug": "engineering/vision/visual-uncertainty",
+    "title": "视觉测量噪声与误差传播",
+    "summary": "用局部 Jacobian 传播测量协方差",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M08-011", "M02-014", "M03-005"],
+    "objectives": [
+      "解释视觉测量噪声与误差传播中的数学对象、假设与适用条件",
+      "用局部 Jacobian 传播测量协方差",
+      "通过对照实验识别常见误区：标定后的所有位置都具有相同测量精度"
+    ],
+    "tags": ["视觉测量噪声", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M08-013",
+    "moduleId": "M08",
+    "slug": "engineering/vision/multimodal",
+    "title": "多模态表示与 Embedding 对齐",
+    "summary": "用统一表示比较跨模态检索与语义对齐",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-018", "M01-007"],
+    "objectives": [
+      "解释多模态表示与 Embedding 对齐中的数学对象、假设与适用条件",
+      "用统一表示比较跨模态检索与语义对齐",
+      "通过对照实验识别常见误区：跨模态相似度就是已校准的正确概率"
+    ],
+    "tags": ["多模态表示", "M08", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-001",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/training-inference",
+    "title": "训练与推理的区别",
+    "summary": "区分参数更新、梯度状态与运行模式",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-007"],
+    "objectives": [
+      "解释训练与推理的区别中的数学对象、假设与适用条件",
+      "区分参数更新、梯度状态与运行模式",
+      "通过对照实验识别常见误区：不调用 backward 就自动切换到正确推理模式"
+    ],
+    "tags": ["训练", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-002",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/serialization",
+    "title": "计算图与模型序列化",
+    "summary": "区分模型参数、拓扑、输入契约和运行时",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-001", "M03-018"],
+    "objectives": [
+      "解释计算图与模型序列化中的数学对象、假设与适用条件",
+      "区分模型参数、拓扑、输入契约和运行时",
+      "通过对照实验识别常见误区：任何运行时都能执行同一序列化模型"
+    ],
+    "tags": ["计算图", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-003",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/onnx",
+    "title": "ONNX 与算子兼容性",
+    "summary": "检查 opset、动态形状和逐输出数值一致性",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-002"],
+    "objectives": [
+      "解释ONNX 与算子兼容性中的数学对象、假设与适用条件",
+      "检查 opset、动态形状和逐输出数值一致性",
+      "通过对照实验识别常见误区：导出成功就证明目标硬件可以正确运行"
+    ],
+    "tags": ["ONNX ", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-004",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/floating-point-formats",
+    "title": "FP32、FP16 与数值误差",
+    "summary": "比较精度、动态范围和零附近误差度量",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M03-017"],
+    "objectives": [
+      "解释FP32、FP16 与数值误差中的数学对象、假设与适用条件",
+      "比较精度、动态范围和零附近误差度量",
+      "通过对照实验识别常见误区：FP16 只是精确值变少而数值范围相同"
+    ],
+    "tags": ["FP32、FP16 ", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-005",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/int8",
+    "title": "INT8 量化与量化误差",
+    "summary": "理解 scale、zero point、舍入与饱和",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-004", "M02-010"],
+    "objectives": [
+      "解释INT8 量化与量化误差中的数学对象、假设与适用条件",
+      "理解 scale、zero point、舍入与饱和",
+      "通过对照实验识别常见误区：所有量化误差都不超过半个量化步长"
+    ],
+    "tags": ["INT8 量化", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-006",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/ptq",
+    "title": "PTQ 与校准数据",
+    "summary": "用代表性校准数据平衡截断和分辨率",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-005", "M04-004"],
+    "objectives": [
+      "解释PTQ 与校准数据中的数学对象、假设与适用条件",
+      "用代表性校准数据平衡截断和分辨率",
+      "通过对照实验识别常见误区：任意少量随机输入都足以完成可靠校准"
+    ],
+    "tags": ["PTQ ", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-007",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/qat",
+    "title": "QAT",
+    "summary": "解释伪量化与近似梯度的训练作用",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-006", "M06-005"],
+    "objectives": [
+      "解释QAT中的数学对象、假设与适用条件",
+      "解释伪量化与近似梯度的训练作用",
+      "通过对照实验识别常见误区：QAT 的 straight-through 梯度是舍入函数的精确导数"
+    ],
+    "tags": ["QAT", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-008",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/pruning",
+    "title": "模型剪枝",
+    "summary": "区分非结构稀疏、结构裁剪与运行时加速",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-026", "M06-027"],
+    "objectives": [
+      "解释模型剪枝中的数学对象、假设与适用条件",
+      "区分非结构稀疏、结构裁剪与运行时加速",
+      "通过对照实验识别常见误区：零权重更多就必然获得同比例加速"
+    ],
+    "tags": ["模型剪枝", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-009",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/distillation",
+    "title": "知识蒸馏",
+    "summary": "比较软标签、温度与学生容量",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M06-004", "M02-025"],
+    "objectives": [
+      "解释知识蒸馏中的数学对象、假设与适用条件",
+      "比较软标签、温度与学生容量",
+      "通过对照实验识别常见误区：蒸馏保证学生超过教师且不需要评价"
+    ],
+    "tags": ["知识蒸馏", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-010",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/performance-metrics",
+    "title": "Latency、Throughput 与 Memory",
+    "summary": "区分单请求延迟、并发吞吐和峰值内存",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-001", "M06-027"],
+    "objectives": [
+      "解释Latency、Throughput 与 Memory中的数学对象、假设与适用条件",
+      "区分单请求延迟、并发吞吐和峰值内存",
+      "通过对照实验识别常见误区：吞吐的倒数总等于用户端到端延迟"
+    ],
+    "tags": ["Latency、Throughput ", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-011",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/tail-latency",
+    "title": "P50、P95、P99 与截止期限",
+    "summary": "用分位数和超期率描述实时尾部风险",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-010", "M02-004"],
+    "objectives": [
+      "解释P50、P95、P99 与截止期限中的数学对象、假设与适用条件",
+      "用分位数和超期率描述实时尾部风险",
+      "通过对照实验识别常见误区：P99 小于截止期限就证明系统永不超时"
+    ],
+    "tags": ["P50、P95、P99 ", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-012",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/mcu-budgets",
+    "title": "Edge AI 与 MCU 资源预算",
+    "summary": "在 Flash、RAM、周期和功耗之间做可验证预算",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-005", "M09-010"],
+    "objectives": [
+      "解释Edge AI 与 MCU 资源预算中的数学对象、假设与适用条件",
+      "在 Flash、RAM、周期和功耗之间做可验证预算",
+      "通过对照实验识别常见误区：模型文件小于 RAM 就一定能运行"
+    ],
+    "tags": ["Edge AI ", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-013",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/embedded-runtimes",
+    "title": "CMSIS-NN 与 TFLite Micro",
+    "summary": "理解核库、微型运行时、算子与 tensor arena",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-012"],
+    "objectives": [
+      "解释CMSIS-NN 与 TFLite Micro中的数学对象、假设与适用条件",
+      "理解核库、微型运行时、算子与 tensor arena",
+      "通过对照实验识别常见误区：CMSIS-NN 是一个可训练任意网络的完整框架"
+    ],
+    "tags": ["CMSIS-NN ", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-014",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/device-benchmarks",
+    "title": "真实设备推理基准",
+    "summary": "定义预热、同步、重复次数与端到端边界",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-011", "M04-022"],
+    "objectives": [
+      "解释真实设备推理基准中的数学对象、假设与适用条件",
+      "定义预热、同步、重复次数与端到端边界",
+      "通过对照实验识别常见误区：在 PC 测出的模型延迟代表 MCU 性能"
+    ],
+    "tags": ["真实设备推理基准", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-015",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/data-parity",
+    "title": "训练与推理数据一致性",
+    "summary": "验证缩放、通道顺序、单位和缺失值策略",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-002", "M04-009"],
+    "objectives": [
+      "解释训练与推理数据一致性中的数学对象、假设与适用条件",
+      "验证缩放、通道顺序、单位和缺失值策略",
+      "通过对照实验识别常见误区：模型权重一致就保证整个预测系统一致"
+    ],
+    "tags": ["训练", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-016",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/robustness",
+    "title": "鲁棒性与漂移监测",
+    "summary": "预定义扰动与漂移告警而非只看平均精度",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-015", "M07-021"],
+    "objectives": [
+      "解释鲁棒性与漂移监测中的数学对象、假设与适用条件",
+      "预定义扰动与漂移告警而非只看平均精度",
+      "通过对照实验识别常见误区：漂移告警本身就证明模型已失效"
+    ],
+    "tags": ["鲁棒性", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M09-017",
+    "moduleId": "M09",
+    "slug": "engineering/deployment/regression-tests",
+    "title": "模型回归测试",
+    "summary": "固定黄金样本、容差和性能预算防止更新退化",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M09-014", "M09-015", "M04-023"],
+    "objectives": [
+      "解释模型回归测试中的数学对象、假设与适用条件",
+      "固定黄金样本、容差和性能预算防止更新退化",
+      "通过对照实验识别常见误区：平均准确率未降就可以忽略所有个别退化"
+    ],
+    "tags": ["模型回归测试", "M09", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 17,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-001",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/state-action-reward",
+    "title": "State、Action 与 Reward",
+    "summary": "定义环境、动作和奖励的时间索引",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": [],
+    "objectives": [
+      "解释State、Action 与 Reward中的数学对象、假设与适用条件",
+      "定义环境、动作和奖励的时间索引",
+      "通过对照实验识别常见误区：奖励就是人工监督的正确动作标签"
+    ],
+    "tags": ["State、Action ", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-002",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/mdp",
+    "title": "Markov 性与 MDP",
+    "summary": "检查状态是否包含预测未来所需的信息",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-001", "M02-012"],
+    "objectives": [
+      "解释Markov 性与 MDP中的数学对象、假设与适用条件",
+      "检查状态是否包含预测未来所需的信息",
+      "通过对照实验识别常见误区：传感器当前读数总是满足 Markov 性"
+    ],
+    "tags": ["Markov 性", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-003",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/returns",
+    "title": "Return 与 Discount Factor",
+    "summary": "比较即时收益与长期折扣回报",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-002", "M02-009"],
+    "objectives": [
+      "解释Return 与 Discount Factor中的数学对象、假设与适用条件",
+      "比较即时收益与长期折扣回报",
+      "通过对照实验识别常见误区：gamma 只是为避免计算溢出而设置"
+    ],
+    "tags": ["Return ", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-004",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/value-functions",
+    "title": "状态价值与动作价值",
+    "summary": "区分策略条件下的状态与动作价值",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-003"],
+    "objectives": [
+      "解释状态价值与动作价值中的数学对象、假设与适用条件",
+      "区分策略条件下的状态与动作价值",
+      "通过对照实验识别常见误区：一个状态的价值与后续策略无关"
+    ],
+    "tags": ["状态价值", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-005",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/bellman",
+    "title": "Bellman Equation",
+    "summary": "将长期价值分解为一步奖励与后继价值",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-004", "M02-012"],
+    "objectives": [
+      "解释Bellman Equation中的数学对象、假设与适用条件",
+      "将长期价值分解为一步奖励与后继价值",
+      "通过对照实验识别常见误区：Bellman 等式只适用于最优策略"
+    ],
+    "tags": ["Bellman Equation", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-006",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/dynamic-programming",
+    "title": "动态规划：策略迭代与价值迭代",
+    "summary": "在已知小型模型上单步更新价值和策略",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-005"],
+    "objectives": [
+      "解释动态规划：策略迭代与价值迭代中的数学对象、假设与适用条件",
+      "在已知小型模型上单步更新价值和策略",
+      "通过对照实验识别常见误区：动态规划不需要知道转移模型"
+    ],
+    "tags": ["动态规划：策略迭代", "M10", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-007",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/monte-carlo",
+    "title": "Monte Carlo 价值估计",
+    "summary": "用完整回合回报估计策略价值",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-004", "M02-016"],
+    "objectives": [
+      "解释Monte Carlo 价值估计中的数学对象、假设与适用条件",
+      "用完整回合回报估计策略价值",
+      "通过对照实验识别常见误区：Monte Carlo 必须使用环境转移概率模型"
+    ],
+    "tags": ["Monte Carlo 价值估计", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-008",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/temporal-difference",
+    "title": "Temporal Difference",
+    "summary": "通过一步 bootstrap 对比完整回报估计",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-005", "M10-007"],
+    "objectives": [
+      "解释Temporal Difference中的数学对象、假设与适用条件",
+      "通过一步 bootstrap 对比完整回报估计",
+      "通过对照实验识别常见误区：超时截断和真正终止总应使用相同目标"
+    ],
+    "tags": ["Temporal Difference", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-009",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/q-learning",
+    "title": "Q-Learning",
+    "summary": "区分行为动作与贪心目标的离策略更新",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-008"],
+    "objectives": [
+      "解释Q-Learning中的数学对象、假设与适用条件",
+      "区分行为动作与贪心目标的离策略更新",
+      "通过对照实验识别常见误区：Q-Learning 的目标必须使用实际采取的下一动作"
+    ],
+    "tags": ["Q-Learning", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-010",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/exploration",
+    "title": "Exploration 与 Exploitation",
+    "summary": "用探索预算比较短期收益与信息获取",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-009"],
+    "objectives": [
+      "解释Exploration 与 Exploitation中的数学对象、假设与适用条件",
+      "用探索预算比较短期收益与信息获取",
+      "通过对照实验识别常见误区：探索越多最终回报就一定越高"
+    ],
+    "tags": ["Exploration ", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-011",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/dqn",
+    "title": "DQN",
+    "summary": "用神经网络近似 Q 并说明自举目标不稳定",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-009", "M06-005"],
+    "objectives": [
+      "解释DQN中的数学对象、假设与适用条件",
+      "用神经网络近似 Q 并说明自举目标不稳定",
+      "通过对照实验识别常见误区：DQN 就是把 Q 表换成网络而无需其他稳定措施"
+    ],
+    "tags": ["DQN", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-012",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/replay-targets",
+    "title": "经验回放与目标网络",
+    "summary": "降低序列相关并减缓训练目标移动",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-011"],
+    "objectives": [
+      "解释经验回放与目标网络中的数学对象、假设与适用条件",
+      "降低序列相关并减缓训练目标移动",
+      "通过对照实验识别常见误区：经验回放能让任意旧数据永远同样有价值"
+    ],
+    "tags": ["经验回放", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-013",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/policy-gradient",
+    "title": "Policy Gradient",
+    "summary": "从采样回报估计策略参数梯度",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-003", "M03-003", "M02-019"],
+    "objectives": [
+      "解释Policy Gradient中的数学对象、假设与适用条件",
+      "从采样回报估计策略参数梯度",
+      "通过对照实验识别常见误区：奖励可以直接作为网络参数的梯度"
+    ],
+    "tags": ["Policy Gradient", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-014",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/actor-critic",
+    "title": "Actor-Critic",
+    "summary": "区分策略网络与价值估计器的职责",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-013", "M10-008"],
+    "objectives": [
+      "解释Actor-Critic中的数学对象、假设与适用条件",
+      "区分策略网络与价值估计器的职责",
+      "通过对照实验识别常见误区：Critic 直接输出环境的正确动作"
+    ],
+    "tags": ["Actor-Critic", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-015",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/ppo",
+    "title": "PPO",
+    "summary": "用概率比裁剪解释保守更新的近似机制",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-014", "M02-025"],
+    "objectives": [
+      "解释PPO中的数学对象、假设与适用条件",
+      "用概率比裁剪解释保守更新的近似机制",
+      "通过对照实验识别常见误区：PPO 裁剪保证每一步真实 KL 都严格受限"
+    ],
+    "tags": ["PPO", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-016",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/sac",
+    "title": "SAC",
+    "summary": "理解最大熵目标与连续动作探索",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-014", "M02-024"],
+    "objectives": [
+      "解释SAC中的数学对象、假设与适用条件",
+      "理解最大熵目标与连续动作探索",
+      "通过对照实验识别常见误区：SAC 只是给任意策略输出叠加高斯噪声"
+    ],
+    "tags": ["SAC", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-017",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/reward-shaping",
+    "title": "Reward Shaping",
+    "summary": "区分潜势奖励与可能改变目标的任意奖励",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-005"],
+    "objectives": [
+      "解释Reward Shaping中的数学对象、假设与适用条件",
+      "区分潜势奖励与可能改变目标的任意奖励",
+      "通过对照实验识别常见误区：奖励越密集就越不会产生投机策略"
+    ],
+    "tags": ["Reward Shaping", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 17,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-018",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/behavior-cloning",
+    "title": "模仿学习与 Behavior Cloning",
+    "summary": "把专家状态动作对转化为监督策略学习",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-001", "M04-005"],
+    "objectives": [
+      "解释模仿学习与 Behavior Cloning中的数学对象、假设与适用条件",
+      "把专家状态动作对转化为监督策略学习",
+      "通过对照实验识别常见误区：专家数据的动作平均值总是合理动作"
+    ],
+    "tags": ["模仿学习", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 18,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-019",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/imitation-shift",
+    "title": "模仿学习的分布偏移",
+    "summary": "解释小动作误差如何引起状态偏离与累积失效",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-018", "M04-008"],
+    "objectives": [
+      "解释模仿学习的分布偏移中的数学对象、假设与适用条件",
+      "解释小动作误差如何引起状态偏离与累积失效",
+      "通过对照实验识别常见误区：随机划分牌谱或轨迹的单步准确率足以证明闭环稳定"
+    ],
+    "tags": ["模仿学习的分布偏移", "M10", "数学直觉"],
+    "interactionType": "mixed",
+    "localLab": false,
+    "order": 19,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-020",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/offline-rl",
+    "title": "离线强化学习",
+    "summary": "理解固定数据覆盖与分布外动作价值外推",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-009", "M04-009"],
+    "objectives": [
+      "解释离线强化学习中的数学对象、假设与适用条件",
+      "理解固定数据覆盖与分布外动作价值外推",
+      "通过对照实验识别常见误区：只要离线数据量大就可安全评估任何新策略"
+    ],
+    "tags": ["离线强化学习", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 20,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-021",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/self-play",
+    "title": "多智能体与自对弈",
+    "summary": "理解对手变化、联合动作和策略非平稳性",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-002", "M10-010"],
+    "objectives": [
+      "解释多智能体与自对弈中的数学对象、假设与适用条件",
+      "理解对手变化、联合动作和策略非平稳性",
+      "通过对照实验识别常见误区：自对弈胜率上升就意味着对所有对手都变强"
+    ],
+    "tags": ["多智能体", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 21,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-022",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/pomdp",
+    "title": "部分可观测决策与信念状态",
+    "summary": "通过观测更新隐藏状态概率分布",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-002", "M02-023"],
+    "objectives": [
+      "解释部分可观测决策与信念状态中的数学对象、假设与适用条件",
+      "通过观测更新隐藏状态概率分布",
+      "通过对照实验识别常见误区：把不可见真状态加入特征不会造成评估泄漏"
+    ],
+    "tags": ["部分可观测决策", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 22,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-023",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/sim-to-real",
+    "title": "Sim-to-Real 与 Domain Randomization",
+    "summary": "通过质量、摩擦、延迟扰动评估迁移鲁棒性",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-014", "M02-026"],
+    "objectives": [
+      "解释Sim-to-Real 与 Domain Randomization中的数学对象、假设与适用条件",
+      "通过质量、摩擦、延迟扰动评估迁移鲁棒性",
+      "通过对照实验识别常见误区：仿真参数随机化后可以跳过真实设备安全验证"
+    ],
+    "tags": ["Sim-to-Real ", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 23,
+    "relatedLessons": []
+  },
+  {
+    "id": "M10-024",
+    "moduleId": "M10",
+    "slug": "learning/reinforcement/safe-control",
+    "title": "安全约束与 RL 控制评估",
+    "summary": "分别报告任务收益、约束违例与实时预算",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M10-017", "M04-022", "M09-011"],
+    "objectives": [
+      "解释安全约束与 RL 控制评估中的数学对象、假设与适用条件",
+      "分别报告任务收益、约束违例与实时预算",
+      "通过对照实验识别常见误区：把危险行为加负奖励就等于获得硬安全保证"
+    ],
+    "tags": ["安全约束", "M10", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 24,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-001",
+    "moduleId": "M11",
+    "slug": "engineering/llm/tokenization",
+    "title": "Tokenization",
+    "summary": "区分字节、字符、词和 token 的编码单位",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": [],
+    "objectives": [
+      "解释Tokenization中的数学对象、假设与适用条件",
+      "区分字节、字符、词和 token 的编码单位",
+      "通过对照实验识别常见误区：一个汉字或一个英文单词固定对应一个 token"
+    ],
+    "tags": ["Tokenization", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-002",
+    "moduleId": "M11",
+    "slug": "engineering/llm/token-embeddings",
+    "title": "Token Embedding",
+    "summary": "解释词表索引到向量的映射和上下文化前后的区别",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-001", "M06-018"],
+    "objectives": [
+      "解释Token Embedding中的数学对象、假设与适用条件",
+      "解释词表索引到向量的映射和上下文化前后的区别",
+      "通过对照实验识别常见误区：静态 embedding 就是 token 在任何语境下的最终含义"
+    ],
+    "tags": ["Token Embedding", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-003",
+    "moduleId": "M11",
+    "slug": "engineering/llm/autoregressive",
+    "title": "自回归语言建模",
+    "summary": "从条件概率连乘理解下一 token 预测",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-002", "M06-021", "M02-012"],
+    "objectives": [
+      "解释自回归语言建模中的数学对象、假设与适用条件",
+      "从条件概率连乘理解下一 token 预测",
+      "通过对照实验识别常见误区：模型同时看到完整序列意味着训练时可以读取未来标签"
+    ],
+    "tags": ["自回归语言建模", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-004",
+    "moduleId": "M11",
+    "slug": "engineering/llm/language-loss",
+    "title": "Transformer 训练目标",
+    "summary": "区分输入位移、标签位移与 loss mask",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-003", "M06-023", "M02-024"],
+    "objectives": [
+      "解释Transformer 训练目标中的数学对象、假设与适用条件",
+      "区分输入位移、标签位移与 loss mask",
+      "通过对照实验识别常见误区：causal mask 与 loss mask 是同一个概念"
+    ],
+    "tags": ["Transformer 训练目标", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-005",
+    "moduleId": "M11",
+    "slug": "engineering/llm/pretraining",
+    "title": "Pretraining",
+    "summary": "说明数据覆盖、计算预算与预训练目标的关系",
+    "difficulty": "intro",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-004", "M06-007"],
+    "objectives": [
+      "解释Pretraining中的数学对象、假设与适用条件",
+      "说明数据覆盖、计算预算与预训练目标的关系",
+      "通过对照实验识别常见误区：更多 token 无论质量如何都会等比例提升能力"
+    ],
+    "tags": ["Pretraining", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-006",
+    "moduleId": "M11",
+    "slug": "engineering/llm/sft",
+    "title": "SFT",
+    "summary": "用指令响应数据适配行为并正确遮蔽标签",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-005", "M06-025"],
+    "objectives": [
+      "解释SFT中的数学对象、假设与适用条件",
+      "用指令响应数据适配行为并正确遮蔽标签",
+      "通过对照实验识别常见误区：SFT 只是把原始对话文本拼接起来无需标签设计"
+    ],
+    "tags": ["SFT", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-007",
+    "moduleId": "M11",
+    "slug": "engineering/llm/preferences",
+    "title": "Preference Optimization",
+    "summary": "区分偏好对、参考策略及相对概率目标",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-006", "M02-025"],
+    "objectives": [
+      "解释Preference Optimization中的数学对象、假设与适用条件",
+      "区分偏好对、参考策略及相对概率目标",
+      "通过对照实验识别常见误区：偏好优化必然等同于在线强化学习并需要环境 rollout"
+    ],
+    "tags": ["Preference Optimization", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-008",
+    "moduleId": "M11",
+    "slug": "engineering/llm/lora",
+    "title": "LoRA 与 PEFT",
+    "summary": "以低秩参数增量减少可训练参数",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-006", "M01-019"],
+    "objectives": [
+      "解释LoRA 与 PEFT中的数学对象、假设与适用条件",
+      "以低秩参数增量减少可训练参数",
+      "通过对照实验识别常见误区：LoRA 让整个推理模型权重文件自动变得很小"
+    ],
+    "tags": ["LoRA ", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-009",
+    "moduleId": "M11",
+    "slug": "engineering/llm/small-models",
+    "title": "小模型蒸馏与专用化",
+    "summary": "围绕窄任务、教师输出和独立评价构建学生模型",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-006", "M09-009"],
+    "objectives": [
+      "解释小模型蒸馏与专用化中的数学对象、假设与适用条件",
+      "围绕窄任务、教师输出和独立评价构建学生模型",
+      "通过对照实验识别常见误区：教师生成的数据可以直接兼作测试答案而不产生偏差"
+    ],
+    "tags": ["小模型蒸馏", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-010",
+    "moduleId": "M11",
+    "slug": "engineering/llm/benchmarks",
+    "title": "模型评测与 Benchmark",
+    "summary": "定义任务、评分规则、样本单位与置信范围",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M04-004", "M04-022"],
+    "objectives": [
+      "解释模型评测与 Benchmark中的数学对象、假设与适用条件",
+      "定义任务、评分规则、样本单位与置信范围",
+      "通过对照实验识别常见误区：单个榜单分数足以代表所有工程任务能力"
+    ],
+    "tags": ["模型评测", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-011",
+    "moduleId": "M11",
+    "slug": "engineering/llm/llm-calibration",
+    "title": "语言模型概率输出与校准",
+    "summary": "区分 token 概率、序列概率与回答正确概率",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-003", "M02-027"],
+    "objectives": [
+      "解释语言模型概率输出与校准中的数学对象、假设与适用条件",
+      "区分 token 概率、序列概率与回答正确概率",
+      "通过对照实验识别常见误区：一个回答 token 概率高就说明事实一定正确"
+    ],
+    "tags": ["语言模型概率输出", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-012",
+    "moduleId": "M11",
+    "slug": "engineering/llm/agent-planning",
+    "title": "Agent 任务规划",
+    "summary": "把任务状态、计划、动作与反馈分开记录",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-003"],
+    "objectives": [
+      "解释Agent 任务规划中的数学对象、假设与适用条件",
+      "把任务状态、计划、动作与反馈分开记录",
+      "通过对照实验识别常见误区：输出一段看似合理计划就等于完成任务"
+    ],
+    "tags": ["Agent 任务规划", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-013",
+    "moduleId": "M11",
+    "slug": "engineering/llm/tool-calling",
+    "title": "工具调用与执行轨迹",
+    "summary": "使用结构化参数、结果和错误描述可审计轨迹",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-012"],
+    "objectives": [
+      "解释工具调用与执行轨迹中的数学对象、假设与适用条件",
+      "使用结构化参数、结果和错误描述可审计轨迹",
+      "通过对照实验识别常见误区：工具返回文本可以无条件当作新的高优先级指令"
+    ],
+    "tags": ["工具调用", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-014",
+    "moduleId": "M11",
+    "slug": "engineering/llm/agent-evaluation",
+    "title": "Agent 评测",
+    "summary": "同时记录任务成功、成本、错误恢复和约束遵守",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-013", "M11-010", "M04-023"],
+    "objectives": [
+      "解释Agent 评测中的数学对象、假设与适用条件",
+      "同时记录任务成功、成本、错误恢复和约束遵守",
+      "通过对照实验识别常见误区：只评最终回复流畅性就能评价工具 Agent"
+    ],
+    "tags": ["Agent 评测", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-015",
+    "moduleId": "M11",
+    "slug": "engineering/llm/rag",
+    "title": "RAG 与检索评估",
+    "summary": "分别评价检索命中、证据支持和生成答案",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-002", "M11-010", "M04-019"],
+    "objectives": [
+      "解释RAG 与检索评估中的数学对象、假设与适用条件",
+      "分别评价检索命中、证据支持和生成答案",
+      "通过对照实验识别常见误区：增加上下文长度必然改善 RAG"
+    ],
+    "tags": ["RAG ", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-016",
+    "moduleId": "M11",
+    "slug": "engineering/llm/contamination",
+    "title": "数据质量、污染与评测泄漏",
+    "summary": "通过文档来源、近重复和时间切分控制污染",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-010", "M04-009"],
+    "objectives": [
+      "解释数据质量、污染与评测泄漏中的数学对象、假设与适用条件",
+      "通过文档来源、近重复和时间切分控制污染",
+      "通过对照实验识别常见误区：只要文件名不同就不存在训练测试污染"
+    ],
+    "tags": ["数据质量、污染", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M11-017",
+    "moduleId": "M11",
+    "slug": "engineering/llm/inference-tradeoffs",
+    "title": "推理成本、吞吐与延迟权衡",
+    "summary": "区分首 token、逐 token、排队和完整响应延迟",
+    "difficulty": "advanced",
+    "estimatedMinutes": 25,
+    "prerequisites": ["M11-003", "M09-010", "M09-011"],
+    "objectives": [
+      "解释推理成本、吞吐与延迟权衡中的数学对象、假设与适用条件",
+      "区分首 token、逐 token、排队和完整响应延迟",
+      "通过对照实验识别常见误区：tokens/s 更高必然意味着首 token 更快"
+    ],
+    "tags": ["推理成本、吞吐", "M11", "数学直觉"],
+    "interactionType": "visual",
+    "localLab": false,
+    "order": 17,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-001",
+    "moduleId": "M12",
+    "slug": "labs/reproducible-environment",
+    "title": "Python ML 环境与可复现实验",
+    "summary": "记录环境、依赖、随机种子和数据版本并生成复现记录",
+    "difficulty": "intro",
+    "estimatedMinutes": 90,
+    "prerequisites": [],
+    "objectives": [
+      "解释Python ML 环境与可复现实验中的数学对象、假设与适用条件",
+      "记录环境、依赖、随机种子和数据版本并生成复现记录",
+      "通过对照实验识别常见误区：固定 seed 就保证跨硬件与版本逐位一致"
+    ],
+    "tags": ["Python ML 环境", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 1,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-002",
+    "moduleId": "M12",
+    "slug": "labs/numpy-regression",
+    "title": "NumPy 从零实现线性回归",
+    "summary": "实现解析解与梯度下降并比较残差",
+    "difficulty": "intro",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-001", "M05-001", "M03-010"],
+    "objectives": [
+      "解释NumPy 从零实现线性回归中的数学对象、假设与适用条件",
+      "实现解析解与梯度下降并比较残差",
+      "通过对照实验识别常见误区：训练损失低就无需保留测试数据"
+    ],
+    "tags": ["NumPy 从零实现线性回归", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 2,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-003",
+    "moduleId": "M12",
+    "slug": "labs/sensor-calibration",
+    "title": "传感器标定与非线性误差补偿",
+    "summary": "比较线性标定、多项式补偿与保留工况误差",
+    "difficulty": "intro",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-002", "M04-010", "M04-015"],
+    "objectives": [
+      "解释传感器标定与非线性误差补偿中的数学对象、假设与适用条件",
+      "比较线性标定、多项式补偿与保留工况误差",
+      "通过对照实验识别常见误区：标定点拟合准确就代表全部工况准确"
+    ],
+    "tags": ["传感器标定", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 3,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-004",
+    "moduleId": "M12",
+    "slug": "labs/hid-latency",
+    "title": "USB/HID 延迟分布分析",
+    "summary": "分析合成或自采延迟 CSV 的分位数与超期率",
+    "difficulty": "intro",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-001", "M02-021", "M09-011"],
+    "objectives": [
+      "解释USB/HID 延迟分布分析中的数学对象、假设与适用条件",
+      "分析合成或自采延迟 CSV 的分位数与超期率",
+      "通过对照实验识别常见误区：不同设备时钟可以未经同步直接相减"
+    ],
+    "tags": ["USB/HID 延迟分布分析", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 4,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-005",
+    "moduleId": "M12",
+    "slug": "labs/motor-anomalies",
+    "title": "电机电流与编码器异常检测",
+    "summary": "建立合成正常与故障数据、时间切分和事件评估",
+    "difficulty": "intro",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-001", "M07-008", "M07-016", "M05-018"],
+    "objectives": [
+      "解释电机电流与编码器异常检测中的数学对象、假设与适用条件",
+      "建立合成正常与故障数据、时间切分和事件评估",
+      "通过对照实验识别常见误区：随机切分高度重叠窗口可可靠评估新工况"
+    ],
+    "tags": ["电机电流", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 5,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-006",
+    "moduleId": "M12",
+    "slug": "labs/pytorch-training",
+    "title": "PyTorch 训练循环",
+    "summary": "实现 train/eval、清梯度、检查点和恢复",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-001", "M06-005", "M06-007", "M06-013"],
+    "objectives": [
+      "解释PyTorch 训练循环中的数学对象、假设与适用条件",
+      "实现 train/eval、清梯度、检查点和恢复",
+      "通过对照实验识别常见误区：只保存权重就足以精确恢复任意训练"
+    ],
+    "tags": ["PyTorch 训练循环", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 6,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-007",
+    "moduleId": "M12",
+    "slug": "labs/pytorch-timeseries",
+    "title": "PyTorch 时序信号分类器",
+    "summary": "训练小型一维 CNN 并按设备或时间隔离评估",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-006", "M07-009", "M07-011"],
+    "objectives": [
+      "解释PyTorch 时序信号分类器中的数学对象、假设与适用条件",
+      "训练小型一维 CNN 并按设备或时间隔离评估",
+      "通过对照实验识别常见误区：训练数据的标准化统计应在每个测试批重新计算"
+    ],
+    "tags": ["PyTorch 时序信号分类器", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 7,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-008",
+    "moduleId": "M12",
+    "slug": "labs/onnx-export",
+    "title": "导出 ONNX 与数值一致性检查",
+    "summary": "导出小模型并在 CPU runtime 比较输出",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-006", "M09-003", "M09-015"],
+    "objectives": [
+      "解释导出 ONNX 与数值一致性检查中的数学对象、假设与适用条件",
+      "导出小模型并在 CPU runtime 比较输出",
+      "通过对照实验识别常见误区：仅比较最终 argmax 一致就足以证明数值一致"
+    ],
+    "tags": ["导出 ONNX ", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 8,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-009",
+    "moduleId": "M12",
+    "slug": "labs/edge-benchmark",
+    "title": "边缘设备推理性能测试",
+    "summary": "在明确设备上记录预热、内存、分位延迟和超期率",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-008", "M09-012", "M09-014"],
+    "objectives": [
+      "解释边缘设备推理性能测试中的数学对象、假设与适用条件",
+      "在明确设备上记录预热、内存、分位延迟和超期率",
+      "通过对照实验识别常见误区：模拟器速度可以直接作为真实 MCU 延迟"
+    ],
+    "tags": ["边缘设备推理性能测试", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 9,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-010",
+    "moduleId": "M12",
+    "slug": "labs/mujoco-baseline",
+    "title": "MuJoCo 环境与传统控制基线",
+    "summary": "建立无渲染可运行的仿真与受限 PID 基线",
+    "difficulty": "intermediate",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-001", "M07-017", "M10-002", "M04-022"],
+    "objectives": [
+      "解释MuJoCo 环境与传统控制基线中的数学对象、假设与适用条件",
+      "建立无渲染可运行的仿真与受限 PID 基线",
+      "通过对照实验识别常见误区：只要仿真能运行就不需要核对状态和动作单位"
+    ],
+    "tags": ["MuJoCo 环境", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 10,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-011",
+    "moduleId": "M12",
+    "slug": "labs/ppo-control",
+    "title": "PPO 控制任务",
+    "summary": "使用小型控制任务比较 PPO 与固定传统基线",
+    "difficulty": "advanced",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-010", "M12-006", "M10-015", "M10-024"],
+    "objectives": [
+      "解释PPO 控制任务中的数学对象、假设与适用条件",
+      "使用小型控制任务比较 PPO 与固定传统基线",
+      "通过对照实验识别常见误区：单条最佳训练曲线代表算法稳定性能"
+    ],
+    "tags": ["PPO 控制任务", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 11,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-012",
+    "moduleId": "M12",
+    "slug": "labs/sac-control",
+    "title": "SAC 控制任务",
+    "summary": "比较最大熵离策略控制与相同预算的基线",
+    "difficulty": "advanced",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-010", "M12-006", "M10-016", "M10-024"],
+    "objectives": [
+      "解释SAC 控制任务中的数学对象、假设与适用条件",
+      "比较最大熵离策略控制与相同预算的基线",
+      "通过对照实验识别常见误区：PPO 与 SAC 可以忽略交互预算直接比墙钟单次结果"
+    ],
+    "tags": ["SAC 控制任务", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 12,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-013",
+    "moduleId": "M12",
+    "slug": "labs/expert-imitation",
+    "title": "专家数据采集与模仿学习",
+    "summary": "按轨迹保存专家数据并评估闭环分布偏移",
+    "difficulty": "advanced",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-010", "M12-006", "M10-019"],
+    "objectives": [
+      "解释专家数据采集与模仿学习中的数学对象、假设与适用条件",
+      "按轨迹保存专家数据并评估闭环分布偏移",
+      "通过对照实验识别常见误区：单步验证误差低就保证闭环长期稳定"
+    ],
+    "tags": ["专家数据采集", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 13,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-014",
+    "moduleId": "M12",
+    "slug": "labs/mahjong-probabilities",
+    "title": "立直麻将牌谱整理与概率估计",
+    "summary": "定义可见信息、事件标签和按对局隔离的概率基线",
+    "difficulty": "advanced",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-001", "M02-023", "M04-011"],
+    "objectives": [
+      "解释立直麻将牌谱整理与概率估计中的数学对象、假设与适用条件",
+      "定义可见信息、事件标签和按对局隔离的概率基线",
+      "通过对照实验识别常见误区：离线牌谱中记录的信息在决策时全部可用"
+    ],
+    "tags": ["立直麻将牌谱整理", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 14,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-015",
+    "moduleId": "M12",
+    "slug": "labs/mahjong-decisions",
+    "title": "立直麻将概率决策模型",
+    "summary": "在简化候选动作中结合事件概率与效用比较决策",
+    "difficulty": "advanced",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-014", "M10-022", "M04-022"],
+    "objectives": [
+      "解释立直麻将概率决策模型中的数学对象、假设与适用条件",
+      "在简化候选动作中结合事件概率与效用比较决策",
+      "通过对照实验识别常见误区：最高和牌概率总等于最优决策"
+    ],
+    "tags": ["立直麻将概率决策模型", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 15,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-016",
+    "moduleId": "M12",
+    "slug": "labs/domain-finetuning",
+    "title": "领域小模型微调与评测",
+    "summary": "提供本地 PEFT 配置、数据划分和独立评价流程",
+    "difficulty": "advanced",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M12-006", "M11-008", "M11-010", "M11-016"],
+    "objectives": [
+      "解释领域小模型微调与评测中的数学对象、假设与适用条件",
+      "提供本地 PEFT 配置、数据划分和独立评价流程",
+      "通过对照实验识别常见误区：训练损失下降就能证明领域任务质量提升"
+    ],
+    "tags": ["领域小模型微调", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 16,
+    "relatedLessons": []
+  },
+  {
+    "id": "M12-017",
+    "moduleId": "M12",
+    "slug": "labs/reproduction-report",
+    "title": "完整 ML 工程复现报告",
+    "summary": "用一个已完成项目贯通数据、训练、评价和部署报告",
+    "difficulty": "advanced",
+    "estimatedMinutes": 90,
+    "prerequisites": ["M04-023", "M09-017", "M12-002"],
+    "objectives": [
+      "解释完整 ML 工程复现报告中的数学对象、假设与适用条件",
+      "用一个已完成项目贯通数据、训练、评价和部署报告",
+      "通过对照实验识别常见误区：只交最终最优数字而省略失败和环境即可复现"
+    ],
+    "tags": ["完整 ML 工程复现报告", "M12", "本地实验"],
+    "interactionType": "local-lab",
+    "localLab": true,
+    "order": 17,
+    "relatedLessons": []
+  }
+]
