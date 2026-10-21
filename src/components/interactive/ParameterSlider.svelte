@@ -7,6 +7,8 @@
     max,
     step = 1,
     unit = '',
+    initialValue,
+    description = '',
     onchange,
   }: {
     label: string;
@@ -15,6 +17,8 @@
     max: number;
     step?: number;
     unit?: string;
+    initialValue?: number;
+    description?: string;
     onchange: (value: number) => void;
   } = $props();
 </script>
@@ -31,4 +35,9 @@
     {value}
     oninput={(e) => onchange(e.currentTarget.valueAsNumber)}
   />
+  {#if description}<p>{description}</p>{/if}
+  {#if initialValue !== undefined}<button
+      class="btn btn-sm btn-ghost"
+      onclick={() => onchange(initialValue!)}>重置{label}</button
+    >{/if}
 </div>
