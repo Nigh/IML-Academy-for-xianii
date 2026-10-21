@@ -1,6 +1,6 @@
 # LESSON_SPEC — 交互课程统一开发规范 v1
 
-本规范定义单课的教学与交付标准；公共类型以 `src/lib/lesson/contract.ts` 为准。v1 接口在 Phase 1 验收后冻结。
+本规范定义单课的教学与交付标准；公共类型以 `src/lib/lesson/contract.ts` 为准。v1 接口已通过 Phase 1 的 PR CI 与代理内容审阅并冻结；后续破坏性变更需显式迁移。
 
 ## 1. 职责、输入与文件所有权
 
@@ -151,3 +151,21 @@ export default {
 每节课程使用独立 `lesson/<ID>-<slug>` 分支和一个 PR，目标为 `main`；禁止多课捆绑或直接推送 main。公共基础设施和跨课程文档分别走独立 PR。使用 Conventional Commits；通过 CI 和内容审阅后合并，不能绕过失败检查。具体合并流程见 CONTRIBUTING。
 
 完成报告及 PR 必须列出：课程 ID、实际交互、数学验证方式、实际运行的测试与结果、主题/响应式/链接与文件范围检查、限制和遗留问题、修改文件清单。未运行的验证明确注明。
+
+## 8. Phase 1 交互组件实现约定
+
+`Interactive Component Contract v1` 的真实接口与限制见 [COMPONENTS](COMPONENTS.md)，
+三种完整 Svelte 组合示例见 [INTERACTIVE_GUIDE](INTERACTIVE_GUIDE.md)。
+当前共享 Plot2D、VectorDiagram、DistributionPlot、HistogramPlot、ContourPlot、MatrixView、
+预设、算法解释与播放组件均有实际实现。不得复制另一套公共控件或在课程中修改其 API。
+
+实验状态由课程持有，派生数学结果使用纯函数与 `$derived`。
+SimulationControls 仅推进时间/索引；StepByStep 仅显示解释步骤，二者不代替数学模型。
+模型参数变化须重置迭代，并停止先前播放（可以使用 key 重建控制器）。
+图表仅接收数据；等高线点由课内纯函数生成。超过图形范围的真实参数仍需文本报告。
+零向量方向、单样本方差等未定义结果使用 null 与可读说明，不能用零替代。
+输入负号与小数点中间态保留；只有合法有限数才进入模型。所有随机结果标明 seed、样本数及模型假设。
+
+本阶段按实际元数据验证 M01-007、M02-004、M03-010，保留原有 M01-002。
+不变更正式课程身份，也不将未实现课程标为 ready。共享层、三课和集成测试已分别通过 PR CI 与代理内容审阅，公共协议 v1 由本次验收冻结。
+Phase 2 继续使用单课目录所有权、独立分支与独立 PR，集中开发分支不得作为多课合并 PR 发布。
