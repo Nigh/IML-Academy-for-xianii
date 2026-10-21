@@ -16,6 +16,18 @@
     guides = $state(true),
     process = $state(true);
   const result = $derived(measure(a, b));
+  const range = $derived(
+    1.4 *
+      Math.max(
+        1,
+        Math.abs(a.x),
+        Math.abs(a.y),
+        Math.abs(b.x),
+        Math.abs(b.y),
+        Math.abs(result.projection?.x ?? 0),
+        Math.abs(result.projection?.y ?? 0),
+      ),
+  );
   const fmt = (n: number) => Number(n.toFixed(4));
   function select(id: string) {
     const p = presets.find((p) => p.id === id)!;
@@ -77,19 +89,23 @@
       </div>
       <VectorDiagram
         vectors={[
-          { ...a, label: 'a', role: 'primary', draggable: true },
-          { ...b, label: 'b', role: 'secondary', draggable: true },
+          { ...a, label: result.aNorm === 0 ? '' : 'a', role: 'primary', draggable: true },
+          { ...b, label: result.bNorm === 0 ? '' : 'b', role: 'secondary', draggable: true },
           ...(result.projection
-            ? [{ ...result.projection, label: 'proj', role: 'accent' as const }]
+            ? [{ ...result.projection, label: '', role: 'accent' as const }]
             : []),
         ]}
-        range={6}
+        {range}
         onchange={change}
         projection={guides && result.projection ? { from: a, to: result.projection } : undefined}
         showAngle
         description={`a=(${a.x},${a.y}), b=(${b.x},${b.y})；点积 ${result.dot}`}
       />
     </div>
+    <p>
+      图例：a 为实线，b 为虚线；投影数值在下方单独列出，投影与 a
+      重合时保留真实重合关系。零投影落在原点，不另画方向箭头。视域按当前分量等比例调整，比较大小时请读取范数和坐标。
+    </p>
     <label><input type="checkbox" bind:checked={guides} /> 显示投影辅助线</label>
     <label><input type="checkbox" bind:checked={process} /> 显示计算过程</label>
     <div class="experiment-result" aria-live="polite">
