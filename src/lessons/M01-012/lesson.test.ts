@@ -1,0 +1,21 @@
+import { render, fireEvent, cleanup } from '@testing-library/svelte';
+import { afterEach, it, expect } from 'vitest';
+import Lesson from './Lesson.svelte';
+import definition from './lesson.ts';
+import { lessonById } from '../../lib/curriculum/catalog.ts';
+import { lessonDefinitionSchema } from '../../lib/lesson/contract.ts';
+afterEach(cleanup);
+it('协议、全部变换、矩阵参数与复位', async () => {
+  expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-012');
+  const v = render(Lesson, { metadata: lessonById.get('M01-012')! });
+  for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
+  expect(v.getByTestId('result').textContent).toContain('右上角像=(2,1)');
+  await fireEvent.click(v.getByText('场景二：剪切方格'));
+  expect(v.container.querySelectorAll('.after')).toHaveLength(10);
+  await fireEvent.click(v.getByText('场景三：压成直线'));
+  expect(v.getByTestId('result').textContent).toContain('右上角像=(1,0)');
+  await fireEvent.input(v.getByLabelText('A 第2行第2列'), { target: { value: '2' } });
+  expect(v.getByTestId('result').textContent).toContain('右上角像=(1,2)');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('result').textContent).toContain('右上角像=(2,1)');
+});
