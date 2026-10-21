@@ -1,0 +1,19 @@
+import { render, fireEvent, cleanup } from '@testing-library/svelte';
+import { afterEach, it, expect } from 'vitest';
+import Lesson from './Lesson.svelte';
+import definition from './lesson.ts';
+import { lessonById } from '../../lib/curriculum/catalog.ts';
+import { lessonDefinitionSchema } from '../../lib/lesson/contract.ts';
+afterEach(cleanup);
+it('协议、单位对照、尺度与复位', async () => {
+  expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-008');
+  const v = render(Lesson, { metadata: lessonById.get('M01-008')! });
+  for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
+  expect(v.getByTestId('result').textContent).toContain('L1=7.000 m；L2=5.000 m');
+  await fireEvent.click(v.getByText('场景二：第一特征改用毫米'));
+  expect(v.getByText(/显示分量：3000 mm/)).toBeTruthy();
+  await fireEvent.input(v.getByLabelText('第一特征尺度 (m)'), { target: { value: '3' } });
+  expect(v.getByText(/L2=4.123（无量纲）/)).toBeTruthy();
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByText(/显示分量：3 m/)).toBeTruthy();
+});
