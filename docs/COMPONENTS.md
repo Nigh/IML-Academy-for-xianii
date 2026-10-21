@@ -45,6 +45,7 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 
 图表最小逻辑宽度保持文字可读，移动端只在图内横向滚动；SVG 高 DPI 自适应，无外部字体/CDN。
 关键结果必须另外放在正文或 aria-live output；图形标题不能替代所有数学解释。
+预设参数、视域与标签布局按 [LESSON_SPEC §4.1](LESSON_SPEC.md#41-预设图形的可读性验收) 逐项验收。共享组件不会自动保证所有输入组合的布局可读；课程应显式选择 `range` / `xRange` / `yRange`，避免内容挤在原点附近。该要求是使用与验收约束，不新增自动缩放、标签避让等组件能力或修改 v1 props。
 例：`<HistogramPlot samples={samples} bins={20} mode="density" />`；
 `<ContourPlot contours={levels} path={trajectory} current={point} xRange={[-5,5]} yRange={[-5,5]} description="椭圆为目标值等高线" />`。
 
