@@ -1,0 +1,21 @@
+import { render, fireEvent, cleanup } from '@testing-library/svelte';
+import { afterEach, it, expect } from 'vitest';
+import Lesson from './Lesson.svelte';
+import definition from './lesson.ts';
+import { lessonById } from '../../lib/curriculum/catalog.ts';
+import { lessonDefinitionSchema } from '../../lib/lesson/contract.ts';
+afterEach(cleanup);
+it('协议、预设、参数与复位', async () => {
+  expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-004');
+  const v = render(Lesson, { metadata: lessonById.get('M01-004')! });
+  for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
+  expect(v.getByTestId('result').textContent).toContain('当前组合属于集合');
+  await fireEvent.click(v.getByText('场景二：平移直线'));
+  expect(v.getByTestId('result').textContent).toContain('缺陷 1.000');
+  await fireEvent.click(v.getByText('场景三：乘以零'));
+  expect(v.getByTestId('result').textContent).toContain('缺陷 -1.000');
+  await fireEvent.input(v.getByLabelText('偏移 d'), { target: { value: '0' } });
+  expect(v.getByTestId('result').textContent).toContain('当前组合属于集合');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('result').textContent).toContain('缺陷 0.000');
+});
