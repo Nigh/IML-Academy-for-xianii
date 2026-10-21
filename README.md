@@ -1,5 +1,7 @@
 # Interactive Machine Learning Academy for xianii
 
+<img src="public/logo.webp" alt="IML Academy for xianii 标志" width="200" height="200" />
+
 面向工程师的交互式机器学习自学课程。用中文建立数学直觉，通过浏览器实验验证原理，再在本地环境完成工程实践。
 
 **12 个模块 · 247 节预注册课程 · Phase 0：1 节已发布示范课，其余为规划页。**

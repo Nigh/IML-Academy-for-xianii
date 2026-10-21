@@ -54,10 +54,14 @@
   }}>跳到主要内容</a
 >
 <header class="app-header">
-  <a class="brand" href="#/"
-    ><span class="brand-mark" aria-hidden="true">M<span>↗</span></span><span
-      ><strong>IML Academy</strong><small>FOR XIANII</small></span
-    ></a
+  <a class="brand" href="#/" aria-labelledby="brand-name"
+    ><img
+      class="brand-mark"
+      src={`${import.meta.env.BASE_URL}logo.webp`}
+      alt=""
+      width="44"
+      height="44"
+    /><span id="brand-name"><strong>IML Academy</strong><small>FOR XIANII</small></span></a
   ><button
     class="btn btn-sm btn-ghost mobile-menu"
     aria-expanded={menuOpen}
