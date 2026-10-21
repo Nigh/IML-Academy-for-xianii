@@ -137,23 +137,10 @@ a:hover {
   gap: 0.75rem;
 }
 .brand-mark {
-  height: 2.25rem;
-  width: 2.25rem;
-  display: grid;
-  place-content: center;
-  background: var(--color-base-200);
-  border: 1px solid var(--color-base-300);
-  border-radius: var(--radius-selector);
-  font-family: var(--font-mono);
-  color: var(--color-primary);
-  font-weight: 700;
-  position: relative;
-}
-.brand-mark span {
-  position: absolute;
-  font-size: var(--font-size-xs);
-  right: 0.125rem;
-  top: -0.25rem;
+  height: 2.75rem;
+  width: 2.75rem;
+  flex-shrink: 0;
+  object-fit: contain;
 }
 .brand strong {
   display: block;
@@ -1022,7 +1009,8 @@ dialog p {
     font-size: var(--font-size-sm);
   }
   .brand-mark {
-    display: none;
+    height: 2rem;
+    width: 2rem;
   }
   .brand small {
     font-size: var(--font-size-xs);
@@ -1211,4 +1199,10 @@ dialog p {
 .experiment-result {
   color: var(--color-base-content);
   border-inline-start: 2px solid var(--color-accent);
+}
+
+@media (max-width: 400px) {
+  .brand > span {
+    display: none;
+  }
 }
