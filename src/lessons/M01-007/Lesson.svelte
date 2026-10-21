@@ -1,0 +1,162 @@
+<script lang="ts">
+  import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
+  import TheorySection from '../../components/lesson/TheorySection.svelte';
+  import FormulaBlock from '../../components/math/FormulaBlock.svelte';
+  import InteractivePanel from '../../components/interactive/InteractivePanel.svelte';
+  import ParameterSlider from '../../components/interactive/ParameterSlider.svelte';
+  import PresetSelector from '../../components/interactive/PresetSelector.svelte';
+  import VectorDiagram from '../../components/charts/VectorDiagram.svelte';
+  import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
+  import LessonSummary from '../../components/lesson/LessonSummary.svelte';
+  import { measure, presets, limitComponents } from './experiment.ts';
+  let { metadata }: LessonBodyProps = $props();
+  let a = $state({ x: 3, y: 1 }),
+    b = $state({ x: 1, y: 3 }),
+    preset = $state('arbitrary'),
+    guides = $state(true),
+    process = $state(true);
+  const result = $derived(measure(a, b));
+  const fmt = (n: number) => Number(n.toFixed(4));
+  function select(id: string) {
+    const p = presets.find((p) => p.id === id)!;
+    a = { ...p.a };
+    b = { ...p.b };
+    preset = id;
+  }
+  function reset() {
+    select('arbitrary');
+    guides = true;
+    process = true;
+  }
+  function change(i: number, x: number, y: number) {
+    const value = limitComponents({ x, y });
+    if (i === 0) a = value;
+    else b = value;
+    preset = 'custom';
+  }
+</script>
+
+<TheorySection id="motivation" title="两个特征朝向是否一致？"
+  ><p>
+    检索系统比较两个样本的特征，神经网络在线性层计算输入与权重的匹配。{metadata.title}让我们从两个数值列表走向方向与长度的几何关系。本课所有分量为无量纲的二维实数，不涉及真实训练。
+  </p></TheorySection
+>
+<TheorySection id="intuition" title="把一个箭头投到另一个方向"
+  ><p>
+    把 b 当作参考方向。a 沿 b 的分量越大，点积通常越大；但 b
+    自身的长度也参与乘法。因此，只有去除长度的影响后，才适合比较方向相似性。锐角、直角与钝角分别对应正、零、负点积。
+  </p></TheorySection
+>
+<TheorySection id="experiment" title="先预测符号，再移动端点">
+  <InteractivePanel
+    title="方向与尺度的对照实验"
+    instructions="选择预设，先预测点积正负。拖动 a、b 的圆形端点，或使用同步数值控件。每个分量范围 −5 至 5，超范围输入不传播。"
+    meaning="范数、点积、角度和投影均按当前向量解析计算；角度单位为度。"
+    limitations="二维欧氏空间、同一坐标系、无量纲特征；零向量方向不定义。"
+    onreset={reset}
+  >
+    <PresetSelector {presets} value={preset} defaultId="arbitrary" onchange={select} />
+    <div class="vector-lab">
+      <div>
+        {#each ['x', 'y'] as axis (axis)}<ParameterSlider
+            label={`a 的 ${axis} 分量`}
+            value={a[axis as 'x' | 'y']}
+            min={-5}
+            max={5}
+            step={0.1}
+            onchange={(v) => change(0, axis === 'x' ? v : a.x, axis === 'y' ? v : a.y)}
+          />{/each}
+        {#each ['x', 'y'] as axis (axis)}<ParameterSlider
+            label={`b 的 ${axis} 分量`}
+            value={b[axis as 'x' | 'y']}
+            min={-5}
+            max={5}
+            step={0.1}
+            onchange={(v) => change(1, axis === 'x' ? v : b.x, axis === 'y' ? v : b.y)}
+          />{/each}
+      </div>
+      <VectorDiagram
+        vectors={[
+          { ...a, label: 'a', role: 'primary', draggable: true },
+          { ...b, label: 'b', role: 'secondary', draggable: true },
+          ...(result.projection
+            ? [{ ...result.projection, label: 'proj', role: 'accent' as const }]
+            : []),
+        ]}
+        range={6}
+        onchange={change}
+        projection={guides && result.projection ? { from: a, to: result.projection } : undefined}
+        showAngle
+        description={`a=(${a.x},${a.y}), b=(${b.x},${b.y})；点积 ${result.dot}`}
+      />
+    </div>
+    <label><input type="checkbox" bind:checked={guides} /> 显示投影辅助线</label>
+    <label><input type="checkbox" bind:checked={process} /> 显示计算过程</label>
+    <div class="experiment-result" aria-live="polite">
+      <strong data-testid="dot-result">点积 = {fmt(result.dot)}</strong><span
+        >‖a‖ = {fmt(result.aNorm)}；‖b‖ = {fmt(result.bNorm)}</span
+      ><span>夹角 = {result.angle === null ? '未定义' : `${fmt(result.angle)}°`}</span><span
+        >投影 = {result.projection
+          ? `(${fmt(result.projection.x)}, ${fmt(result.projection.y)})`
+          : '未定义：b 为零向量'}</span
+      >
+    </div>
+    {#if process}<FormulaBlock
+        latex={`${a.x} \\times (${b.x}) + (${a.y}) \\times (${b.y}) = ${fmt(result.dot)}`}
+        description="逐分量相乘并相加；对照图中的投影。"
+      />{/if}
+    <p>
+      探索一：从正交预设开始，只改变 a 的长度，点积仍为零。探索二：选择平行，把 b
+      缩短一半，角度不变而点积减半。探索三：选择零向量，检查哪些量仍然有定义。
+    </p>
+  </InteractivePanel>
+</TheorySection>
+<TheorySection id="mathematics" title="把投影写成公式">
+  <FormulaBlock
+    latex={String.raw`\|\mathbf v\|_2=\sqrt{v_x^2+v_y^2},\quad\mathbf a^\mathsf T\mathbf b=a_xb_x+a_yb_y=\|\mathbf a\|_2\|\mathbf b\|_2\cos\theta`}
+    description="a、b、v 是二维实列向量；分量和范数均无量纲，θ∈[0,π] 为弧度，界面换算为度。代数内积允许零向量；夹角及含 cosθ 的几何表达要求两向量均非零。"
+  />
+  <FormulaBlock
+    latex={String.raw`\operatorname{proj}_{\mathbf b}(\mathbf a)=\frac{\mathbf a^\mathsf T\mathbf b}{\mathbf b^\mathsf T\mathbf b}\mathbf b,\quad\mathbf b\ne\mathbf0`}
+    description="先求参考方向的单位向量，再取 a 在该方向上的有符号长度，最后恢复为向量。投影与 b 平行，残差与 b 正交。"
+  />
+  <p>
+    计算夹角时先归一化，再将余弦值限制在 [−1,1]，避免浮点舍入使 arccos
+    的输入越界。精确的零向量返回未定义，近零非零向量仍有数学方向，但测量误差可能让这个方向非常不可靠。
+  </p>
+</TheorySection>
+<TheorySection id="pitfalls" title="点积不是纯粹的方向分数"
+  ><CommonMistakes
+    items={[
+      {
+        mistake: '内积大就意味着夹角小',
+        correction:
+          '(100,0) 与 (1,1) 点积 100，而 (1,0) 与 (1,0) 点积 1；前者夹角反而更大。比较方向时需要归一化。',
+      },
+      {
+        mistake: '点积为零总能推出夹角 90°',
+        correction: '还需要两个向量非零。零向量和任何向量点积均为零，但夹角未定义。',
+      },
+      {
+        mistake: '对零向量也能投影',
+        correction: '目标方向 b=0 时分母为零；a=0、b 非零时投影则合法且为零。',
+      },
+    ]}
+  /></TheorySection
+>
+<TheorySection id="engineering" title="从传感器投影到线性层"
+  ><p>
+    传感器测量向量投影到已知单位轴，可提取该轴的分量；多轴标定与最小二乘使用内积来衡量残差。特征余弦相似度去除长度影响，适用于方向有意义的表示。线性层以每一行权重与输入的内积再加偏置得到输出。真实带单位测量的点积单位是两个分量单位的乘积，归一化与比较之前必须统一坐标和尺度。
+  </p></TheorySection
+>
+<TheorySection id="summary" title="带走四个结论"
+  ><LessonSummary
+    points={[
+      '范数描述长度，方向还需向量非零。',
+      '点积同时依赖两向量长度和夹角。',
+      '投影提取参考方向的有符号分量。',
+      '零向量与浮点误差需要明确处理。',
+    ]}
+    related={['M01-002', 'M01-008']}
+  /></TheorySection
+>
