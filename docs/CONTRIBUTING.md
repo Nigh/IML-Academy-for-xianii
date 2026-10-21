@@ -12,7 +12,7 @@
 | 公共组件、类型、依赖、构建 | 独立基础设施分支/PR，先保证旧课程兼容                                                   |
 | 规范、共享文档、任务卡生成 | 独立 `docs/<topic>` PR；生成器与其生成文档在同一 PR 更新                                |
 
-课程使用独立 worktree，一个文件同一时间只有一个所有者。禁止多课捆绑、无关改动或全局格式化。提交示例：`feat(M03-010): add deterministic gradient descent experiment`。
+单课使用独立分支；多个 Agent 并行开发时各用独立 worktree，不共享可写工作目录。一个文件同一时间只有一个所有者。禁止多课捆绑、无关改动或全局格式化。提交示例：`feat(M03-010): add deterministic gradient descent experiment`。
 
 ## 检查与合并
 

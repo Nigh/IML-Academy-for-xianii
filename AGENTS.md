@@ -13,7 +13,8 @@ LESSON_SPEC owns teaching acceptance; task cards add lesson-specific requirement
 
 A lesson task may modify only `src/lessons/<LESSON_ID>/**` and `labs/lessons/<LESSON_ID>/**`.
 Do not edit curriculum identity, app/router, shared components, package dependencies, build configuration or this file in a lesson PR.
-Use an isolated branch/worktree: `lesson/M03-010-gradient-descent`.
+Use an isolated branch: `lesson/M03-010-gradient-descent`.
+Parallel agents must use separate worktrees and must not share a writable checkout.
 One file has one owner at a time. Shared infrastructure changes belong in a separate task/PR.
 Prefer existing components; otherwise build a lesson-specific component inside your own directory.
 Record a reusable capability request in your PR rather than changing shared interfaces.
