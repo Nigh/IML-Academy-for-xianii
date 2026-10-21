@@ -37,13 +37,15 @@ pnpm test:e2e
 
 ## 开发一节课程
 
-1. 阅读 [AGENTS.md](AGENTS.md)、[课程协议](docs/LESSON_SPEC.md)、[组件合同](docs/COMPONENTS.md)。
+1. 阅读 [AGENTS.md](AGENTS.md)、[架构](docs/ARCHITECTURE.md)、[课程协议](docs/LESSON_SPEC.md)、[组件合同](docs/COMPONENTS.md)。
 2. 从 [课程目录](docs/CURRICULUM.md) 选择已注册 ID，读取 `curriculum/tasks/<ID>.md`。
 3. 创建 `lesson/<ID>-<slug>` 分支或独立 worktree。
 4. 只在 `src/lessons/<ID>/` 和 `labs/lessons/<ID>/` 实现该课。
 5. 提供 `lesson.ts`、`Lesson.svelte`、`experiment.ts`、`experiment.test.ts`、`lesson.test.ts`。
-6. 声明 draft 开始开发。内容与必要验证完成后改为 ready。
-7. 运行以上检查，提交一个课程的 PR，附截图与数学验证证据。
+6. 声明 draft 开始开发；按课程协议提供至少两个探索场景、两个误区/限制、2–4 道理解题和 3–5 个总结要点，完成教学审阅与必要验证后改为 ready。
+7. 每节课程（含修订）单独提交目标为 main 的 PR，附实际检查、截图、数学验证、限制和修改文件清单；CI 与内容审阅通过后合并，禁止直接推送 main。
+
+共享文档与基础设施变更也通过独立 PR 合并 main。完整流程见 [贡献指南](docs/CONTRIBUTING.md)。
 
 无需修改 App、路由或中央实现注册表。未实现的已注册课程自动显示同一个规划页。
 
