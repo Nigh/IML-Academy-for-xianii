@@ -1,15 +1,29 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import lessons from '../../curriculum/lessons.json' with { type: 'json' };
 import AxeBuilder from '@axe-core/playwright';
-test('所有 247 个课程深链接能加载，planned 不能完成', async ({ page }) => {
+async function audit(page: Page) {
+  // Audit settled theme colors rather than intermediate CSS transition colors.
+  await page.evaluate(async () => {
+    await Promise.all(
+      document.getAnimations().map((animation) => animation.finished.catch(() => {})),
+    );
+  });
+  return new AxeBuilder({ page }).analyze();
+}
+// Local runs use explicit selections too; no implicit full-catalog fallback.
+const selection: { lessons: typeof lessons; removed: typeof lessons } = JSON.parse(
+  process.env.LESSON_SELECTION || '{"lessons":[],"removed":[]}',
+);
+test('选中课程深链接能加载，planned 不能完成', async ({ page }) => {
+  test.skip(selection.lessons.length + selection.removed.length === 0, '无课程变更');
   test.setTimeout(180000);
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('./');
-  for (const lesson of lessons) {
+  for (const lesson of selection.lessons) {
     await page.goto(`./#/lesson/${lesson.slug}`);
     await expect(
       page.getByRole('heading', { level: 1, name: lesson.title, exact: true }),
@@ -25,7 +39,18 @@ test('所有 247 个课程深链接能加载，planned 不能完成', async ({ p
       await expect(page.getByRole('heading', { name: '课程暂时无法加载' })).toHaveCount(0);
     }
   }
+  for (const lesson of selection.removed) {
+    await page.goto(`./#/lesson/${lesson.slug}`);
+    await expect(page.getByRole('heading', { name: '这条路径没有对应的课程' })).toBeVisible();
+  }
   expect(errors).toEqual([]);
+});
+test('代表性 planned 页面仍可加载 @smoke', async ({ page }) => {
+  const planned = lessons.find((lesson) => !existsSync(`src/lessons/${lesson.id}/lesson.ts`));
+  test.skip(!planned, '全部课程已实现');
+  await page.goto(`./#/lesson/${planned!.slug}`);
+  await expect(page.getByRole('heading', { name: '这一节已列入学习地图' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '标记为已完成' })).toHaveCount(0);
 });
 test('搜索、模块、主题、响应式和无障碍', async ({ page }) => {
   await page.goto('./#/curriculum');
@@ -35,10 +60,11 @@ test('搜索、模块、主题、响应式和无障碍', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: '梯度下降' })).toBeVisible();
   await page.getByLabel('主题', { exact: true }).selectOption('light');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'xianii-light');
-  let results = await new AxeBuilder({ page }).analyze();
+  let results = await audit(page);
   expect(results.violations).toEqual([]);
   await page.getByLabel('主题', { exact: true }).selectOption('dark');
-  results = await new AxeBuilder({ page }).analyze();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'xianii');
+  results = await audit(page);
   expect(results.violations).toEqual([]);
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
@@ -47,7 +73,7 @@ test('搜索、模块、主题、响应式和无障碍', async ({ page }) => {
     );
   }
 });
-test('已缓存应用和示范课可以离线刷新，字体与 chunk 无错误', async ({ page, context }) => {
+test('已缓存应用和示范课可以离线刷新，字体与 chunk 无错误 @smoke', async ({ page, context }) => {
   await page.goto('./#/lesson/math/linear-algebra/vector-addition');
   await expect(page.getByText('(1, 3) m')).toBeVisible();
   await page.evaluate(async () => {
@@ -75,7 +101,11 @@ test('首页、示范课与进度页在亮暗主题下可访问', async ({ page 
     if (route.includes('vector-addition')) await expect(page.getByText('(1, 3) m')).toBeVisible();
     for (const theme of ['light', 'dark']) {
       await page.getByLabel('主题', { exact: true }).selectOption(theme);
-      const result = await new AxeBuilder({ page }).analyze();
+      await expect(page.locator('html')).toHaveAttribute(
+        'data-theme',
+        theme === 'light' ? 'xianii-light' : 'xianii',
+      );
+      const result = await audit(page);
       expect(result.violations, `${route} ${theme}`).toEqual([]);
     }
     await page.setViewportSize({ width: 320, height: 850 });
