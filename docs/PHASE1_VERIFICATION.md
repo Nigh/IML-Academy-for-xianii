@@ -1,5 +1,7 @@
 # Phase 1 实现与验证记录
 
+> 本文记录 Phase 1 当时的交付规则和事实。当前规则见 CONTRIBUTING：新建课程仍一课一 PR，既有课程的授权批量修订允许一个 PR；下文的集中分支限制不适用于后一种情况。
+
 日期：2026-10-21。Node 24.9.0、pnpm 11.5.2，Svelte 5 + TypeScript strict + Vite。
 原集成分支：`codex/phase1-interactive`；发布使用独立 worktree 与分支。基线工作区干净；没有覆盖用户未提交修改。
 

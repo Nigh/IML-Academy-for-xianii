@@ -11,13 +11,14 @@ LESSON_SPEC owns teaching acceptance; task cards add lesson-specific requirement
 
 ## Ownership
 
-A lesson task may modify only `src/lessons/<LESSON_ID>/**` and `labs/lessons/<LESSON_ID>/**`.
-Do not edit curriculum identity, app/router, shared components, package dependencies, build configuration or this file in a lesson PR.
-Use an isolated branch: `lesson/M03-010-gradient-descent`.
+A new-lesson creation task may modify only `src/lessons/<LESSON_ID>/**` and `labs/lessons/<LESSON_ID>/**`.
+Do not edit curriculum identity, app/router, shared components, package dependencies, build configuration or this file in a new-lesson PR.
+Use an isolated `lesson/<LESSON_ID>-<slug>` branch for new lessons.
+For authorized batch revisions of existing lessons, use one `codex/<topic>` branch and one PR. The same PR may include directly related shared-component, prerequisite, constraint-document and generated-task updates; list all affected lesson IDs, file scope and verification. Do not include new lessons or unrelated changes.
 Parallel agents must use separate worktrees and must not share a writable checkout.
-One file has one owner at a time. Shared infrastructure changes belong in a separate task/PR.
+One file has one owner at a time. Outside an authorized batch revision, shared infrastructure changes belong in a separate task/PR.
 Prefer existing components; otherwise build a lesson-specific component inside your own directory.
-Record a reusable capability request in your PR rather than changing shared interfaces.
+For new lessons, record a reusable capability request in your PR rather than changing shared interfaces.
 
 ## Architecture
 
@@ -55,7 +56,7 @@ Use native dialog with title, cancel and focus handling; do not use alert/confir
 
 Run `pnpm check`, `pnpm lint`, `pnpm validate:curriculum`, `pnpm validate:lessons`, `pnpm test`, `pnpm build`.
 Use `pnpm test:e2e` for browser-impacting changes. A ready declaration requires actual content, quiz, math tests and component tests.
-Use Conventional Commits. Each lesson (including revisions) uses one PR targeting main; never bundle lessons or push directly to main.
-Shared documentation and infrastructure also use separate PRs. Merge only after all CI checks pass and content review is complete; do not bypass failed checks. Follow docs/CONTRIBUTING.md.
+Use Conventional Commits. Each newly created lesson uses one PR targeting main; never bundle new lessons or push directly to main. Existing lessons may be revised together in an authorized batch-revision PR.
+Shared documentation and infrastructure normally use separate PRs; directly related changes may join an authorized batch-revision PR. Merge only after all CI checks pass and content review is complete; do not bypass failed checks. Follow docs/CONTRIBUTING.md.
 Report the lesson ID, implemented interactions, mathematical verification, actual checks/results, theme/responsive/link/scope checks, limitations and changed files. Attach screenshots or interaction evidence; mark inapplicable/unrun checks honestly.
 Never claim hardware/GPU verification you did not execute.
