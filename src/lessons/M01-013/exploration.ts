@@ -1,15 +1,15 @@
 export const exploration = {
-  prompt: '矩阵两列为(1,2)和(2,4)。所有输出能铺满平面吗？',
+  prompt: '两路执行器分别沿(1,2)和(2,4)推动，能到达任意方向吗？',
   options: [
     {
       text: '不能，输出只能沿一个方向变化',
       correct: true,
-      observation: '试着改变输入而保持输出不动，辨认列之间的倍数关系。',
+      observation: '分别推动两路，再点相互抵消，比较平台的移动方向。',
     },
     {
       text: '能，两列就对应两个独立方向',
       correct: false,
-      observation: '观察两列端点的朝向，比较它们是否提供不同方向。',
+      observation: '切换两路执行器，观察平台能否离开原来的直线。',
     },
   ],
   hints: [

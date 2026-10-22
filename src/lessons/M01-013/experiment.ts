@@ -69,3 +69,23 @@ export function experiment(mode: string, epsilon: number, tolerance: number) {
     range: mode === 'dependent' ? 5 : 1.25,
   };
 }
+
+/** Bounded, ideal two-input actuator model; no hardware calibration. */
+export function actuate(matrix: readonly (readonly number[])[], a: number, b: number) {
+  if (
+    matrix.length !== 2 ||
+    matrix.some(
+      (row) => row.length !== 2 || row.some((n) => !Number.isFinite(n) || Math.abs(n) > 4),
+    ) ||
+    ![a, b].every((n) => Number.isFinite(n) && Math.abs(n) <= 1)
+  )
+    throw new RangeError('2×2有限矩阵元素±4；指令±1。');
+  const apply = (x: number, y: number) => ({
+    x: matrix[0][0] * x + matrix[0][1] * y,
+    y: matrix[1][0] * x + matrix[1][1] * y,
+  });
+  return {
+    position: apply(a, b),
+    corners: [apply(-1, -1), apply(1, -1), apply(1, 1), apply(-1, 1)],
+  };
+}

@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '只改记录单位，最近邻的判断为什么会变？' },
+    { id: 'motivation', title: '沿街送货与直达，哪条路线更短？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '同一位移，不同数值表示' },
+    { id: 'experiment', title: '规划路线，再切换记录单位' },
     { id: 'intuition', title: '直达与沿轴移动' },
     { id: 'mathematics', title: '从范数定义距离' },
     { id: 'pitfalls', title: '度量包含尺度选择' },

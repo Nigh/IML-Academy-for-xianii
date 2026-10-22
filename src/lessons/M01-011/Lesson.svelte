@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ObjectWorkbench from './ObjectWorkbench.svelte';
   import PredictionLab from '../../components/lesson/PredictionLab.svelte';
   import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
@@ -48,8 +49,10 @@
   }
 </script>
 
-<TheorySection id="motivation" title="一个输出格子为什么要读取整行和整列？">
-  <p>A有2行3列，B有3行2列。AB第一个格子应如何计算？</p>
+<TheorySection id="motivation" title="两批订单要准备多少资源？">
+  <p>
+    每批订单包含三种产品，每种产品消耗两种资源。给一种产品加一件，观察哪批、哪种资源的总量改变，再把逐项汇总写成矩阵乘法。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -63,17 +66,29 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="编辑矩阵并逐格检查">
+<TheorySection id="experiment" title="加一件产品，核算整批资源">
   <p>逐格查看乘积来源，再编辑一个权重；比较剪切与缩放的AB、BA，找出顺序改变后哪项贡献不同。</p>
   <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
     <InteractivePanel
       title="每一个乘积从哪里来"
-      instructions="默认2×3乘3×2。矩阵单元格可键盘编辑，有限值范围±1e6；非法输入不传播。结果行/列索引从0开始，数学公式从1开始。预设切换和复位同时重置索引。"
+      instructions="先选择批次和资源，给产品加一件并观察汇总；再核对高亮矩阵行列。默认2×3乘3×2，单元格有限值±1e6，非法输入不传播。顺序预设改用无量纲线性变换解释。"
       meaning="A中高亮当前行，B中高亮当前列，AB高亮当前结果。下方列出实际逐项乘积及相加结果；另显示BA，比较形状与顺序。"
       limitations="最多3×3的有界解析模型，无性能基准或训练。小数使用双精度浮点；形状兼容也不保证特征顺序或单位语义兼容。"
       onreset={() => select('rectangular')}
     >
       <PresetSelector {presets} value={selected} defaultId="rectangular" onchange={select} />
+      <ObjectWorkbench
+        {a}
+        {b}
+        product={result.product}
+        {i}
+        {j}
+        onselect={(row, col) => {
+          i = row;
+          j = col;
+        }}
+        onquantity={(k, n) => edit('a', i, k, n)}
+      />
       <h3>A · {a.length}×{a[0].length}</h3>
       <MatrixView
         values={a}

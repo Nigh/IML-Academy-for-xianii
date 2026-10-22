@@ -21,3 +21,16 @@ it('协议、四个预设、候选与复位', async () => {
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByTestId('result').textContent).toContain('(3.000,0.000)');
 });
+
+it('现实对象操作与数学结果共享状态，复位恢复默认', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-009')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  const initial = v.getByTestId('object-reading').textContent;
+  const before = v.getByTestId('rail-carriage').getAttribute('x');
+  await fireEvent.click(v.getByRole('button', { name: '小车前进半步' }));
+  expect(v.getByTestId('rail-carriage').getAttribute('x')).not.toBe(before);
+  expect(v.getByTestId('object-reading').textContent).toContain('小车位置 (1.500, 0.000)');
+  expect(v.getByText(/候选距离：2.500/)).toBeTruthy();
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('object-reading').textContent).toBe(initial);
+});

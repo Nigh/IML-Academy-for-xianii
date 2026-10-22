@@ -18,3 +18,16 @@ it('协议、单位对照、尺度与复位', async () => {
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByText(/显示分量：3 m/)).toBeTruthy();
 });
+
+it('现实对象操作与数学结果共享状态，复位恢复默认', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-008')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  const initial = v.getByTestId('object-reading').textContent;
+  expect(v.getByTestId('object-reading').textContent).toContain('沿街 7.000 m；直达 5.000 m');
+  const before = v.getByTestId('delivery-target').getAttribute('cx');
+  await fireEvent.click(v.getByRole('button', { name: '收货点向东 1 m' }));
+  expect(v.getByTestId('delivery-target').getAttribute('cx')).not.toBe(before);
+  expect(v.getByTestId('result').textContent).toContain('L1=8.000 m；L2=5.657 m');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('object-reading').textContent).toBe(initial);
+});

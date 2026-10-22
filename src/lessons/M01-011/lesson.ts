@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '一个输出格子为什么要读取整行和整列？' },
+    { id: 'motivation', title: '两批订单要准备多少资源？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '编辑矩阵并逐格检查' },
+    { id: 'experiment', title: '加一件产品，核算整批资源' },
     { id: 'intuition', title: '一格是一次行列匹配' },
     { id: 'mathematics', title: '内维度收缩，外维度保留' },
     { id: 'pitfalls', title: '顺序和形状不能省略' },

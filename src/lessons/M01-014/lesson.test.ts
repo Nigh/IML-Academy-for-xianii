@@ -25,3 +25,20 @@ it('协议、预设、参数改变与复位', async () => {
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByTestId('result').textContent).toContain('当前输入=(1,-1)');
 });
+
+it('现实对象操作与数学结果共享状态，复位恢复默认', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-014')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  const initial = v.getByTestId('object-reading').textContent;
+  await fireEvent.click(v.getByRole('button', { name: '第一路加半格，第二路减半格' }));
+  expect(v.getByTestId('channel-one').textContent).toBe('1.50');
+  expect(v.getByTestId('object-reading').textContent).toContain('输入 (1.500, -1.500)；输出 0.000');
+  expect(v.getByTestId('result').textContent).toContain('Ax=(0)');
+  await fireEvent.click(v.getByText('场景二：满列秩'));
+  expect(v.getByRole('button', { name: '第一路加半格，第二路减半格' })).toHaveProperty(
+    'disabled',
+    true,
+  );
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('object-reading').textContent).toBe(initial);
+});

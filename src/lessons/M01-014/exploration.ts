@@ -1,5 +1,5 @@
 export const exploration = {
-  prompt: '仪器只报告x₁+x₂。给输入增加(t,−t)，读数如何变化？',
+  prompt: '仪表只显示两路总和。第一路加半格、第二路减半格，读数如何变化？',
   options: [
     {
       text: '读数增加2t',

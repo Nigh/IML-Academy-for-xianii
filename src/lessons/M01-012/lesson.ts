@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '只知道两个单位方向的去处，够不够画出整个变换？' },
+    { id: 'motivation', title: '改变印章形状，内部标记会去哪里？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '变换网格和单位正方形' },
+    { id: 'experiment', title: '变形印章，再核对矩阵与网格' },
     { id: 'intuition', title: '看两根基向量去哪里' },
     { id: 'mathematics', title: '列向量决定整个映射' },
     { id: 'pitfalls', title: '线性与平移的边界' },
