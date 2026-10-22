@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('协议、预设、第三向量开关与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-006');
   const v = render(Lesson, { metadata: lessonById.get('M01-006')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   await fireEvent.click(v.getByText('场景一对照：共线二向量'));
   expect(v.getByTestId('result').textContent).toContain('秩=1');

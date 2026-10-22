@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '只保留一个方向时，删掉的信息能否从其他方向补回来？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '只保存主要结构会丢什么' },
+    { id: 'experiment', title: '逐项恢复矩阵' },
     { id: 'intuition', title: '保留强方向，舍弃弱方向' },
     { id: 'mathematics', title: '截断SVD与最优误差' },
-    { id: 'experiment', title: '逐项恢复矩阵' },
     { id: 'pitfalls', title: '能量保留不等于细节无损' },
     { id: 'summary', title: '明确压缩目标和误差' },
   ],

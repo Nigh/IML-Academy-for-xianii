@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '权重可以随便调，就一定能命中任意目标吗？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '模型能合成哪些目标' },
+    { id: 'experiment', title: '尝试命中目标' },
     { id: 'intuition', title: '固定方向，改变系数' },
     { id: 'mathematics', title: '从一次组合到整个张成空间' },
-    { id: 'experiment', title: '尝试命中目标' },
     { id: 'pitfalls', title: '更多向量不一定增加方向' },
     { id: 'summary', title: '张成描述表达能力' },
   ],

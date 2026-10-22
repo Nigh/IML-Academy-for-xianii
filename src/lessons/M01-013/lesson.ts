@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '矩阵有两列，就一定保留两份独立信息吗？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '输出还能保留几个方向' },
+    { id: 'experiment', title: '逐步缩小一个方向' },
     { id: 'intuition', title: '列空间决定可达输出' },
     { id: 'mathematics', title: '精确秩与阈值下的数值秩' },
-    { id: 'experiment', title: '逐步缩小一个方向' },
     { id: 'pitfalls', title: '图形和容差的边界' },
     { id: 'summary', title: '秩回答独立方向数量' },
   ],

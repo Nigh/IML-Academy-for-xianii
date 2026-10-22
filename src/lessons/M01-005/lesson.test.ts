@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('章节、两场景、系数与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-005');
   const v = render(Lesson, { metadata: lessonById.get('M01-005')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('当前误差=0.0000');
   await fireEvent.click(v.getByText('场景二：两个共线方向'));

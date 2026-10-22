@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '相同测量规则，为什么能出现唯一解、无穷解和无解？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '标定能否唯一反推参数' },
+    { id: 'experiment', title: '切换右端项与解的类型' },
     { id: 'intuition', title: '约束直线的三种关系' },
     { id: 'mathematics', title: '逆矩阵需要什么条件' },
-    { id: 'experiment', title: '切换右端项与解的类型' },
     { id: 'pitfalls', title: '奇异与无解不是同义词' },
     { id: 'summary', title: '先判存在性再判唯一性' },
   ],

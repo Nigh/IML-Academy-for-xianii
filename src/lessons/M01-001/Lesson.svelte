@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -6,12 +8,12 @@
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
-  import ExperimentGuide from '../../components/lesson/ExperimentGuide.svelte';
   import InteractivePanel from '../../components/interactive/InteractivePanel.svelte';
   import ParameterSlider from '../../components/interactive/ParameterSlider.svelte';
   import PresetSelector from '../../components/interactive/PresetSelector.svelte';
   import VectorDiagram from '../../components/charts/VectorDiagram.svelte';
   import { experiment, formatVector, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let x = $state(3),
     y = $state(4),
@@ -21,6 +23,7 @@
     presets.find((p) => p.x === x && p.y === y && p.degrees === degrees)?.id ?? 'custom',
   );
   function select(id: string) {
+    if (id === 'displacement') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       x = p.x;
@@ -30,6 +33,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="两台导航仪报告不同的坐标，可能记录了同一段位移吗？">
+  <p>地图上向东3m、向北4m的位移保持不动。只把坐标轴逆时针转90°，会发生什么？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     课程从高中平面坐标、实数、勾股定理和正弦余弦开始。不需要先会矩阵乘法或内积；本课先教会读向量，再理解同一位移为什么有不同坐标。
@@ -41,13 +47,70 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="25°C 与向东走多远">
-  <p>
-    温度计报告25°C，一个数值和单位就足够。导航若只说“移动5m”，终点却可能在很多方向。我们先用向东3m、向北4m的位移，学习如何在同一个坐标系里保留大小和方向。
-  </p>
-  <p>
-    温度的单位不是方向。标量也可以有单位、可以为负；向量则用多个分量记录相对于基的关系。本课是二维欧氏平面的解析教学模型，没有采样或训练。
-  </p>
+
+<TheorySection id="experiment" title="移动坐标轴，保持位移">
+  <p>固定原分量，只转动轴，再把位移设为零。比较“分量改变”和“方向未定义”各自发生在什么条件下。</p>
+  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+    <InteractivePanel
+      title="同一位移，两套分量"
+      instructions="默认位移为 (3,4)m、转角为 0°。分量范围 −5 至 5m，转角 −180 至 180°；非法或非有限输入不会进入计算。固定分量后只改转角，观察新分量与长度。"
+      meaning="坐标轴改变了表示，原坐标中的位移箭头与重构结果保持一致。温度 25°C 不需要两根方向轴。"
+      limitations="只讨论同原点、正交归一基的二维旋转；不涉及平移、曲线坐标或混合单位的特征距离。图中单位为 m，方向基按 1m 刻度显示。"
+      onreset={() => select('displacement')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="displacement" onchange={select} />
+      <div class="parameters">
+        <ParameterSlider
+          label="原坐标 x 分量"
+          value={x}
+          min={-5}
+          max={5}
+          step={0.1}
+          unit="m"
+          onchange={(v) => (x = v)}
+        />
+        <ParameterSlider
+          label="原坐标 y 分量"
+          value={y}
+          min={-5}
+          max={5}
+          step={0.1}
+          unit="m"
+          onchange={(v) => (y = v)}
+        />
+        <ParameterSlider
+          label="坐标轴逆时针转角"
+          value={degrees}
+          min={-180}
+          max={180}
+          step={1}
+          unit="°"
+          onchange={(v) => (degrees = v)}
+        />
+      </div>
+      <VectorDiagram
+        range={7}
+        axisRotation={degrees}
+        vectors={[{ ...result.original, label: x === 0 && y === 0 ? '' : 'v', role: 'primary' }]}
+        description="物理位移v固定；完整网格、刻度与坐标轴按转角旋转，正方向标为x′和y′，每单位为1m。零位移没有方向箭头。"
+      />
+      <div class="readout" aria-live="polite">
+        <p>
+          新坐标轴的单位方向（无量纲）：e₁′ = ({result.basisX.x.toFixed(3)}, {result.basisX.y.toFixed(
+            3,
+          )})；e₂′ = ({result.basisY.x.toFixed(3)}, {result.basisY.y.toFixed(3)})。
+        </p>
+        <p>标量对照：温度 25°C；原分量：{formatVector(result.original)}</p>
+        <p data-testid="components">新坐标分量：{formatVector(result.components)}</p>
+        <p>重构位移：{formatVector(result.reconstructed)}；长度：{result.length.toFixed(3)} m</p>
+        <p>
+          原坐标方向：{result.direction === null
+            ? '未定义（零向量）'
+            : `${result.direction.toFixed(2)}°`}
+        </p>
+      </div>
+    </InteractivePanel>
+  </PredictionLab>
 </TheorySection>
 <TheorySection id="intuition" title="向量与它的坐标不是同一件事">
   <p>
@@ -66,11 +129,13 @@
   <p>
     基向量是给坐标轴选定的单位方向，例如向右和向上各一份。向量可由“横分量乘横方向，再加纵分量乘纵方向”重建。本课仅用互相垂直、同尺度的坐标轴；任意斜坐标不在这里讨论。
   </p>
-  <KnowledgeCheck prompt="坐标系转90°后，位移箭头也应该跟着转吗？"
-    >{#snippet answer()}<p>
-        不应该。这里只更换描述位移的轴；箭头保持原位，新分量变为(4,−3)m。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：地图改成向南为x正向、向东为y正向。同一位移如何记录？为什么长度不变？"
   >
+    {#snippet answer()}<p>
+        新分量为(−4,3)m。两根轴仍互相垂直且每单位1m，平方和仍为25m²；记录改变，位移未改变。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="分量来自基向量">
   <FormulaBlock
@@ -92,78 +157,7 @@
     </p>
   </details>
 </TheorySection>
-<TheorySection id="experiment" title="移动坐标轴，保持位移">
-  <p>
-    先预测再操作：坐标系转90°后，位移箭头也应该跟着转吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="同一位移，两套分量"
-    instructions="默认位移为 (3,4)m、转角为 0°。分量范围 −5 至 5m，转角 −180 至 180°；非法或非有限输入不会进入计算。固定分量后只改转角，观察新分量与长度。"
-    meaning="坐标轴改变了表示，原坐标中的位移箭头与重构结果保持一致。温度 25°C 不需要两根方向轴。"
-    limitations="只讨论同原点、正交归一基的二维旋转；不涉及平移、曲线坐标或混合单位的特征距离。图中单位为 m，方向基按 1m 刻度显示。"
-    onreset={() => select('displacement')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="displacement" onchange={select} />
-    <div class="parameters">
-      <ParameterSlider
-        label="原坐标 x 分量"
-        value={x}
-        min={-5}
-        max={5}
-        step={0.1}
-        unit="m"
-        onchange={(v) => (x = v)}
-      />
-      <ParameterSlider
-        label="原坐标 y 分量"
-        value={y}
-        min={-5}
-        max={5}
-        step={0.1}
-        unit="m"
-        onchange={(v) => (y = v)}
-      />
-      <ParameterSlider
-        label="坐标轴逆时针转角"
-        value={degrees}
-        min={-180}
-        max={180}
-        step={1}
-        unit="°"
-        onchange={(v) => (degrees = v)}
-      />
-    </div>
-    <VectorDiagram
-      range={7}
-      axisRotation={degrees}
-      vectors={[{ ...result.original, label: x === 0 && y === 0 ? '' : 'v', role: 'primary' }]}
-      description="物理位移v固定；完整网格、刻度与坐标轴按转角旋转，正方向标为x′和y′，每单位为1m。零位移没有方向箭头。"
-    />
-    <div class="readout" aria-live="polite">
-      <p>
-        新坐标轴的单位方向（无量纲）：e₁′ = ({result.basisX.x.toFixed(3)}, {result.basisX.y.toFixed(
-          3,
-        )})；e₂′ = ({result.basisY.x.toFixed(3)}, {result.basisY.y.toFixed(3)})。
-      </p>
-      <p>标量对照：温度 25°C；原分量：{formatVector(result.original)}</p>
-      <p data-testid="components">新坐标分量：{formatVector(result.components)}</p>
-      <p>重构位移：{formatVector(result.reconstructed)}；长度：{result.length.toFixed(3)} m</p>
-      <p>
-        原坐标方向：{result.direction === null
-          ? '未定义（零向量）'
-          : `${result.direction.toFixed(2)}°`}
-      </p>
-    </div>
-  </InteractivePanel>
-  <ExperimentGuide
-    steps={[
-      '场景一：温度 25°C 是标量；位移 (3,4)m 长度为 5m，却还保留了方向。',
-      '场景二：坐标轴转 90°，确认新分量 (4,−3)m，而重构仍为 (3,4)m。',
-      '场景三：零位移长度为零、方向未定义。网格与轴一起转动，物理位移箭头保持不动；结果区报告新轴的单位方向。',
-      '修改任一分量再调转角，观察重构与长度；最后复位，恢复全部默认参数。',
-    ]}
-  />
-</TheorySection>
+
 <TheorySection id="pitfalls" title="表示的边界">
   <CommonMistakes
     items={[

@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '三点不共线，怎样判断一条拟合线已经无法整体改善？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '无法同时穿过每个观测' },
+    { id: 'experiment', title: '三点残差与离群点影响' },
     { id: 'intuition', title: '观测空间中的正交投影' },
     { id: 'mathematics', title: '最优性条件与线性拟合' },
-    { id: 'experiment', title: '三点残差与离群点影响' },
     { id: 'pitfalls', title: '整体最优不等于逐点最优' },
     { id: 'summary', title: '把残差与模型方向分开' },
   ],

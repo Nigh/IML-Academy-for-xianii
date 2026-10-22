@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -11,6 +13,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let B = $state(2),
     T = $state(3),
@@ -22,6 +25,7 @@
     presets.find((p) => p.shape[0] === B && p.shape[1] === T && p.shape[2] === C)?.id ?? 'custom',
   );
   function select(id: string) {
+    if (id === 'original') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       [B, T, C] = p.shape;
@@ -31,6 +35,11 @@
   }
 </script>
 
+<TheorySection id="motivation" title="24个数足够说明一段数据属于谁、何时、哪个通道吗？">
+  <p>
+    两段记录、三个时刻、四个通道，共24个数。若接收方分成三段、每段两个时刻，同一个数会被当成哪里的读数？用地址编码逐格核对。
+  </p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     上一课用两个有顺序的分量表示一个向量。现在把这种“每个位置有含义”的想法扩展到列表、表格和多张表，不要求学过矩阵运算。
@@ -42,13 +51,83 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="一段数据属于谁、何时、哪个通道">
+
+<TheorySection id="experiment" title="切开三阶张量">
   <p>
-    假设有两段实验记录，每段三个时刻，每个时刻记录四个通道。把这些数交给别人时，只说“24个数”不够：对方还要知道每个数属于哪段实验、哪个时刻、哪个通道。张量的形状就是组织这些地址的办法。
+    比较两种24元素的分组，再比较单通道与三通道。找到最后批次的最后一个时刻，检查零起始索引的边界。
   </p>
-  <p>
-    本课没有录音采样或训练；表中数据是按地址生成的无量纲整数编码，用来追踪元素在哪里。真实特征的单位要单独登记，例如振幅或频率，形状本身不包含单位。
-  </p>
+  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+    <InteractivePanel
+      title="带语义的切片"
+      instructions="B 默认2（1–8），T 默认3（1–100），C 默认4（1–8）；全部为无量纲整数。输入非法时保留有效值。选批次和起始时刻，查看最多8行、全部通道；所有时刻可通过起始索引访问。"
+      meaning="每格实际计算 X[b,t,c]=(bT+t)C+c。表头给出地址，各预设展示真实元素数与索引变化。"
+      limitations="这是固定行主序的教学数组，不代表任意框架内存布局；不分配训练模型，不测量运行时内存或速度。"
+      onreset={() => select('original')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="original" onchange={select} />
+      <div class="parameters">
+        <NumericInput
+          label="批次数 B"
+          value={B}
+          min={1}
+          max={8}
+          integer
+          onchange={(v) => {
+            B = v;
+            batch = 0;
+          }}
+        />
+        <NumericInput
+          label="时刻数 T"
+          value={T}
+          min={1}
+          max={100}
+          integer
+          onchange={(v) => {
+            T = v;
+            start = 0;
+          }}
+        />
+        <NumericInput
+          label="通道数 C"
+          value={C}
+          min={1}
+          max={8}
+          integer
+          onchange={(v) => (C = v)}
+        />
+        <NumericInput
+          label="批次索引 b"
+          value={batch}
+          min={0}
+          max={B - 1}
+          integer
+          onchange={(v) => (batch = v)}
+        />
+        <NumericInput
+          label="起始时刻 t"
+          value={start}
+          min={0}
+          max={T - 1}
+          integer
+          onchange={(v) => (start = v)}
+        />
+      </div>
+      <p data-testid="shape" aria-live="polite">
+        形状 ({B},{T},{C}) · 3阶 · {result.count} 个元素 · float32 原始数据 {result.bytes} 字节
+      </p>
+      <MatrixView
+        values={result.values}
+        rowLabels={Array.from({ length: result.rows }, (_, i) => `t=${start + i}`)}
+        columnLabels={Array.from({ length: C }, (_, i) => `c=${i}`)}
+      />
+      <p>
+        当前批次 b={batch}；每格为无量纲地址编码。展平索引 q={result.offset} 对应地址 ({result.coordinates.join(
+          ',',
+        )})。
+      </p>
+    </InteractivePanel>
+  </PredictionLab>
 </TheorySection>
 <TheorySection id="intuition" title="轴是数据的地址">
   <p>
@@ -65,16 +144,18 @@
     description="B为实验片段的个数（批次），T为每段时刻数，C为每时刻通道数；N为元素总数，所有计数无量纲。X是确定性教学数组。"
   />
   <p>
-    找一个元素就像报地址：“第几张表、第几行、第几列”。程序从0开始编号，因此地址(1,2,3)表示第二段实验、第三个时刻、第四个通道；不是把这三个数相乘。下面的实验用地址编码代替真实温湿度，所有格子无量纲。
+    找一个元素就像报地址：“第几张表、第几行、第几列”。程序从0开始编号，因此地址(1,2,3)表示第二段实验、第三个时刻、第四个通道；不是把这三个数相乘。刚才的实验用地址编码代替真实温湿度，所有格子无量纲。
   </p>
   <p>
     形状(3,2,4)虽然也有24个数，却意味着三段实验、每段两个时刻。同样数量的纸张文字，分成不同表格就有不同地址含义。形状只说大小；每个轴代表什么、数值单位是什么，需要另行约定。长度为1的轴仍然存在，例如单通道数据仍可有批次、时间、通道三个轴。
   </p>
-  <KnowledgeCheck prompt="形状(2,3,1)有几根轴？地址(1,2,0)表示哪里？"
-    >{#snippet answer()}<p>
-        3根轴；第二段实验、第三个时刻、唯一的通道。轴长为1仍保留这个轴。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：当时间和通道长度恰好都为4，交换这两轴还能靠形状发现吗？说明应该检查什么。"
   >
+    {#snippet answer()}<p>
+        形状可能仍相同，需要追踪已知元素的地址并核对轴名称、通道顺序和单位。形状检查无法代替语义检查。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="阶数、形状与索引">
   <p>
@@ -99,79 +180,7 @@
     </p>
   </details></TheorySection
 >
-<TheorySection id="experiment" title="切开三阶张量">
-  <p>
-    先预测再操作：形状(2,3,1)有几根轴？地址(1,2,0)表示哪里？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="带语义的切片"
-    instructions="B 默认2（1–8），T 默认3（1–100），C 默认4（1–8）；全部为无量纲整数。输入非法时保留有效值。选批次和起始时刻，查看最多8行、全部通道；所有时刻可通过起始索引访问。"
-    meaning="每格实际计算 X[b,t,c]=(bT+t)C+c。表头给出地址，各预设展示真实元素数与索引变化。"
-    limitations="这是固定行主序的教学数组，不代表任意框架内存布局；不分配训练模型，不测量运行时内存或速度。"
-    onreset={() => select('original')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="original" onchange={select} />
-    <div class="parameters">
-      <NumericInput
-        label="批次数 B"
-        value={B}
-        min={1}
-        max={8}
-        integer
-        onchange={(v) => {
-          B = v;
-          batch = 0;
-        }}
-      />
-      <NumericInput
-        label="时刻数 T"
-        value={T}
-        min={1}
-        max={100}
-        integer
-        onchange={(v) => {
-          T = v;
-          start = 0;
-        }}
-      />
-      <NumericInput label="通道数 C" value={C} min={1} max={8} integer onchange={(v) => (C = v)} />
-      <NumericInput
-        label="批次索引 b"
-        value={batch}
-        min={0}
-        max={B - 1}
-        integer
-        onchange={(v) => (batch = v)}
-      />
-      <NumericInput
-        label="起始时刻 t"
-        value={start}
-        min={0}
-        max={T - 1}
-        integer
-        onchange={(v) => (start = v)}
-      />
-    </div>
-    <p data-testid="shape" aria-live="polite">
-      形状 ({B},{T},{C}) · 3阶 · {result.count} 个元素 · float32 原始数据 {result.bytes} 字节
-    </p>
-    <MatrixView
-      values={result.values}
-      rowLabels={Array.from({ length: result.rows }, (_, i) => `t=${start + i}`)}
-      columnLabels={Array.from({ length: C }, (_, i) => `c=${i}`)}
-    />
-    <p>
-      当前批次 b={batch}；每格为无量纲地址编码。展平索引 q={result.offset} 对应地址 ({result.coordinates.join(
-        ',',
-      )})。
-    </p>
-  </InteractivePanel>
-  <p>
-    先比较 (2,3,4) 和 (3,2,4)：都为24个元素，但 q=8 的地址从 (0,2,0) 变为
-    (1,0,0)。再比较单通道与三通道：元素数由800变为2400。切到最后批次与最后时刻，验证零起始边界；复位恢复
-    (2,3,4)。
-  </p>
-</TheorySection>
+
 <TheorySection id="pitfalls" title="元素数不决定语义">
   <CommonMistakes
     items={[

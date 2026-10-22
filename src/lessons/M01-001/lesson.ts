@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '两台导航仪报告不同的坐标，可能记录了同一段位移吗？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '25°C 与向东走多远' },
+    { id: 'experiment', title: '移动坐标轴，保持位移' },
     { id: 'intuition', title: '向量与它的坐标不是同一件事' },
     { id: 'mathematics', title: '分量来自基向量' },
-    { id: 'experiment', title: '移动坐标轴，保持位移' },
     { id: 'pitfalls', title: '表示的边界' },
     { id: 'engineering', title: '从位置记录到 ML 特征' },
     { id: 'summary', title: '带走四个结论' },

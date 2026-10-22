@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -12,6 +14,7 @@
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { mapping, unitGrid } from '../../lib/math/coordinates.ts';
   import { experiment, presets, type Point } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let s1 = $state(3),
     s2 = $state(1),
@@ -28,6 +31,7 @@
   };
   const fmt = (n: number) => Number(n.toPrecision(5));
   function select(id: string) {
+    if (id === 'diagonal') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       s1 = p.s1;
@@ -41,6 +45,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="没有实特征方向的旋转，还能拆成简单步骤吗？">
+  <p>一个90°旋转保持所有长度。它的奇异值可能是什么？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     已有特征方向、矩阵乘法和正交分解。本课把任意实矩阵的作用拆为三个步骤；转置、正交矩阵和奇异值在下面逐一解释。
@@ -52,11 +59,141 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="找出变换最强与最弱的方向"
-  ><p>
-    标定系统对不同输入方向的响应可能差很多：有的被放大，有的几乎被消去。{metadata.title}用一组正交方向和非负伸缩量描述这种差异，为伪逆、秩和压缩提供统一工具。本课从已知因子构造二维矩阵并计算真实映射，不假装执行通用SVD求解器。
-  </p></TheorySection
->
+
+<TheorySection id="experiment" title="逐步观察单位圆的像">
+  <p>
+    先逐阶段追踪同一探针，再把第二伸缩降为0；比较纯旋转和反射，检查非负伸缩与方向变化各由哪部分负责。
+  </p>
+  <PredictionLab {...exploration} context={JSON.stringify([r, stage])} {resetVersion}>
+    <InteractivePanel
+      title="同一分解的四个阶段"
+      instructions="σ₁默认3，范围0–4；σ₂默认1，范围0–σ₁。降低σ₁会同步收紧σ₂。U/V角默认0°，范围±180°。均可键盘编辑，非法值不参与计算；复选框让U含反射。阶段选择不改变A。"
+      meaning="等比例图中虚线是原单位圆，实线是当前阶段的像；圆点为45°输入探针在该阶段的位置，四阶段坐标列于下方。圆周72个等间隔线段仅用于绘图，不是随机样本。零宽度保持真实退化。"
+      limitations="从合法SVD因子构造A，不从任意输入矩阵反求分解。图形是有限分段近似，矩阵与探针直接解析计算。所有阶段使用同一视域，较小圆可能显得小，便于比较伸缩；改变σ₁会调整整张图尺度。"
+      onreset={() => select('diagonal')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="diagonal" onchange={select} />
+      <ParameterSlider
+        label="第一奇异值 σ₁"
+        value={s1}
+        min={0}
+        max={4}
+        step={0.25}
+        onchange={(n) => {
+          s1 = n;
+          s2 = Math.min(s2, n);
+          selected = 'custom';
+        }}
+      />
+      <ParameterSlider
+        label="第二奇异值 σ₂"
+        value={s2}
+        min={0}
+        max={s1}
+        step={0.25}
+        onchange={(n) => {
+          s2 = n;
+          selected = 'custom';
+        }}
+      />
+      <ParameterSlider
+        label="U旋转角"
+        unit="°"
+        value={u}
+        min={-180}
+        max={180}
+        step={5}
+        onchange={(n) => {
+          u = n;
+          selected = 'custom';
+        }}
+      />
+      <ParameterSlider
+        label="V旋转角"
+        unit="°"
+        value={v}
+        min={-180}
+        max={180}
+        step={5}
+        onchange={(n) => {
+          v = n;
+          selected = 'custom';
+        }}
+      />
+      <label
+        ><input
+          type="checkbox"
+          checked={reflect}
+          onchange={(e) => {
+            reflect = e.currentTarget.checked;
+            selected = 'custom';
+          }}
+        /> U包含反射</label
+      >
+      <label class="stage"
+        >观察阶段<select class="select" bind:value={stage}
+          ><option value={0}>0：输入单位圆</option><option value={1}>1：Vᵀ换轴</option><option
+            value={2}>2：Σ拉伸</option
+          ><option value={3}>3：U换轴得到输出</option></select
+        ></label
+      >
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex (Keyboard focus enables local chart scrolling.) -->
+      <div class="chart" tabindex="0" role="region" aria-label="SVD图，可横向滚动">
+        <svg viewBox="0 0 400 435" role="img" aria-label="单位圆的逐阶段映射，等比例无量纲坐标">
+          {#each unitGrid([-r.extent, r.extent], 320).values as tick (tick)}
+            {@const q = map.toScreen({ x: tick, y: tick })}
+            <path d={`M${q.x + 40},40V360 M40,${q.y + 40}H360`} class="reference-grid" />
+            {#if tick !== 0}<text x={q.x + 40} y="380" text-anchor="middle">{tick}</text>{/if}
+          {/each}
+          <line x1="40" y1="200" x2="360" y2="200" class="axis" /><line
+            x1="200"
+            y1="40"
+            x2="200"
+            y2="360"
+            class="axis"
+          />
+          <polyline points={r.circle.map(pt).join(' ')} class="original" /><polyline
+            points={r.curves[stage].map(pt).join(' ')}
+            class="transformed"
+          />
+          <circle
+            cx={map.toScreen(r.probe[stage]).x + 40}
+            cy={map.toScreen(r.probe[stage]).y + 40}
+            r="5"
+            class="probe"
+          />
+          <text x="365" y="195">x</text><text x="208" y="30">y</text><text x="208" y="220">0</text>
+          <text x="40" y="420">单位网格=1 · 两轴范围±{fmt(r.extent)}，无量纲</text>
+        </svg>
+      </div>
+      <p>
+        虚线：原单位圆；实线：当前阶段；圆点：45°探针。{s2 === 0
+          ? '第二方向精确消去；σ₁也为0时输出只剩原点。'
+          : ''}
+      </p>
+      <div aria-live="polite" data-testid="result">
+        <p>奇异值=({s1},{s2})；精确秩={r.rank}；阶段={stage}。</p>
+        <p>A=UΣVᵀ：</p>
+        <MatrixView values={r.matrix.map((row) => row.map(fmt))} />
+        <p>探针逐步坐标：</p>
+        <MatrixView
+          values={r.probe.map((p) => [fmt(p.x), fmt(p.y)])}
+          rowLabels={['输入', 'Vᵀ后', 'Σ后', 'U后']}
+          columnLabels={['x', 'y']}
+        />
+      </div>
+      <details>
+        <summary>查看三个分解因子的数值</summary>
+        <p>U：</p>
+        <MatrixView values={r.U.map((row) => row.map(fmt))} />
+        <p>Σ：</p>
+        <MatrixView values={r.sigma} />
+        <p>Vᵀ：</p>
+        <MatrixView values={r.Vt.map((row) => row.map(fmt))} />
+      </details>
+    </InteractivePanel>
+  </PredictionLab>
+</TheorySection>
 <TheorySection id="intuition" title="换轴、拉伸、再换轴">
   <p>
     分解是把一个复杂变换写成几个简单变换的连续作用。SVD读作奇异值分解：先换输入坐标轴，再沿轴伸缩，最后换到输出方向。矩阵乘法从右向左作用，因而这三步写成UΣVᵀ。
@@ -74,11 +211,13 @@
   <p>
     对称矩阵是转置后不变的方阵；半正定表示任何输入与其输出的点积都非负。AᵀA满足这两个性质，因为该点积等于Ax的长度平方。这说明下面公式里的特征值可开平方得到非负奇异值；不需要在这里实现通用分解求解器。
   </p>
-  <KnowledgeCheck prompt="出现反射时，必须让某个奇异值为负吗？"
-    >{#snippet answer()}<p>
-        不需要。反射包含在正交因子中，奇异值只记录非负长度伸缩。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：σ₁=σ₂=1时，分解中的主方向必须唯一吗？为什么圆的图形不足以确定它们？"
   >
+    {#snippet answer()}<p>
+        不唯一。所有正交方向都有相同伸缩，圆不提供独特长轴；只要因子的组合仍等于A，就可能有多种合法方向选择。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="正交因子与非负奇异值">
   <FormulaBlock
@@ -94,141 +233,7 @@
     u_i，得到第一式。对diag(3,1)，U=V=I即可；90°旋转的AᵀA=I，奇异值为1、1，却没有实特征值。奇异值描述长度伸缩，不能与一般矩阵的特征值等同。
   </p>
 </TheorySection>
-<TheorySection id="experiment" title="逐步观察单位圆的像">
-  <p>
-    先预测再操作：出现反射时，必须让某个奇异值为负吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="同一分解的四个阶段"
-    instructions="σ₁默认3，范围0–4；σ₂默认1，范围0–σ₁。降低σ₁会同步收紧σ₂。U/V角默认0°，范围±180°。均可键盘编辑，非法值不参与计算；复选框让U含反射。阶段选择不改变A。"
-    meaning="等比例图中虚线是原单位圆，实线是当前阶段的像；圆点为45°输入探针在该阶段的位置，四阶段坐标列于下方。圆周72个等间隔线段仅用于绘图，不是随机样本。零宽度保持真实退化。"
-    limitations="从合法SVD因子构造A，不从任意输入矩阵反求分解。图形是有限分段近似，矩阵与探针直接解析计算。所有阶段使用同一视域，较小圆可能显得小，便于比较伸缩；改变σ₁会调整整张图尺度。"
-    onreset={() => select('diagonal')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="diagonal" onchange={select} />
-    <ParameterSlider
-      label="第一奇异值 σ₁"
-      value={s1}
-      min={0}
-      max={4}
-      step={0.25}
-      onchange={(n) => {
-        s1 = n;
-        s2 = Math.min(s2, n);
-        selected = 'custom';
-      }}
-    />
-    <ParameterSlider
-      label="第二奇异值 σ₂"
-      value={s2}
-      min={0}
-      max={s1}
-      step={0.25}
-      onchange={(n) => {
-        s2 = n;
-        selected = 'custom';
-      }}
-    />
-    <ParameterSlider
-      label="U旋转角"
-      unit="°"
-      value={u}
-      min={-180}
-      max={180}
-      step={5}
-      onchange={(n) => {
-        u = n;
-        selected = 'custom';
-      }}
-    />
-    <ParameterSlider
-      label="V旋转角"
-      unit="°"
-      value={v}
-      min={-180}
-      max={180}
-      step={5}
-      onchange={(n) => {
-        v = n;
-        selected = 'custom';
-      }}
-    />
-    <label
-      ><input
-        type="checkbox"
-        checked={reflect}
-        onchange={(e) => {
-          reflect = e.currentTarget.checked;
-          selected = 'custom';
-        }}
-      /> U包含反射</label
-    >
-    <label class="stage"
-      >观察阶段<select class="select" bind:value={stage}
-        ><option value={0}>0：输入单位圆</option><option value={1}>1：Vᵀ换轴</option><option
-          value={2}>2：Σ拉伸</option
-        ><option value={3}>3：U换轴得到输出</option></select
-      ></label
-    >
-    <!-- svelte-ignore a11y_no_noninteractive_tabindex (Keyboard focus enables local chart scrolling.) -->
-    <div class="chart" tabindex="0" role="region" aria-label="SVD图，可横向滚动">
-      <svg viewBox="0 0 400 435" role="img" aria-label="单位圆的逐阶段映射，等比例无量纲坐标">
-        {#each unitGrid([-r.extent, r.extent], 320).values as tick (tick)}
-          {@const q = map.toScreen({ x: tick, y: tick })}
-          <path d={`M${q.x + 40},40V360 M40,${q.y + 40}H360`} class="reference-grid" />
-          {#if tick !== 0}<text x={q.x + 40} y="380" text-anchor="middle">{tick}</text>{/if}
-        {/each}
-        <line x1="40" y1="200" x2="360" y2="200" class="axis" /><line
-          x1="200"
-          y1="40"
-          x2="200"
-          y2="360"
-          class="axis"
-        />
-        <polyline points={r.circle.map(pt).join(' ')} class="original" /><polyline
-          points={r.curves[stage].map(pt).join(' ')}
-          class="transformed"
-        />
-        <circle
-          cx={map.toScreen(r.probe[stage]).x + 40}
-          cy={map.toScreen(r.probe[stage]).y + 40}
-          r="5"
-          class="probe"
-        />
-        <text x="365" y="195">x</text><text x="208" y="30">y</text><text x="208" y="220">0</text>
-        <text x="40" y="420">单位网格=1 · 两轴范围±{fmt(r.extent)}，无量纲</text>
-      </svg>
-    </div>
-    <p>
-      虚线：原单位圆；实线：当前阶段；圆点：45°探针。{s2 === 0
-        ? '第二方向精确消去；σ₁也为0时输出只剩原点。'
-        : ''}
-    </p>
-    <div aria-live="polite" data-testid="result">
-      <p>奇异值=({s1},{s2})；精确秩={r.rank}；阶段={stage}。</p>
-      <p>A=UΣVᵀ：</p>
-      <MatrixView values={r.matrix.map((row) => row.map(fmt))} />
-      <p>探针逐步坐标：</p>
-      <MatrixView
-        values={r.probe.map((p) => [fmt(p.x), fmt(p.y)])}
-        rowLabels={['输入', 'Vᵀ后', 'Σ后', 'U后']}
-        columnLabels={['x', 'y']}
-      />
-    </div>
-    <details>
-      <summary>查看三个分解因子的数值</summary>
-      <p>U：</p>
-      <MatrixView values={r.U.map((row) => row.map(fmt))} />
-      <p>Σ：</p>
-      <MatrixView values={r.sigma} />
-      <p>Vᵀ：</p>
-      <MatrixView values={r.Vt.map((row) => row.map(fmt))} />
-    </details>
-  </InteractivePanel>
-  <p>
-    场景一切换四阶段，确认最终椭圆半轴3与1。场景二检查第二奇异值为0，改变U角只旋转退化线段。场景三比较纯旋转前后圆的大小与探针位置。场景四观察反射探针，奇异值仍非负。复位恢复diag(3,1)。
-  </p>
-</TheorySection>
+
 <TheorySection id="pitfalls" title="奇异值不是带符号的特征值"
   ><CommonMistakes
     items={[

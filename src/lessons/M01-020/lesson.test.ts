@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('协议、三点拟合、离群参数与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-020');
   const v = render(Lesson, { metadata: lessonById.get('M01-020')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('斜率a=1.5');
   await fireEvent.click(v.getByText('场景二对照：加入普通点'));

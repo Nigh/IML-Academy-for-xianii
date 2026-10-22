@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('协议、四个预设、候选与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-009');
   const v = render(Lesson, { metadata: lessonById.get('M01-009')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   await fireEvent.click(v.getByText('场景二：方向放大两倍'));
   expect(v.getByTestId('result').textContent).toContain('(3.000,0.000)');

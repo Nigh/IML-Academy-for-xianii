@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '没有实特征方向的旋转，还能拆成简单步骤吗？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '找出变换最强与最弱的方向' },
+    { id: 'experiment', title: '逐步观察单位圆的像' },
     { id: 'intuition', title: '换轴、拉伸、再换轴' },
     { id: 'mathematics', title: '正交因子与非负奇异值' },
-    { id: 'experiment', title: '逐步观察单位圆的像' },
     { id: 'pitfalls', title: '奇异值不是带符号的特征值' },
     { id: 'summary', title: '统一描述线性映射的伸缩' },
   ],

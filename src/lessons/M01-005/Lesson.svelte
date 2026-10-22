@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -11,6 +13,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let mode = $state('plane'),
     a = $state(3),
@@ -20,6 +23,7 @@
     presets.find((p) => p.id === mode && p.a === a && p.b === b)?.id ?? 'custom',
   );
   function select(id: string) {
+    if (id === 'plane') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       mode = p.id;
@@ -29,6 +33,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="权重可以随便调，就一定能命中任意目标吗？">
+  <p>只用方向(1,1)和(2,2)，系数可取任意实数，能组合出(1,0)吗？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     前课已经解释集合、向量加法、数乘和子空间的封闭性。本课固定几根向量，研究只靠调整系数能够到达哪些位置。
@@ -40,13 +47,79 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="模型能合成哪些目标">
+
+<TheorySection id="experiment" title="尝试命中目标">
   <p>
-    手里有两个固定方向，能不能只靠放大、反向和相加，到达任意目标？本课先让你合成一个具体向量，再研究所有可能结果；这就是“线性组合”与“张成”的区别。
+    在独立方向场景先打乱权重再找回目标；换到共线场景，再尝试同样的操作。比较两种场景的可达位置，并说明你的判断依据。
   </p>
-  <p>
-    本课使用无量纲二维特征。给定两个方向与一个固定目标，只改变两个实数系数，实时计算合成向量；不进行训练，不使用随机或预计算结果。
-  </p>
+  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+    <InteractivePanel
+      title="组合与不可消除的距离"
+      instructions="场景一默认 a=3、b=−2；场景二默认 a=1、b=0。两个系数范围均−3至3、无量纲，非法输入不会进入模型。先预测再切换场景，尝试把当前组合移到目标。"
+      meaning="散点由25组固定整数系数实时生成；目标和当前组合另列图例。下方显示两份中间贡献、组合、当前误差及目标到完整span的最小距离。"
+      limitations="有限网格不等于连续span。图域按场景和当前参数调整，比较距离请读取数值；最近点仅对本课标准平面或直线解析计算。"
+      onreset={() => select('plane')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="plane" onchange={select} />
+      <div class="parameters">
+        <ParameterSlider
+          label="第一方向系数 a"
+          value={a}
+          min={-3}
+          max={3}
+          step={0.1}
+          onchange={(n) => (a = n)}
+        /><ParameterSlider
+          label="第二方向系数 b"
+          value={b}
+          min={-3}
+          max={3}
+          step={0.1}
+          onchange={(n) => (b = n)}
+        />
+      </div>
+      <Plot2D
+        equal
+        series={result.series}
+        xRange={[-result.extent, result.extent]}
+        yRange={[-result.extent, result.extent]}
+        xLabel="第一特征"
+        yLabel="第二特征"
+        xUnit="无量纲"
+        yUnit="无量纲"
+        description="25组系数网格：两个独立方向铺开平面，共线方向的点重合在一条直线上。目标与组合可能重合，数值区域如实报告。"
+      />
+      <div aria-live="polite">
+        <p>
+          u=({result.u.x},{result.u.y})；v=({result.v.x},{result.v.y})；目标=({result.target
+            .x},{result.target.y})
+        </p>
+        <p>
+          贡献 a u=({result.first.x.toFixed(2)},{result.first.y.toFixed(2)})，b v=({result.second.x.toFixed(
+            2,
+          )},{result.second.y.toFixed(2)})
+        </p>
+        <p data-testid="result">
+          组合=({result.w.x.toFixed(2)},{result.w.y.toFixed(2)})；当前误差={result.error.toFixed(
+            4,
+          )}；张成维数={result.dimension}
+        </p>
+        <details>
+          <summary>进阶：目标到可达集合的最近距离</summary>
+          <p>
+            这是到整条可达直线的垂直距离，不是当前滑块结果的误差。系统解释见 <a
+              href={lessonHref('M01-009')}>M01-009 投影</a
+            >；不需要先掌握它才能理解张成。
+          </p>
+          <p>
+            目标在span中的最近点=({result.nearest.x.toFixed(2)},{result.nearest.y.toFixed(
+              2,
+            )})；最小距离={result.distance.toFixed(4)}
+          </p>
+        </details>
+      </div>
+    </InteractivePanel>
+  </PredictionLab>
 </TheorySection>
 <TheorySection id="intuition" title="固定方向，改变系数">
   <p>
@@ -71,13 +144,15 @@
     “张成维数”数的是可独立变化的方向：只有零向量是0维，一条过原点的直线是1维，整个二维平面是2维。它不是数手上有几根箭头。新增一根原有方向的倍数不会增加维数；下一课会用线性独立和基给出更正式的解释。
   </p>
   <p>
-    下面图中的有限点只是若干系数组合的示例。点之间以及视域外也可能属于张成空间；滑块的有限范围是操作边界，不是数学定义的范围。先判断能否命中目标，再调参数验证。
+    实验图中的有限点只是若干系数组合的示例。点之间以及视域外也可能属于张成空间；滑块的有限范围是操作边界，不是数学定义的范围。先判断能否命中目标，再调参数验证。
   </p>
-  <KnowledgeCheck prompt="再加一根原方向的三倍向量，会让可达直线变成平面吗？"
-    >{#snippet answer()}<p>
-        不会。它仍可由原方向表示，没有新增独立方向；可达集合仍是一条线。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：新增方向(−3,−3)能帮助命中(1,0)吗？若不能，给出一个能扩展可达集合的方向并解释。"
   >
+    {#snippet answer()}<p>
+        它仍在同一直线上，不能。新增(1,0)等线外方向后，两个独立方向可张成平面；增加数量本身没有保证。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="从一次组合到整个张成空间">
   <p>
@@ -95,82 +170,7 @@
     张成空间必含零向量，也对线性组合封闭：两个组合相加或缩放，只是把它们的系数相加或缩放。这连接了前一课的子空间判据。能张成平面不等于任何受限系数范围都能到达整个平面，数学定义和控件预算要区分。
   </p>
 </TheorySection>
-<TheorySection id="experiment" title="尝试命中目标">
-  <p>
-    先预测再操作：再加一根原方向的三倍向量，会让可达直线变成平面吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="组合与不可消除的距离"
-    instructions="场景一默认 a=3、b=−2；场景二默认 a=1、b=0。两个系数范围均−3至3、无量纲，非法输入不会进入模型。先预测再切换场景，尝试把当前组合移到目标。"
-    meaning="散点由25组固定整数系数实时生成；目标和当前组合另列图例。下方显示两份中间贡献、组合、当前误差及目标到完整span的最小距离。"
-    limitations="有限网格不等于连续span。图域按场景和当前参数调整，比较距离请读取数值；最近点仅对本课标准平面或直线解析计算。"
-    onreset={() => select('plane')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="plane" onchange={select} />
-    <div class="parameters">
-      <ParameterSlider
-        label="第一方向系数 a"
-        value={a}
-        min={-3}
-        max={3}
-        step={0.1}
-        onchange={(n) => (a = n)}
-      /><ParameterSlider
-        label="第二方向系数 b"
-        value={b}
-        min={-3}
-        max={3}
-        step={0.1}
-        onchange={(n) => (b = n)}
-      />
-    </div>
-    <Plot2D
-      equal
-      series={result.series}
-      xRange={[-result.extent, result.extent]}
-      yRange={[-result.extent, result.extent]}
-      xLabel="第一特征"
-      yLabel="第二特征"
-      xUnit="无量纲"
-      yUnit="无量纲"
-      description="25组系数网格：两个独立方向铺开平面，共线方向的点重合在一条直线上。目标与组合可能重合，数值区域如实报告。"
-    />
-    <div aria-live="polite">
-      <p>
-        u=({result.u.x},{result.u.y})；v=({result.v.x},{result.v.y})；目标=({result.target
-          .x},{result.target.y})
-      </p>
-      <p>
-        贡献 a u=({result.first.x.toFixed(2)},{result.first.y.toFixed(2)})，b v=({result.second.x.toFixed(
-          2,
-        )},{result.second.y.toFixed(2)})
-      </p>
-      <p data-testid="result">
-        组合=({result.w.x.toFixed(2)},{result.w.y.toFixed(2)})；当前误差={result.error.toFixed(
-          4,
-        )}；张成维数={result.dimension}
-      </p>
-      <details>
-        <summary>进阶：目标到可达集合的最近距离</summary>
-        <p>
-          这是到整条可达直线的垂直距离，不是当前滑块结果的误差。系统解释见 <a
-            href={lessonHref('M01-009')}>M01-009 投影</a
-          >；不需要先掌握它才能理解张成。
-        </p>
-        <p>
-          目标在span中的最近点=({result.nearest.x.toFixed(2)},{result.nearest.y.toFixed(
-            2,
-          )})；最小距离={result.distance.toFixed(4)}
-        </p>
-      </details>
-    </div>
-  </InteractivePanel>
-  <p>
-    场景一先打乱权重再恢复3和−2，确认误差可为零。场景二无论如何调系数，组合的两个分量相等，无法命中
-    (1,0)；两分量始终相等这一条件，已经足以解释为什么调参也无法命中目标。令
-    a=−2b，可以让两个非零贡献完全抵消；复位恢复独立方向场景。
-  </p>
-</TheorySection>
+
 <TheorySection id="pitfalls" title="更多向量不一定增加方向">
   <CommonMistakes
     items={[

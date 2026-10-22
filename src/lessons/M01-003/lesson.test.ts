@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('全部预设、切片、非法值与复位符合协议', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-003');
   const v = render(Lesson, { metadata: lessonById.get('M01-003')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const section of definition.sections)
     expect(v.container.querySelector(`#${section.id}`)).toBeTruthy();
   for (const [name, count] of [

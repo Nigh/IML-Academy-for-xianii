@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '只知道两个单位方向的去处，够不够画出整个变换？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '矩阵改变的不只是数字' },
+    { id: 'experiment', title: '变换网格和单位正方形' },
     { id: 'intuition', title: '看两根基向量去哪里' },
     { id: 'mathematics', title: '列向量决定整个映射' },
-    { id: 'experiment', title: '变换网格和单位正方形' },
     { id: 'pitfalls', title: '线性与平移的边界' },
     { id: 'summary', title: '从基向量读变换' },
   ],

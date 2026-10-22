@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('协议、矩阵编辑、逐格计算、顺序和复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-011');
   const v = render(Lesson, { metadata: lessonById.get('M01-011')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('和：58');
   await fireEvent.input(v.getByLabelText('结果行索引 i'), { target: { value: '1' } });

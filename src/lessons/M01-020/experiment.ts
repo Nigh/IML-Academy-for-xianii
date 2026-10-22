@@ -52,6 +52,33 @@ export function fit(points: readonly (readonly number[])[]) {
     matrix: points.map((p) => [1, p[0]]),
   };
 }
+export function candidate(extra: boolean, delta: number, intercept: number, slope: number) {
+  if (![intercept, slope].every((n) => Number.isFinite(n) && Math.abs(n) <= 8))
+    throw new RangeError('候选截距和斜率必须有限且在±8。');
+  const optimal = experiment(extra, delta);
+  const predicted = optimal.points.map(([t]) => intercept + slope * t);
+  const residual = predicted.map((value, i) => value - optimal.points[i][1]);
+  const series: PlotSeries = {
+    id: 'candidate',
+    label: '我的候选直线（实线）',
+    kind: 'line',
+    role: 'accent',
+    points: [-1.5, 2.5].map((x) => ({ x, y: intercept + slope * x })),
+  };
+  const values = [...optimal.yRange, ...series.points.map((p) => p.y)];
+  return {
+    predicted,
+    residual,
+    sse: residual.reduce((sum, value) => sum + value * value, 0),
+    normal: [
+      residual.reduce((sum, value) => sum + value, 0),
+      residual.reduce((sum, value, i) => sum + value * optimal.points[i][0], 0),
+    ],
+    series,
+    yRange: [Math.min(...values) - 0.5, Math.max(...values) + 0.5] as [number, number],
+  };
+}
+
 export function experiment(extra: boolean, delta: number) {
   if (typeof extra !== 'boolean' || !Number.isFinite(delta) || Math.abs(delta) > 8)
     throw new RangeError('开关须布尔值，离群偏移须有限且在±8。');

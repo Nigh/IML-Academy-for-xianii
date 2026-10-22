@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '反复应用同一个变换，哪些输入方向最容易追踪？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '哪些方向在反复变换中最简单' },
+    { id: 'experiment', title: '旋转输入寻找特征方向' },
     { id: 'intuition', title: '共线可以同向也可以反向' },
     { id: 'mathematics', title: '非零向量与实数条件' },
-    { id: 'experiment', title: '旋转输入寻找特征方向' },
     { id: 'pitfalls', title: '实矩阵不保证实特征向量基' },
     { id: 'summary', title: '用不变方向理解变换' },
   ],

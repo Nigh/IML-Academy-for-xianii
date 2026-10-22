@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -11,6 +13,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let d = $state(0),
     a = $state(1),
@@ -20,6 +23,7 @@
     presets.find((p) => p.d === d && p.a === a && p.b === b)?.id ?? 'custom',
   );
   function select(id: string) {
+    if (id === 'linear') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       d = p.d;
@@ -29,6 +33,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="一条直线上的两个合法输出相加，还会是合法输出吗？">
+  <p>比较y=2x与y=2x+1，各取线上两点相加。两条直线都能始终容纳结果吗？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     前置课程已经教过向量逐分量相加，以及正、负、零倍数。本课问的是：选定的一批向量，经过这些操作后会不会离开这批向量？
@@ -40,15 +47,70 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="模型允许哪些输出">
-  <p>
-    直线上的两个位移相加，结果还在这条直线上吗？把其中一段反向或放大呢？本课从这些已经学过的操作出发，解释哪些向量集合能容纳任意这样的组合，再把结论用于模型允许的输出。
-  </p>
-  <p>
-    例如两路无量纲特征受约束 y=2x，任何强度的叠加仍满足比例关系；加上固定偏置后变成
-    y=2x+1，关系看似只是平移，代数结构却改变了。ML 中带 bias
-    的映射通常是仿射映射，不是严格线性映射。
-  </p>
+
+<TheorySection id="experiment" title="直线能否容纳线性组合">
+  <p>比较过原点与平移直线；在平移场景尝试a+b=1和a=b=0，解释为什么有些组合成功仍不能证明子空间。</p>
+  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+    <InteractivePanel
+      title="组合后还在线上吗"
+      instructions="偏移 d 默认0，系数 a、b 默认1；范围均 −2 至2，无量纲。u=(1,2+d)、v=(−1,−2+d)。输入非法时保留有效结果。"
+      meaning="折线是候选集合，三个有名称的散点为 u、v 和 w；计算缺陷 w_y−2w_x−d 判断组合是否仍满足方程。重合点通过下方坐标和图例读取。"
+      limitations="只展示直线族和两名成员；有限交互不是任意集合封闭性的证明。点的成员判定用绝对容差1e−12，子空间结论由解析条件 d=0 给出。"
+      onreset={() => select('linear')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="linear" onchange={select} />
+      <div class="parameters">
+        <ParameterSlider
+          label="偏移 d"
+          value={d}
+          min={-2}
+          max={2}
+          step={0.1}
+          onchange={(n) => (d = n)}
+        />
+        <ParameterSlider
+          label="u 的系数 a"
+          value={a}
+          min={-2}
+          max={2}
+          step={0.1}
+          onchange={(n) => (a = n)}
+        />
+        <ParameterSlider
+          label="v 的系数 b"
+          value={b}
+          min={-2}
+          max={2}
+          step={0.1}
+          onchange={(n) => (b = n)}
+        />
+      </div>
+      <Plot2D
+        equal
+        series={result.series}
+        xRange={[-5, 5]}
+        yRange={[-12, 12]}
+        xLabel="x"
+        yLabel="y"
+        xUnit="无量纲"
+        yUnit="无量纲"
+        description="折线为候选集合 y=2x+d，散点图例分别标出 u、v、组合 w；横纵坐标均无量纲，固定视域方便比较偏移。"
+      />
+      <div aria-live="polite">
+        <p>u=({result.u.x},{result.u.y})；v=({result.v.x},{result.v.y})</p>
+        <p data-testid="result">
+          w=({result.w.x.toFixed(3)},{result.w.y.toFixed(3)}) · 缺陷 {result.defect.toFixed(3)} · {result.member
+            ? '当前组合属于集合'
+            : '当前组合不属于集合'}
+        </p>
+        <p>
+          集合 V_d：{result.subspace ? '是线性子空间' : '不是线性子空间'}；{d === 0
+            ? '原点在集合内'
+            : '原点不在集合内'}。
+        </p>
+      </div>
+    </InteractivePanel>
+  </PredictionLab>
 </TheorySection>
 <TheorySection id="intuition" title="封闭意味着组合后仍合法">
   <p>
@@ -71,11 +133,11 @@
   <p>
     线性模型在这里指把固定向量分别乘系数后相加的规则。所有允许的输出合起来叫输出集合；系数允许取任意实数且没有固定偏移时，这个集合就是线性输出空间。机器学习中常把加固定偏置的模型也叫线性模型，但严格数学上它对输入通常是仿射（affine）映射；读本课时要区分这两种用法。
   </p>
-  <KnowledgeCheck prompt="一条直线包含原点，就足以说明任意集合都是子空间吗？"
-    >{#snippet answer()}<p>
-        不能。对这里的整条过原点直线成立；任意集合还要检查任意加法与数乘的封闭性，例如只有原点和一个非零点的集合就不封闭。
-      </p>{/snippet}</KnowledgeCheck
-  >
+  <KnowledgeCheck prompt="迁移：两条坐标轴的并集包含原点，它是子空间吗？请给出一组检验。">
+    {#snippet answer()}<p>
+        取(1,0)和(0,1)，和为(1,1)，不在任一坐标轴上。零向量是必要条件，加法和任意实数乘的封闭性也必须成立。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="子空间判据与反例">
   <p>
@@ -95,75 +157,7 @@
     时结果也会在线上，但仅说明仿射组合封闭。
   </p>
 </TheorySection>
-<TheorySection id="experiment" title="直线能否容纳线性组合">
-  <p>
-    先预测再操作：一条直线包含原点，就足以说明任意集合都是子空间吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="组合后还在线上吗"
-    instructions="偏移 d 默认0，系数 a、b 默认1；范围均 −2 至2，无量纲。u=(1,2+d)、v=(−1,−2+d)。输入非法时保留有效结果。"
-    meaning="折线是候选集合，三个有名称的散点为 u、v 和 w；计算缺陷 w_y−2w_x−d 判断组合是否仍满足方程。重合点通过下方坐标和图例读取。"
-    limitations="只展示直线族和两名成员；有限交互不是任意集合封闭性的证明。点的成员判定用绝对容差1e−12，子空间结论由解析条件 d=0 给出。"
-    onreset={() => select('linear')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="linear" onchange={select} />
-    <div class="parameters">
-      <ParameterSlider
-        label="偏移 d"
-        value={d}
-        min={-2}
-        max={2}
-        step={0.1}
-        onchange={(n) => (d = n)}
-      />
-      <ParameterSlider
-        label="u 的系数 a"
-        value={a}
-        min={-2}
-        max={2}
-        step={0.1}
-        onchange={(n) => (a = n)}
-      />
-      <ParameterSlider
-        label="v 的系数 b"
-        value={b}
-        min={-2}
-        max={2}
-        step={0.1}
-        onchange={(n) => (b = n)}
-      />
-    </div>
-    <Plot2D
-      equal
-      series={result.series}
-      xRange={[-5, 5]}
-      yRange={[-12, 12]}
-      xLabel="x"
-      yLabel="y"
-      xUnit="无量纲"
-      yUnit="无量纲"
-      description="折线为候选集合 y=2x+d，散点图例分别标出 u、v、组合 w；横纵坐标均无量纲，固定视域方便比较偏移。"
-    />
-    <div aria-live="polite">
-      <p>u=({result.u.x},{result.u.y})；v=({result.v.x},{result.v.y})</p>
-      <p data-testid="result">
-        w=({result.w.x.toFixed(3)},{result.w.y.toFixed(3)}) · 缺陷 {result.defect.toFixed(3)} · {result.member
-          ? '当前组合属于集合'
-          : '当前组合不属于集合'}
-      </p>
-      <p>
-        集合 V_d：{result.subspace ? '是线性子空间' : '不是线性子空间'}；{d === 0
-          ? '原点在集合内'
-          : '原点不在集合内'}。
-      </p>
-    </div>
-  </InteractivePanel>
-  <p>
-    场景一先取
-    a=b=1，检查相加结果；任意改系数，缺陷仍为零。场景二保持系数不动只加偏移，缺陷变为1。场景三取零系数，在平移直线中直接见到零向量不属于集合。再令
-    a+b=1，观察偶然成功为何不足以证明子空间。
-  </p>
-</TheorySection>
+
 <TheorySection id="pitfalls" title="一次成功不是证明">
   <CommonMistakes
     items={[

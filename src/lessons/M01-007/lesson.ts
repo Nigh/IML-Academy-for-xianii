@@ -4,35 +4,14 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '检索分数变大，是方向更接近，还是特征变长了？' },
     { id: 'learning-path', title: '接上已有知识' },
-    {
-      id: 'motivation',
-      title: '两个特征朝向是否一致？',
-    },
-    {
-      id: 'intuition',
-      title: '把一个箭头投到另一个方向',
-    },
-    {
-      id: 'mathematics',
-      title: '把投影写成公式',
-    },
-    {
-      id: 'experiment',
-      title: '先预测符号，再移动端点',
-    },
-    {
-      id: 'pitfalls',
-      title: '点积不是纯粹的方向分数',
-    },
-    {
-      id: 'engineering',
-      title: '从传感器投影到线性层',
-    },
-    {
-      id: 'summary',
-      title: '带走四个结论',
-    },
+    { id: 'experiment', title: '先预测符号，再移动端点' },
+    { id: 'intuition', title: '把一个箭头投到另一个方向' },
+    { id: 'mathematics', title: '把投影写成公式' },
+    { id: 'pitfalls', title: '点积不是纯粹的方向分数' },
+    { id: 'engineering', title: '从传感器投影到线性层' },
+    { id: 'summary', title: '带走四个结论' },
   ],
   quiz: [
     {

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -12,6 +14,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let x = $state(3),
     y = $state(2),
@@ -21,6 +24,7 @@
     presets.find((p) => p.x === x && p.y === y && p.degrees === degrees)?.id ?? 'custom',
   );
   function select(id: string) {
+    if (id === 'axis') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       x = p.x;
@@ -31,6 +35,9 @@
   const fmt = (n: number) => (Math.abs(n) < 0.0005 ? 0 : n).toFixed(3);
 </script>
 
+<TheorySection id="motivation" title="模型解释了一部分观测，剩余部分还藏着同方向的贡献吗？">
+  <p>把(3,2)正交投影到横轴后，投影和残差的长度平方如何合计？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     前课已经求出直线上的最近点，也区分了投影向量与系数。本课用向量相减得到剩余部分，并解释为什么这个剩余部分必与参考方向垂直。
@@ -42,10 +49,78 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="观测中哪些部分能被模型解释"
-  ><p>
-    标定模型只包含一个已知响应方向时，可以解释观测的多少部分？{metadata.title}把观测拆成沿模型方向的拟合分量和剩余残差。它是理解最小二乘几何的基础，而不只是作图技巧。本课使用无量纲的二维确定性向量，不进行真实训练。
-  </p></TheorySection
+
+<TheorySection id="experiment" title="旋转参考方向再分解">
+  <p>固定观测转参考方向；再让观测恰好落在参考线上。每次同时检查重构、方向内积和平方范数账本。</p>
+  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+    <InteractivePanel
+      title="同一观测的平方范数账本"
+      instructions="默认观测(3,2)，分量范围±5、无量纲，方向角默认0°、范围±180°。非法输入保留有效值；方向始终由单位圆构造为非零向量。"
+      meaning="v是观测，p是投影，从p出发的虚线是残差r；残差端点与v重合，因此残差名称放在表格中。显示内积残差与平方范数恒等式的数值误差。"
+      limitations="二维欧氏正交投影，不推断残差的随机分布或独立性。视域按端点等比例调整；小于显示精度的值四舍五入，检验量另用科学记数法。"
+      onreset={() => select('axis')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="axis" onchange={select} />
+      <div class="parameters">
+        <ParameterSlider
+          label="观测 x"
+          value={x}
+          min={-5}
+          max={5}
+          step={0.1}
+          onchange={(n) => (x = n)}
+        /><ParameterSlider
+          label="观测 y"
+          value={y}
+          min={-5}
+          max={5}
+          step={0.1}
+          onchange={(n) => (y = n)}
+        /><ParameterSlider
+          label="参考方向角"
+          value={degrees}
+          min={-180}
+          max={180}
+          step={1}
+          unit="°"
+          onchange={(n) => (degrees = n)}
+        />
+      </div>
+      <VectorDiagram
+        range={result.range}
+        vectors={[
+          { ...result.v, label: x || y ? 'v' : '', role: 'primary' },
+          {
+            ...result.p,
+            label: result.projectionZero || result.residualZero ? '' : 'p',
+            role: 'accent',
+          },
+          { ...result.r, origin: result.p, label: '', role: 'secondary' },
+        ]}
+        description="横纵轴均无量纲且等比例。v为原观测，p为投影，虚线r从p连到v，形成直角三角形；零分量如实重合。"
+      />
+      <MatrixView
+        values={[
+          [x, result.p.x, result.r.x],
+          [y, result.p.y, result.r.y],
+        ].map((row) => row.map((n) => Number(fmt(n))))}
+        rowLabels={['x', 'y']}
+        columnLabels={['观测 v', '投影 p', '残差 r']}
+      />
+      <div aria-live="polite">
+        <p data-testid="result">
+          平方范数：{fmt(result.originalSquared)} = {fmt(result.parallelSquared)} + {fmt(
+            result.residualSquared,
+          )}
+        </p>
+        <p>
+          残差 r=({fmt(result.r.x)},{fmt(result.r.y)})；方向内积 uᵀr={result.cross.toExponential(
+            2,
+          )}；恒等式误差={result.energyError.toExponential(2)}
+        </p>
+      </div>
+    </InteractivePanel>
+  </PredictionLab></TheorySection
 >
 <TheorySection id="intuition" title="沿线分量与垂直剩余">
   <p>
@@ -61,11 +136,11 @@
   <p>
     平方范数在这里是长度的平方；只有物理模型说明比例关系和单位后，才能解释成能量。把任意向量分成两份时，平方展开还含两份向量的内积交叉项，只有正交时该项为0。概率独立属于后续统计知识，不能从几何垂直直接推出。
   </p>
-  <KnowledgeCheck prompt="任意两份向量相加还原观测，就能把长度平方直接相加吗？"
-    >{#snippet answer()}<p>
-        不能。还需两份向量正交；否则平方展开中的内积交叉项不为0。
-      </p>{/snippet}</KnowledgeCheck
-  >
+  <KnowledgeCheck prompt="迁移：若两份向量为(1,0)和(1,1)，平方范数还能直接相加吗？算出缺的项。">
+    {#snippet answer()}<p>
+        和为(2,1)，平方范数5；两项平方范数和为3，缺少交叉项2×1=2。相加能还原不等于正交分解。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="正交性消去交叉项"
   ><FormulaBlock
@@ -79,81 +154,7 @@
     一般拆成两向量仍能相加还原原向量，却未必正交，也未必满足平方范数相加。正交分解相对于选定子空间唯一，不能把任意拆分都叫投影残差。
   </p></TheorySection
 >
-<TheorySection id="experiment" title="旋转参考方向再分解"
-  ><p>
-    先预测再操作：任意两份向量相加还原观测，就能把长度平方直接相加吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="同一观测的平方范数账本"
-    instructions="默认观测(3,2)，分量范围±5、无量纲，方向角默认0°、范围±180°。非法输入保留有效值；方向始终由单位圆构造为非零向量。"
-    meaning="v是观测，p是投影，从p出发的虚线是残差r；残差端点与v重合，因此残差名称放在表格中。显示内积残差与平方范数恒等式的数值误差。"
-    limitations="二维欧氏正交投影，不推断残差的随机分布或独立性。视域按端点等比例调整；小于显示精度的值四舍五入，检验量另用科学记数法。"
-    onreset={() => select('axis')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="axis" onchange={select} />
-    <div class="parameters">
-      <ParameterSlider
-        label="观测 x"
-        value={x}
-        min={-5}
-        max={5}
-        step={0.1}
-        onchange={(n) => (x = n)}
-      /><ParameterSlider
-        label="观测 y"
-        value={y}
-        min={-5}
-        max={5}
-        step={0.1}
-        onchange={(n) => (y = n)}
-      /><ParameterSlider
-        label="参考方向角"
-        value={degrees}
-        min={-180}
-        max={180}
-        step={1}
-        unit="°"
-        onchange={(n) => (degrees = n)}
-      />
-    </div>
-    <VectorDiagram
-      range={result.range}
-      vectors={[
-        { ...result.v, label: x || y ? 'v' : '', role: 'primary' },
-        {
-          ...result.p,
-          label: result.projectionZero || result.residualZero ? '' : 'p',
-          role: 'accent',
-        },
-        { ...result.r, origin: result.p, label: '', role: 'secondary' },
-      ]}
-      description="横纵轴均无量纲且等比例。v为原观测，p为投影，虚线r从p连到v，形成直角三角形；零分量如实重合。"
-    />
-    <MatrixView
-      values={[
-        [x, result.p.x, result.r.x],
-        [y, result.p.y, result.r.y],
-      ].map((row) => row.map((n) => Number(fmt(n))))}
-      rowLabels={['x', 'y']}
-      columnLabels={['观测 v', '投影 p', '残差 r']}
-    />
-    <div aria-live="polite">
-      <p data-testid="result">
-        平方范数：{fmt(result.originalSquared)} = {fmt(result.parallelSquared)} + {fmt(
-          result.residualSquared,
-        )}
-      </p>
-      <p>
-        残差 r=({fmt(result.r.x)},{fmt(result.r.y)})；方向内积 uᵀr={result.cross.toExponential(
-          2,
-        )}；恒等式误差={result.energyError.toExponential(2)}
-      </p>
-    </div>
-  </InteractivePanel>
-  <p>
-    场景一得到残差(0,2)，验证13=9+4。场景二转到45°，观测不动，验证13=12.5+0.5。连续改变方向角，检查方向内积接近零；场景三观测已在参考直线上，残差为零。最后复位恢复场景一。
-  </p></TheorySection
->
+
 <TheorySection id="pitfalls" title="残差不是任意剩余"
   ><CommonMistakes
     items={[

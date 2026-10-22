@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -12,6 +14,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, parseShape, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let a = $state('2,3,4'),
     b = $state('4'),
@@ -29,6 +32,7 @@
     outcome.result?.rows[Math.min(flat, (outcome.result?.rows.length ?? 1) - 1)],
   );
   function select(id: string) {
+    if (id === 'channels') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       a = p.a;
@@ -41,6 +45,9 @@
   const fmt = (s: readonly number[]) => `(${s.join(',')}${s.length === 1 ? ',' : ''})`;
 </script>
 
+<TheorySection id="motivation" title="给每个通道加偏置，程序怎么知道哪个轴是通道？">
+  <p>(3,)和(4,)相加，会自动得到3×4表吗？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     已有张量的阶数、形状与索引，也会区分矩阵乘法。本课新增广播：让一个较小数组中的值在逐元素运算中重复使用。
@@ -52,11 +59,95 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="给每个通道加偏置，不写三重循环"
-  ><p>
-    批次、时间和通道构成一个三维特征张量，模型需要给每个通道加一个偏置。{metadata.title}用尾轴对齐规则描述同一个偏置如何在多个位置复用。这个规则减少显式循环，却也容易让形状正确、业务含义错误的表达式悄悄运行。本课使用无量纲地址编码合成数据，执行真正的逐元素加法，不涉及训练。
-  </p></TheorySection
->
+
+<TheorySection id="experiment" title="追踪每个输出来自哪里">
+  <p>
+    先追踪逐通道偏置跨批次与时间的复用，再比较行列扩展和尾轴冲突。最后用时间与通道等长的场景检查语义错误。
+  </p>
+  <PredictionLab {...exploration} context={JSON.stringify([a, b, offset, flat])} {resetVersion}>
+    <InteractivePanel
+      title="尾轴对齐与真实加法"
+      instructions="形状用逗号分隔1–3个整数，每轴1–4，默认2,3,4和4；不输入括号。偏置起点默认10，范围±10，步长1，可键盘编辑。输出位置从0起；形状非法或不兼容时显示原因并停止计算。"
+      meaning="第一个输入A按行优先扁平索引i赋值A[i]=i；第二个输入D[j]=偏置起点+j。这是确定性地址编码，便于查来源，不代表实测特征。选择任意输出，查看完整坐标、两个来源和实际求和。"
+      limitations="仅演示正长度小张量加法，不含标量、空轴、其他运算或实际框架内存分配。表格只列前12项，全部最多64项都可用输出位置检查器访问。形状合法不能证明批次/时间/通道语义正确。"
+      onreset={() => select('channels')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="channels" onchange={select} />
+      <div class="shapes">
+        <label
+          >输入A形状<input
+            class="input"
+            value={a}
+            aria-invalid={!!outcome.error}
+            oninput={(e) => {
+              a = e.currentTarget.value;
+              flat = 0;
+              selected = 'custom';
+            }}
+          /></label
+        ><label
+          >输入D形状<input
+            class="input"
+            value={b}
+            aria-invalid={!!outcome.error}
+            oninput={(e) => {
+              b = e.currentTarget.value;
+              flat = 0;
+              selected = 'custom';
+            }}
+          /></label
+        >
+      </div>
+      <ParameterSlider
+        label="偏置起点"
+        value={offset}
+        min={-10}
+        max={10}
+        step={1}
+        onchange={(n) => {
+          offset = n;
+          selected = 'custom';
+        }}
+      />
+      {#if outcome.error}<p role="status" class="error">
+          无法计算：{outcome.error}
+        </p>{:else if outcome.result && current}
+        {@const r = outcome.result}
+        <div aria-live="polite" data-testid="result">
+          <p>
+            尾轴对齐：A={fmt(r.left)}；D={fmt(r.right)}；输出形状={fmt(r.shape)}；元素数={r.rows
+              .length}。
+          </p>
+        </div>
+        <MatrixView
+          values={[r.left, r.right, r.shape]}
+          rowLabels={['A补前轴', 'D补前轴', '输出']}
+        />
+        <NumericInput
+          integer
+          label="输出扁平位置"
+          value={flat}
+          min={0}
+          max={r.rows.length - 1}
+          step={1}
+          onchange={(n) => (flat = n)}
+        />
+        <p data-testid="trace" aria-live="polite">
+          输出坐标{fmt(current.index)}：A来源{fmt(current.left.index)}（扁平{current.left
+            .flat}）={current.av}；D来源{fmt(current.right.index)}（扁平{current.right
+            .flat}）={current.bv}；相加={current.value}。
+        </p>
+        <p>前{Math.min(12, r.rows.length)}项／共{r.rows.length}项：</p>
+        <MatrixView
+          values={r.rows
+            .slice(0, 12)
+            .map((x) => [x.flat, x.left.flat, x.right.flat, x.av, x.bv, x.value])}
+          columnLabels={['输出位置', 'A位置', 'D位置', 'A值', 'D值', '和']}
+        />
+      {/if}
+    </InteractivePanel>
+  </PredictionLab>
+</TheorySection>
 <TheorySection id="intuition" title="从最后一轴开始对齐">
   <p>
     先做一张表的加法：每行有4个通道，想给第一个通道加10、第二个加20，以此类推。同一份4个偏置要在每行重复使用，程序把这种按规则复用称为广播（broadcasting）。它不执行矩阵乘法里的行列求和。
@@ -71,11 +162,13 @@
   <p>
     例如(3,1)与(1,4)，前者每行只有一个值，后者只有一行，每个输出取对应行值加对应列值，形成3×4表；(3,)与(4,)末轴3和4不兼容，会失败。形状兼容并不能证明通道意义正确，程序不会自动理解业务语义。
   </p>
-  <KnowledgeCheck prompt="两个一维形状(3,)和(4,)能自动组成3×4表吗？"
-    >{#snippet answer()}<p>
-        不能。尾轴冲突；应明确写出(3,1)与(1,4)才能得到该外和。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：形状(2,3,3)希望按时间加偏置，写成(3,)会发生什么？应该如何明确时间轴？"
   >
+    {#snippet answer()}<p>
+        (3,)会沿最后的通道轴对齐，形状合法但语义错误。明确写成(1,3,1)才能按时间复用；可用来源索引验证。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="兼容条件与索引映射">
   <FormulaBlock
@@ -94,92 +187,7 @@
     广播语义不要求先把输入物理复制成完整输出大小；实现可能使用步幅等机制。但输出计算和后续操作仍有成本，不能把广播理解为任意大张量都不占内存。
   </p>
 </TheorySection>
-<TheorySection id="experiment" title="追踪每个输出来自哪里">
-  <p>
-    先预测再操作：两个一维形状(3,)和(4,)能自动组成3×4表吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="尾轴对齐与真实加法"
-    instructions="形状用逗号分隔1–3个整数，每轴1–4，默认2,3,4和4；不输入括号。偏置起点默认10，范围±10，步长1，可键盘编辑。输出位置从0起；形状非法或不兼容时显示原因并停止计算。"
-    meaning="第一个输入A按行优先扁平索引i赋值A[i]=i；第二个输入D[j]=偏置起点+j。这是确定性地址编码，便于查来源，不代表实测特征。选择任意输出，查看完整坐标、两个来源和实际求和。"
-    limitations="仅演示正长度小张量加法，不含标量、空轴、其他运算或实际框架内存分配。表格只列前12项，全部最多64项都可用输出位置检查器访问。形状合法不能证明批次/时间/通道语义正确。"
-    onreset={() => select('channels')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="channels" onchange={select} />
-    <div class="shapes">
-      <label
-        >输入A形状<input
-          class="input"
-          value={a}
-          aria-invalid={!!outcome.error}
-          oninput={(e) => {
-            a = e.currentTarget.value;
-            flat = 0;
-            selected = 'custom';
-          }}
-        /></label
-      ><label
-        >输入D形状<input
-          class="input"
-          value={b}
-          aria-invalid={!!outcome.error}
-          oninput={(e) => {
-            b = e.currentTarget.value;
-            flat = 0;
-            selected = 'custom';
-          }}
-        /></label
-      >
-    </div>
-    <ParameterSlider
-      label="偏置起点"
-      value={offset}
-      min={-10}
-      max={10}
-      step={1}
-      onchange={(n) => {
-        offset = n;
-        selected = 'custom';
-      }}
-    />
-    {#if outcome.error}<p role="status" class="error">
-        无法计算：{outcome.error}
-      </p>{:else if outcome.result && current}
-      {@const r = outcome.result}
-      <div aria-live="polite" data-testid="result">
-        <p>
-          尾轴对齐：A={fmt(r.left)}；D={fmt(r.right)}；输出形状={fmt(r.shape)}；元素数={r.rows
-            .length}。
-        </p>
-      </div>
-      <MatrixView values={[r.left, r.right, r.shape]} rowLabels={['A补前轴', 'D补前轴', '输出']} />
-      <NumericInput
-        integer
-        label="输出扁平位置"
-        value={flat}
-        min={0}
-        max={r.rows.length - 1}
-        step={1}
-        onchange={(n) => (flat = n)}
-      />
-      <p data-testid="trace" aria-live="polite">
-        输出坐标{fmt(current.index)}：A来源{fmt(current.left.index)}（扁平{current.left
-          .flat}）={current.av}；D来源{fmt(current.right.index)}（扁平{current.right
-          .flat}）={current.bv}；相加={current.value}。
-      </p>
-      <p>前{Math.min(12, r.rows.length)}项／共{r.rows.length}项：</p>
-      <MatrixView
-        values={r.rows
-          .slice(0, 12)
-          .map((x) => [x.flat, x.left.flat, x.right.flat, x.av, x.bv, x.value])}
-        columnLabels={['输出位置', 'A位置', 'D位置', 'A值', 'D值', '和']}
-      />
-    {/if}
-  </InteractivePanel>
-  <p>
-    场景一检查输出位置0、4、12：偏置跨时间和批次重复，但A值改变。场景二检查行列扩展；切到(3,)+(4,)后观察尾轴错误，不能靠自动转置解决。场景三两个长度都为3，改变输出索引并确认偏置只跟最后一轴走；若本意沿时间加偏置，应显式写(1,3,1)。复位恢复逐通道场景。
-  </p>
-</TheorySection>
+
 <TheorySection id="pitfalls" title="广播只懂形状，不懂轴的名字"
   ><CommonMistakes
     items={[

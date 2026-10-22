@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('协议、全部形状预设、来源检查器、错误恢复与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-021');
   const v = render(Lesson, { metadata: lessonById.get('M01-021')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('输出形状=(2,3,4)');
   await fireEvent.input(v.getByLabelText('输出扁平位置'), { target: { value: '23' } });

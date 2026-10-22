@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -12,6 +14,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let mode = $state('identity'),
     b1 = $state(2),
@@ -21,6 +24,7 @@
   const result = $derived(experiment(mode, b1, b2, t));
   const fmt = (n: number) => Number(n.toFixed(3));
   function select(id: string) {
+    if (id === 'identity') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       mode = p.mode;
@@ -32,6 +36,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="相同测量规则，为什么能出现唯一解、无穷解和无解？">
+  <p>约束x₁+x₂=2与2x₁+2x₂=3能同时满足吗？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     已有列空间、秩、零空间及解族的知识。本课把高中方程组的相交、平行与重合连接到这些概念，再解释何时能用逆矩阵恢复输入。
@@ -43,11 +50,89 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="标定能否唯一反推参数"
-  ><p>
-    标定模型把未知参数x映射为观测b，已知观测后能否反求参数？{metadata.title}研究这件事的存在性和唯一性。若两个测量只是同一约束的重复，更多读数并不一定带来更多信息；若读数彼此矛盾，则精确方程根本无解。本课用无量纲实数、三个固定二维矩阵解析展示，不把合成数据当实测结果。
-  </p></TheorySection
->
+
+<TheorySection id="experiment" title="切换右端项与解的类型">
+  <p>先比较相交、重合与平行，再只改右端项；检查系数矩阵奇异时，目标变化会怎样改变解的存在性。</p>
+  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+    <InteractivePanel
+      title="同一个矩阵，不同观测"
+      instructions="选择矩阵场景。b₁默认2、b₂默认1，各范围−4至4；解族系数t默认0、范围−3至3，步长0.25，均无量纲。数值框支持键盘；非有限或越界输入不进入计算。"
+      meaning="实线与虚线分别表示两行约束，圆点是唯一解或解族当前成员。无解时不伪造交点；两线重合时虚线覆盖实线，文字明确说明。图范围自适应，像素长度不可跨预设比较。"
+      limitations="仅三个结构已知的小矩阵；相容性按当前双精度数值严格比较b₂−2b₁是否为0，预设与0.25步长均能精确表示。任意近似输入或含噪数据需容差/最小二乘分析。t只在无穷解时影响当前成员。"
+      onreset={() => select('identity')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="identity" onchange={select} />
+      <ParameterSlider
+        label="右端项 b₁"
+        value={b1}
+        min={-4}
+        max={4}
+        step={0.25}
+        onchange={(n) => {
+          b1 = n;
+          selected = 'custom';
+        }}
+      />
+      <ParameterSlider
+        label="右端项 b₂"
+        value={b2}
+        min={-4}
+        max={4}
+        step={0.25}
+        onchange={(n) => {
+          b2 = n;
+          selected = 'custom';
+        }}
+      />
+      <ParameterSlider
+        label="解族系数 t"
+        value={t}
+        min={-3}
+        max={3}
+        step={0.25}
+        onchange={(n) => {
+          t = n;
+          selected = 'custom';
+        }}
+      />
+      <MatrixView values={result.matrix} columnLabels={['x₁系数', 'x₂系数']} />
+      <Plot2D
+        equal
+        series={result.series}
+        xRange={[-result.extent, result.extent]}
+        yRange={[-result.extent, result.extent]}
+        xLabel="x₁"
+        yLabel="x₂"
+        xUnit="无量纲"
+        yUnit="无量纲"
+        description="输入平面中的两行约束：实线第一式，虚线第二式；重合表示约束重复，圆点标识当前解。线段在视域边界截取，解族不限于图中范围。"
+      />
+      <div aria-live="polite" data-testid="result">
+        <p>
+          解的类型：{result.status === 'unique'
+            ? '唯一解'
+            : result.status === 'infinite'
+              ? '无穷多解（两约束重合）'
+              : '无解（两约束平行分离）'}；det A={result.determinant}。
+        </p>
+        {#if mode === 'dependent'}<p>
+            消元检查：0=b₂−2b₁={result.consistency.toExponential(3)}。{result.status === 'none'
+              ? '矛盾，故没有精确解。'
+              : '恒等式，剩余一个自由参数。'}
+          </p>{/if}
+        {#if result.solution && result.output}<p>
+            当前解=({result.solution.map(fmt).join(',')})；Ax=({result.output
+              .map(fmt)
+              .join(',')})；b=({b1},{b2})；残差范数={result.residual?.toExponential(2)}。
+          </p>{/if}
+        {#if result.inverse}<p>解析逆矩阵：</p>
+          <MatrixView values={result.inverse} />{:else}<p>
+            逆矩阵不存在；这不等于每个右端项都无解。
+          </p>{/if}
+      </div>
+    </InteractivePanel>
+  </PredictionLab>
+</TheorySection>
 <TheorySection id="intuition" title="约束直线的三种关系">
   <p>
     矩阵方程把一组高中线性方程简写到一起：每行就是一条约束，未知数放在同一列。先按消元法判断约束有没有冲突，再问能不能唯一还原输入。
@@ -62,11 +147,13 @@
   <p>
     满秩方阵表示输入方向全部保留，且输入输出维数相同。二维行列式是从四个元素算出的一个数，下面给出乘积之差公式；其绝对值是单位方形经变换后的面积，为0说明被压成线或点，因此不能逆转。增广矩阵是在系数矩阵右侧再附上目标列，用于同时记录约束及其目标。
   </p>
-  <KnowledgeCheck prompt="第二个约束只是第一个的2倍，会自动产生唯一解吗？"
-    >{#snippet answer()}<p>
-        不会。若目标也成2倍，约束重复；否则矛盾。要唯一解，必须有足够独立约束。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：一个1×2矩阵满行秩，对所有标量目标都有解。这是否足以定义普通逆和唯一解？"
   >
+    {#snippet answer()}<p>
+        不足。[1,1]满行秩但有非零核方向，对任意已有解可加(t,−t)。非方阵没有此处的双边普通逆，满行秩也不保证唯一。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="逆矩阵需要什么条件">
   <FormulaBlock
@@ -84,91 +171,7 @@
     一般线性系统有解当且仅当b属于A的列空间；等价地，增广矩阵[A|b]与A的秩相同。若有解，零空间是否只有0决定唯一性。实际大型计算通常直接求解或做分解，不必显式形成逆矩阵；含噪观测需要最小二乘，留给后续课程。
   </p>
 </TheorySection>
-<TheorySection id="experiment" title="切换右端项与解的类型">
-  <p>
-    先预测再操作：第二个约束只是第一个的2倍，会自动产生唯一解吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="同一个矩阵，不同观测"
-    instructions="选择矩阵场景。b₁默认2、b₂默认1，各范围−4至4；解族系数t默认0、范围−3至3，步长0.25，均无量纲。数值框支持键盘；非有限或越界输入不进入计算。"
-    meaning="实线与虚线分别表示两行约束，圆点是唯一解或解族当前成员。无解时不伪造交点；两线重合时虚线覆盖实线，文字明确说明。图范围自适应，像素长度不可跨预设比较。"
-    limitations="仅三个结构已知的小矩阵；相容性按当前双精度数值严格比较b₂−2b₁是否为0，预设与0.25步长均能精确表示。任意近似输入或含噪数据需容差/最小二乘分析。t只在无穷解时影响当前成员。"
-    onreset={() => select('identity')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="identity" onchange={select} />
-    <ParameterSlider
-      label="右端项 b₁"
-      value={b1}
-      min={-4}
-      max={4}
-      step={0.25}
-      onchange={(n) => {
-        b1 = n;
-        selected = 'custom';
-      }}
-    />
-    <ParameterSlider
-      label="右端项 b₂"
-      value={b2}
-      min={-4}
-      max={4}
-      step={0.25}
-      onchange={(n) => {
-        b2 = n;
-        selected = 'custom';
-      }}
-    />
-    <ParameterSlider
-      label="解族系数 t"
-      value={t}
-      min={-3}
-      max={3}
-      step={0.25}
-      onchange={(n) => {
-        t = n;
-        selected = 'custom';
-      }}
-    />
-    <MatrixView values={result.matrix} columnLabels={['x₁系数', 'x₂系数']} />
-    <Plot2D
-      equal
-      series={result.series}
-      xRange={[-result.extent, result.extent]}
-      yRange={[-result.extent, result.extent]}
-      xLabel="x₁"
-      yLabel="x₂"
-      xUnit="无量纲"
-      yUnit="无量纲"
-      description="输入平面中的两行约束：实线第一式，虚线第二式；重合表示约束重复，圆点标识当前解。线段在视域边界截取，解族不限于图中范围。"
-    />
-    <div aria-live="polite" data-testid="result">
-      <p>
-        解的类型：{result.status === 'unique'
-          ? '唯一解'
-          : result.status === 'infinite'
-            ? '无穷多解（两约束重合）'
-            : '无解（两约束平行分离）'}；det A={result.determinant}。
-      </p>
-      {#if mode === 'dependent'}<p>
-          消元检查：0=b₂−2b₁={result.consistency.toExponential(3)}。{result.status === 'none'
-            ? '矛盾，故没有精确解。'
-            : '恒等式，剩余一个自由参数。'}
-        </p>{/if}
-      {#if result.solution && result.output}<p>
-          当前解=({result.solution.map(fmt).join(',')})；Ax=({result.output
-            .map(fmt)
-            .join(',')})；b=({b1},{b2})；残差范数={result.residual?.toExponential(2)}。
-        </p>{/if}
-      {#if result.inverse}<p>解析逆矩阵：</p>
-        <MatrixView values={result.inverse} />{:else}<p>
-          逆矩阵不存在；这不等于每个右端项都无解。
-        </p>{/if}
-    </div>
-  </InteractivePanel>
-  <p>
-    场景一验证x直接等于b。场景二先保持b=(2,4)拖动t，观察圆点沿重合直线移动；切到b=(2,3)，第二条线平移并失去全部交点。场景三检查剪切逆得到x=(1,1)而不是原样返回b，复位恢复单位矩阵。
-  </p>
-</TheorySection>
+
 <TheorySection id="pitfalls" title="奇异与无解不是同义词"
   ><CommonMistakes
     items={[

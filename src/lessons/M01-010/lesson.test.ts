@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('协议、全部预设、角度与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-010');
   const v = render(Lesson, { metadata: lessonById.get('M01-010')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('13.000 = 9.000 + 4.000');
   await fireEvent.click(v.getByText('场景二：转到45°方向'));

@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('协议、误差预设、参数和复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-019');
   const v = render(Lesson, { metadata: lessonById.get('M01-019')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('Frobenius误差=1');
   await fireEvent.click(v.getByText('场景二：保留全部项'));

@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '删去一个特征，模型的表达能力一定下降吗？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '冗余特征为何让权重不唯一' },
+    { id: 'experiment', title: '寻找非平凡零组合' },
     { id: 'intuition', title: '能抵消的贡献揭示冗余' },
     { id: 'mathematics', title: '相关、独立与基' },
-    { id: 'experiment', title: '寻找非平凡零组合' },
     { id: 'pitfalls', title: '数量与维数的区别' },
     { id: 'summary', title: '用最少方向完整表示' },
   ],

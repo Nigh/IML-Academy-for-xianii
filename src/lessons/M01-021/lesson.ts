@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '给每个通道加偏置，程序怎么知道哪个轴是通道？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '给每个通道加偏置，不写三重循环' },
+    { id: 'experiment', title: '追踪每个输出来自哪里' },
     { id: 'intuition', title: '从最后一轴开始对齐' },
     { id: 'mathematics', title: '兼容条件与索引映射' },
-    { id: 'experiment', title: '追踪每个输出来自哪里' },
     { id: 'pitfalls', title: '广播只懂形状，不懂轴的名字' },
     { id: 'summary', title: '先检查轴，再检查语义' },
   ],
