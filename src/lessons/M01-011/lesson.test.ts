@@ -20,3 +20,17 @@ it('协议、矩阵编辑、逐格计算、顺序和复位', async () => {
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByTestId('result').textContent).toContain('和：58');
 });
+
+it('现实对象操作与数学结果共享状态，复位恢复默认', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-011')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  const initial = v.getByTestId('object-reading').textContent;
+  await fireEvent.click(v.getByRole('button', { name: '产品 1 加一件' }));
+  expect(v.getByTestId('object-reading').textContent).toContain('资源 1 总量：65');
+  expect(v.getByTestId('result').textContent).toContain('和：65');
+  await fireEvent.click(v.getByRole('button', { name: '查看第 2 批订单' }));
+  expect(v.getByTestId('object-reading').textContent).toContain('资源 1 总量：139');
+  expect(v.getByTestId('result').textContent).toContain('和：139');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('object-reading').textContent).toBe(initial);
+});

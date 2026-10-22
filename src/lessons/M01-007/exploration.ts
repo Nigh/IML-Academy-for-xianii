@@ -1,5 +1,5 @@
 export const exploration = {
-  prompt: '保持两向量方向，只把b放大2倍，点积会怎样？',
+  prompt: '只把候选卡b的两个特征同时放大2倍，方向保持不变，点积分数会怎样？',
   options: [
     {
       text: '点积放大2倍，夹角不变',

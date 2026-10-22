@@ -20,3 +20,21 @@ it('协议、三点拟合、离群参数与复位', async () => {
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByTestId('result').textContent).toContain('观测数=3');
 });
+
+it('对象操作与数学结果同源', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-020')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  expect(v.getByTestId('object-workbench')).toBeTruthy();
+  await fireEvent.click(v.getByRole('button', { name: '零点提高半单位' }));
+  expect(v.getByTestId('sample-readings').textContent).toContain(
+    '样本 1：输入 -1；记录 0；仪表预测 0.5',
+  );
+  await fireEvent.click(v.getByRole('button', { name: '增益提高半单位' }));
+  expect(v.getByTestId('sample-readings').textContent).toContain(
+    '样本 1：输入 -1；记录 0；仪表预测 0',
+  );
+  expect(v.getByTestId('sample-readings').textContent).toContain(
+    '样本 3：输入 1；记录 3；仪表预测 3',
+  );
+  await fireEvent.click(v.getByText('复位 ↺'));
+});

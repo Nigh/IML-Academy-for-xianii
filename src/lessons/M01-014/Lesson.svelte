@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ObjectWorkbench from './ObjectWorkbench.svelte';
   import PredictionLab from '../../components/lesson/PredictionLab.svelte';
   import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
@@ -34,8 +35,10 @@
   const fmt = (n: number) => Number(n.toFixed(3));
 </script>
 
-<TheorySection id="motivation" title="只读到两路信号之和，哪些输入变化永远看不见？">
-  <p>仪器只报告x₁+x₂。给输入增加(t,−t)，读数如何变化？</p>
+<TheorySection id="motivation" title="改变两路输入，为什么仪表读数不动？">
+  <p>
+    仪器只报告两路带符号信号的总和。一边增加、一边减少，仪表能分辨这次变化吗？试过零目标后，再换成非零目标。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -49,17 +52,27 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="改变输入但保持输出">
+<TheorySection id="experiment" title="平衡两路信号，观察仪表">
   <p>比较零目标、非零目标与单位矩阵。沿t移动时记录哪些量不变，再改d，辨认平移后的解集。</p>
   <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
     <InteractivePanel
       title="输入移动，读数不动"
-      instructions="选择矩阵预设。目标参数d默认0、范围−4到4；核方向系数t默认1、范围−3到3，均无量纲，步长0.25。可用滑块或键盘数值框，非法值不进入计算。"
+      instructions="先用平衡键增减两路信号，观察输入与输出；再换非零目标和独立通道。d为±4，t为±3，均无量纲，步长0.25；数值框可精确控制，非法值不进入计算。"
       meaning="图中实线为特解x_p，虚线为当前输入x，点线为从x_p出发的核位移；重合或零长度不添加偏移。结果区显示实际Ax、b和残差。切换预设时坐标范围自适应，不能跨图凭像素长度比较。"
       limitations="三个固定小矩阵的解析模型；b按已知特解构造，所以实验总有解，不能据此推断任意b都有解。满列秩时t不起作用，因为没有非零核方向。"
       onreset={() => select('kernel')}
     >
       <PresetSelector {presets} value={selected} defaultId="kernel" onchange={select} />
+      <ObjectWorkbench
+        x={result.x}
+        output={result.output}
+        {t}
+        hasKernel={result.nullity > 0}
+        onbalance={(n) => {
+          t = n;
+          selected = 'custom';
+        }}
+      />
       <ParameterSlider
         label="目标参数 d"
         value={d}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ObjectWorkbench from './ObjectWorkbench.svelte';
   import PredictionLab from '../../components/lesson/PredictionLab.svelte';
   import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
@@ -35,8 +36,10 @@
   const fmt = (n: number) => (Math.abs(n) < 0.0005 ? 0 : n).toFixed(3);
 </script>
 
-<TheorySection id="motivation" title="模型解释了一部分观测，剩余部分还藏着同方向的贡献吗？">
-  <p>把(3,2)正交投影到横轴后，投影和残差的长度平方如何合计？</p>
+<TheorySection id="motivation" title="转动导轨，两段行程怎样重新分配？">
+  <p>
+    目标在导轨旁，小车沿轨行驶后用垂直连接臂触及目标。转动导轨，两段长度如何变化？怎样从这些行程解释直距的平方？
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -50,17 +53,33 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="旋转参考方向再分解">
-  <p>固定观测转参考方向；再让观测恰好落在参考线上。每次同时检查重构、方向内积和平方范数账本。</p>
+<TheorySection id="experiment" title="转导轨，比较行程与平方账本">
+  <p>
+    先固定目标转动导轨，再把目标移到轨道上；比较小车行程与连接臂，随后核对投影、残差和平方范数账本。
+  </p>
   <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
     <InteractivePanel
       title="同一观测的平方范数账本"
-      instructions="默认观测(3,2)，分量范围±5、无量纲，方向角默认0°、范围±180°。非法输入保留有效值；方向始终由单位圆构造为非零向量。"
+      instructions="先按按钮转动导轨，观察小车与连接臂；再移动目标，看哪段行程变化。默认目标(3,2)，分量±5，角度±180°，均为无量纲模型；数值框可精确调整。"
       meaning="v是观测，p是投影，从p出发的虚线是残差r；残差端点与v重合，因此残差名称放在表格中。显示内积残差与平方范数恒等式的数值误差。"
       limitations="二维欧氏正交投影，不推断残差的随机分布或独立性。视域按端点等比例调整；小于显示精度的值四舍五入，检验量另用科学记数法。"
       onreset={() => select('axis')}
     >
       <PresetSelector {presets} value={selected} defaultId="axis" onchange={select} />
+      <ObjectWorkbench
+        v={result.v}
+        u={result.u}
+        p={result.p}
+        r={result.r}
+        {degrees}
+        onrotate={(n) => {
+          degrees = n;
+        }}
+        onmove={(a, b) => {
+          x = a;
+          y = b;
+        }}
+      />
       <div class="parameters">
         <ParameterSlider
           label="观测 x"

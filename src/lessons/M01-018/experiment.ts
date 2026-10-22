@@ -88,9 +88,18 @@ export function experiment(s1: number, s2: number, u: number, v: number, reflect
     x: Math.cos((i * Math.PI) / 36),
     y: Math.sin((i * Math.PI) / 36),
   }));
+  const stamp = [
+    { x: -0.6, y: -0.4 },
+    { x: 0.6, y: -0.4 },
+    { x: 0.6, y: 0 },
+    { x: 0, y: 0 },
+    { x: 0, y: 0.7 },
+    { x: -0.6, y: 0.7 },
+  ].map(stage);
   const stages = circle.map(stage),
     probe = stage({ x: Math.SQRT1_2, y: Math.SQRT1_2 });
   return {
+    stamp: [0, 1, 2, 3].map((i) => stamp.map((p) => p[i])),
     U,
     Vt,
     sigma,

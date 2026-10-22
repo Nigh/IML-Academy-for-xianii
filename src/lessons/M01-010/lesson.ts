@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '模型解释了一部分观测，剩余部分还藏着同方向的贡献吗？' },
+    { id: 'motivation', title: '转动导轨，两段行程怎样重新分配？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '旋转参考方向再分解' },
+    { id: 'experiment', title: '转导轨，比较行程与平方账本' },
     { id: 'intuition', title: '沿线分量与垂直剩余' },
     { id: 'mathematics', title: '正交性消去交叉项' },
     { id: 'pitfalls', title: '残差不是任意剩余' },

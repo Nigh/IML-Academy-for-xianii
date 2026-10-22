@@ -23,7 +23,7 @@ for (const lesson of lessons.filter((l) => l.id.startsWith('M01-') && selectedId
     await lab.getByRole('button', { name: '给一点提示' }).click();
     await expect(lab.getByRole('button', { name: '给一点提示' })).toBeDisabled();
     await lab.getByRole('button', { name: '查看推理' }).click();
-    const presets = lab.locator('button[aria-pressed]');
+    const presets = lab.locator('.presets button[aria-pressed], .scenario-buttons > button');
     const count = await presets.count();
     for (const theme of ['light', 'dark']) {
       await page.getByLabel('主题', { exact: true }).selectOption(theme);
@@ -46,6 +46,16 @@ for (const lesson of lessons.filter((l) => l.id.startsWith('M01-') && selectedId
         .analyze();
       expect(audit.violations).toEqual([]);
       await page.setViewportSize({ width: 320, height: 850 });
+      if (['M01-004', 'M01-005'].includes(lesson.id)) {
+        await expect
+          .poll(() =>
+            lab
+              .locator('figure.plot')
+              .first()
+              .evaluate((el) => el.scrollLeft),
+          )
+          .toBeGreaterThan(0);
+      }
       for (let i = 0; i < count; i++) {
         await presets.nth(i).click();
         expect(

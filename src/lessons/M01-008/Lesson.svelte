@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ObjectWorkbench from './ObjectWorkbench.svelte';
   import PredictionLab from '../../components/lesson/PredictionLab.svelte';
   import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
@@ -34,8 +35,10 @@
   }
 </script>
 
-<TheorySection id="motivation" title="只改记录单位，最近邻的判断为什么会变？">
-  <p>把第一分量从m改成mm，同时把该维尺度也换成mm，归一化距离会改变吗？</p>
+<TheorySection id="motivation" title="沿街送货与直达，哪条路线更短？">
+  <p>
+    仓库到收货点向东3m、向北4m。沿街行驶要走多远，允许直达又有多远？先移动收货点比较路线，再检查只换记录单位是否会改变距离。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -49,12 +52,12 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="同一位移，不同数值表示">
+<TheorySection id="experiment" title="规划路线，再切换记录单位">
   <p>比较m与mm显示；再只增大第一尺度。判断两次操作中，哪次改变表示，哪次改变度量。</p>
   <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
     <InteractivePanel
       title="物理长度与数值分数"
-      instructions="默认差向量(3,4)m，尺度均1m。分量范围±5m，尺度0.1至10m。预设只改变第一特征的显示单位；非法输入保留有效结果。"
+      instructions="先用方向按钮移动收货点，比较沿街和直达路线；再切换米/毫米与特征尺度。默认目标(3,4)m，分量±5m，尺度0.1至10m；数值框提供精确控制。"
       meaning="几何始终按m绘制。实线Δ是直达位移，横向与竖向两段显示L1轴向路径；数值区同时报告合法物理范数、错误混合单位分数与归一化度量。"
       limitations="两维欧氏教学模型，无随机/训练。混合m/mm数值平方和只是错误示范，不具有物理长度单位；更一般的特征尺度需要任务知识。"
       onreset={() => select('metres')}
@@ -68,6 +71,16 @@
           : 'custom'}
         defaultId="metres"
         onchange={select}
+      />
+      <ObjectWorkbench
+        {x}
+        {y}
+        l1={result.l1}
+        l2={result.l2}
+        onmove={(a, b) => {
+          x = a;
+          y = b;
+        }}
       />
       <div class="parameters">
         <ParameterSlider

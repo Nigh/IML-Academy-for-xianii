@@ -1,15 +1,15 @@
 export const exploration = {
-  prompt: '把(3,2)正交投影到横轴后，投影和残差的长度平方如何合计？',
+  prompt: '目标固定，导轨横放。沿轨和垂直臂的长度平方怎样合计？',
   options: [
     {
       text: '两项长度直接相加等于原长度',
       correct: false,
-      observation: '从横轴转到45°，对比平方和与方向内积。',
+      observation: '转动导轨，对比小车行程、臂长以及它们的平方和。',
     },
     {
       text: '两项平方和等于原长度平方',
       correct: true,
-      observation: '同时看两份向量的夹角和平方范数账本。',
+      observation: '看导轨与连接臂的垂直关系，再核对平方范数账本。',
     },
   ],
   hints: ['展开(p+r)与自身的点积，会出现几项？', '哪一项由垂直关系消掉？普通拆分也有这个条件吗？'],

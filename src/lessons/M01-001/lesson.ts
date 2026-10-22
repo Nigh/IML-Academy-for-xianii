@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '两台导航仪报告不同的坐标，可能记录了同一段位移吗？' },
+    { id: 'motivation', title: '配送车没有移动，导航仪读数为什么变了？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '移动坐标轴，保持位移' },
+    { id: 'experiment', title: '先设置配送终点，再转动导航仪' },
     { id: 'intuition', title: '向量与它的坐标不是同一件事' },
     { id: 'mathematics', title: '分量来自基向量' },
     { id: 'pitfalls', title: '表示的边界' },

@@ -24,3 +24,15 @@ it('协议、误差预设、参数和复位', async () => {
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByTestId('result').textContent).toContain('Frobenius误差=1');
 });
+
+it('对象操作与数学结果同源', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-019')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  expect(v.getByTestId('object-workbench')).toBeTruthy();
+  await fireEvent.click(v.getByRole('button', { name: '传输 2 层' }));
+  expect(v.getByTestId('tile-reading').textContent).toContain('重构值 3，0，0，1；丢失量 0');
+  await fireEvent.click(v.getByRole('button', { name: '传输 1 层' }));
+  expect(v.getByTestId('tile-reading').textContent).toContain('重构值 3，0，0，0；丢失量 1');
+  expect(v.getByTestId('result').textContent).toContain('Frobenius误差=1');
+  await fireEvent.click(v.getByText('复位 ↺'));
+});

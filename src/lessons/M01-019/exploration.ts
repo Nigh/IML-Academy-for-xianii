@@ -1,10 +1,10 @@
 export const exploration = {
-  prompt: 'diag(3,1)只保留第一奇异项，剩余矩阵的Frobenius误差是多少？',
+  prompt: '原图两格亮度为3和1，另两格为0。只传保留亮度3的第一层，重构图会完全一致吗？',
   options: [
     {
-      text: '1',
+      text: '不会，遗漏亮度1，整体误差为1',
       correct: true,
-      observation: '查看遗漏矩阵，而不只看保留能量的百分比。',
+      observation: '点击传输1层，比较原图、重构和丢失图块。',
     },
     {
       text: '0，因为保留了主要方向',

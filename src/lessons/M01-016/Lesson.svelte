@@ -38,7 +38,9 @@
 </script>
 
 <TheorySection id="motivation" title="同样拟合得好的多个解，应该怎样选一个？">
-  <p>x₁+x₂=2的解很多。只在精确拟合的解中，哪个长度最小？</p>
+  <p>
+    两路驱动共同完成一个总指令，怎样分配才让指令向量最短？换成两只读数表同时要求同一个调节值时，如果目标冲突，又该怎样折中？所有指令均已归一化，不把平方范数当作实际能耗。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -57,7 +59,7 @@
   <PredictionLab {...exploration} context={JSON.stringify(r)} {resetVersion}>
     <InteractivePanel
       title="哪一种误差还可以降低"
-      instructions="选择欠定或超定预设。b₁默认2、b₂默认0，范围±4；t默认1，范围±3，步长0.25，均无量纲。欠定模式只用b₁，b₂仅超定模式显示。非法数值保留有效结果；键盘可编辑。"
+      instructions="先在协作台增减指令，检查输出与负担；再用向量图解释。选择欠定或超定预设。b₁默认2、b₂默认0，范围±4；t默认1，范围±3，步长0.25，均无量纲。欠定模式只用b₁，b₂仅超定模式显示。非法数值保留有效结果；键盘可编辑。"
       meaning="欠定模式画输入空间：实线最小范数解，虚线当前精确解，点线核位移。超定模式画输出空间：实线目标b，虚线最优拟合Ax⋆，点线连接残差。重合和零向量保持真实位置，数值在下方。"
       limitations="两个固定非方阵的解析模型，不是通用伪逆计算器。t在欠定模式增加核分量，在超定模式把标量解偏离均值；对照两种不同后果。自适应等比例视域不可跨图比较像素长度。"
       onreset={() => select('under')}
@@ -96,6 +98,56 @@
           selected = 'custom';
         }}
       />
+      <section
+        class="object-workbench"
+        data-testid="object-workbench"
+        aria-label="协作驱动与读数协调台"
+      >
+        <h3>{mode === 'under' ? '重新分配两路驱动' : '协调两只读数表'}</h3>
+        <p>
+          {mode === 'under'
+            ? '左移指令会从第一路移到第二路，总输出保持不变。比较两路指令的平方和。'
+            : '两只表共用一个调节值。改变它时，观察哪只表的误差缩小、哪只增大。'}
+        </p>
+        <div class="object-actions">
+          <button
+            class="btn"
+            disabled={t < -2.5}
+            onclick={() => {
+              t = Math.max(-3, t - 0.5);
+              selected = 'custom';
+            }}>{mode === 'under' ? '第一路减少半单位' : '共同调节值减少半单位'}</button
+          >
+          <button
+            class="btn"
+            disabled={t > 2.5}
+            onclick={() => {
+              t = Math.min(3, t + 0.5);
+              selected = 'custom';
+            }}>{mode === 'under' ? '第一路增加半单位' : '共同调节值增加半单位'}</button
+          >
+          <button
+            class="btn"
+            onclick={() => {
+              t = 0;
+              selected = 'custom';
+            }}>采用伪逆分配</button
+          >
+        </div>
+        <div class="object-cards" data-testid="drive-readings" aria-live="polite">
+          {#each r.candidate as value, i (i)}<output class="object-card"
+              >驱动 {i + 1} 指令：{fmt(value)}</output
+            >{/each}
+          {#each r.current as value, i (i)}<output class="object-card"
+              >表 {i + 1}：{fmt(value)}；目标 {fmt(r.rhs[i])}；差值 {fmt(value - r.rhs[i])}</output
+            >{/each}
+        </div>
+        <p>
+          当前指令平方和 {fmt(r.candidateNorm ** 2)}；伪逆指令平方和 {fmt(
+            r.starNorm ** 2,
+          )}。输出残差 {fmt(r.candidateResidual)}。
+        </p>
+      </section>
       <p>A：</p>
       <MatrixView values={r.matrix} />
       <p>A⁺：</p>
@@ -210,6 +262,39 @@
 >
 
 <style>
+  .object-workbench {
+    border: 1px solid var(--color-base-300);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-block: 1rem;
+    background: var(--color-base-100);
+  }
+  .object-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-actions button {
+    min-height: 44px;
+    white-space: normal;
+  }
+  .object-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    gap: 0.75rem;
+  }
+  .object-card {
+    border: 1px solid var(--color-base-300);
+    padding: 0.75rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .object-workbench output {
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+
   p {
     overflow-wrap: anywhere;
   }

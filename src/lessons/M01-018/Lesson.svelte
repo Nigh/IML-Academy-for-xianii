@@ -29,6 +29,20 @@
     const q = map.toScreen(p);
     return `${q.x + 40},${q.y + 40}`;
   };
+  const stampExtent = $derived(
+    1.15 *
+      Math.max(
+        0.5,
+        ...r.stamp.flatMap((points) => points.flatMap((p) => [Math.abs(p.x), Math.abs(p.y)])),
+      ),
+  );
+  const stampMap = $derived(
+    mapping([-stampExtent, stampExtent], [-stampExtent, stampExtent], 320, 320, true),
+  );
+  const stampPoint = (p: Point) => {
+    const q = stampMap.toScreen(p);
+    return `${q.x + 40},${q.y + 40}`;
+  };
   const fmt = (n: number) => Number(n.toPrecision(5));
   function select(id: string) {
     if (id === 'diagonal') resetVersion += 1;
@@ -46,7 +60,9 @@
 </script>
 
 <TheorySection id="motivation" title="没有实特征方向的旋转，还能拆成简单步骤吗？">
-  <p>一个90°旋转保持所有长度。它的奇异值可能是什么？</p>
+  <p>
+    要把一个带缺口的平面印章变成指定形状，可以先转向、沿两个方向拉伸，再转向。哪些操作改变长度？如果把一个方向完全压平，会丢掉什么？这里讨论理想平面线性变形，不模拟材料受力。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -67,12 +83,64 @@
   <PredictionLab {...exploration} context={JSON.stringify([r, stage])} {resetVersion}>
     <InteractivePanel
       title="同一分解的四个阶段"
-      instructions="σ₁默认3，范围0–4；σ₂默认1，范围0–σ₁。降低σ₁会同步收紧σ₂。U/V角默认0°，范围±180°。均可键盘编辑，非法值不参与计算；复选框让U含反射。阶段选择不改变A。"
+      instructions="先取回印章，逐道送入工序；再改变拉伸和转向控制。σ₁默认3，范围0–4；σ₂默认1，范围0–σ₁。降低σ₁会同步收紧σ₂。U/V角默认0°，范围±180°。均可键盘编辑，非法值不参与计算；复选框让U含反射。阶段选择不改变A。"
       meaning="等比例图中虚线是原单位圆，实线是当前阶段的像；圆点为45°输入探针在该阶段的位置，四阶段坐标列于下方。圆周72个等间隔线段仅用于绘图，不是随机样本。零宽度保持真实退化。"
       limitations="从合法SVD因子构造A，不从任意输入矩阵反求分解。图形是有限分段近似，矩阵与探针直接解析计算。所有阶段使用同一视域，较小圆可能显得小，便于比较伸缩；改变σ₁会调整整张图尺度。"
       onreset={() => select('diagonal')}
     >
       <PresetSelector {presets} value={selected} defaultId="diagonal" onchange={select} />
+      <section class="object-workbench" data-testid="object-workbench" aria-label="平面印章加工台">
+        <h3>把同一枚带缺口印章送过三道工序</h3>
+        <div class="object-actions">
+          <button class="btn" onclick={() => (stage = 0)}>取回原始印章</button>
+          <button
+            class="btn"
+            onclick={() => (stage = Math.min(3, stage + 1))}
+            disabled={stage === 3}>送入下一道工序</button
+          >
+          <button
+            class="btn"
+            onclick={() => {
+              s2 = 0;
+              stage = 3;
+              selected = 'custom';
+            }}>压平第二方向</button
+          >
+        </div>
+        <svg
+          viewBox="0 0 400 400"
+          role="img"
+          aria-label="同一比例的原始印章虚线轮廓与当前工序实线轮廓"
+        >
+          <polygon
+            points={r.stamp[0].map(stampPoint).join(' ')}
+            fill="none"
+            stroke="currentColor"
+            stroke-dasharray="5 5"
+          />
+          <polygon
+            data-testid="stamp-shape"
+            points={r.stamp[stage].map(stampPoint).join(' ')}
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
+          />
+          <circle cx="200" cy="200" r="3" fill="currentColor" />
+        </svg>
+        <p>
+          虚线：原印章；实线：当前印章；中心不平移。印章图按四道工序的联合范围取景，工序间比例固定，半宽
+          {fmt(stampExtent)} 模型单位；下方单位圆图单独取景。
+        </p>
+        <output data-testid="stamp-reading" aria-live="polite"
+          >工序 {stage}：{['原始印章', 'Vᵀ转向', 'Σ沿轴拉伸', 'U转向或反射'][stage]}；保留方向数 {stage <
+          2
+            ? 2
+            : r.rank}</output
+        >
+        <p>
+          缺口让转向可见；圆没有这个方向标记。下面改变拉伸倍数和转向角，印章、单位圆、探针和矩阵一起更新。
+        </p>
+      </section>
       <ParameterSlider
         label="第一奇异值 σ₁"
         value={s1}
@@ -269,6 +337,36 @@
 >
 
 <style>
+  .object-workbench {
+    border: 1px solid var(--color-base-300);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-block: 1rem;
+    background: var(--color-base-100);
+  }
+  .object-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-actions button {
+    min-height: 44px;
+    white-space: normal;
+  }
+  .object-workbench svg {
+    min-width: 0;
+    display: block;
+    width: 100%;
+    max-width: 28rem;
+    margin-inline: auto;
+    color: var(--color-base-content);
+  }
+  .object-workbench output {
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+
   .reference-grid {
     stroke: var(--color-base-content);
     stroke-opacity: 0.12;

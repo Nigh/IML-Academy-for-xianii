@@ -21,3 +21,17 @@ it('协议、精确/数值秩场景、阈值与复位', async () => {
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByTestId('result').textContent).toContain('精确秩=1；数值秩=1');
 });
+
+it('现实对象操作与数学结果共享状态，复位恢复默认', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-013')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  const initial = v.getByTestId('object-reading').textContent;
+  await fireEvent.click(v.getByRole('button', { name: '试着相互抵消' }));
+  expect(v.getByTestId('object-reading').textContent).toContain('(0.00e+0, 0.00e+0)');
+  await fireEvent.click(v.getByText('场景二：单位矩阵'));
+  await fireEvent.click(v.getByRole('button', { name: '只推动执行器二' }));
+  expect(v.getByTestId('object-reading').textContent).toContain('(0.00e+0, 1.00e+0)');
+  expect(v.getByTestId('result').textContent).toContain('精确秩=2；数值秩=2');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('object-reading').textContent).toBe(initial);
+});

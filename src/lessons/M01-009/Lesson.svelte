@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ObjectWorkbench from './ObjectWorkbench.svelte';
   import PredictionLab from '../../components/lesson/PredictionLab.svelte';
   import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
@@ -44,8 +45,10 @@
   }
 </script>
 
-<TheorySection id="motivation" title="只能沿一条直线解释观测，哪个点离观测最近？">
-  <p>观测(3,2)，候选点只能取(t,0)。哪个t能让距离最小？</p>
+<TheorySection id="motivation" title="小车只能沿直轨走，停在哪里离目标最近？">
+  <p>
+    目标在轨道一侧，小车只能前后移动。先用距离读数找停车位置，再解释为什么最近处的连线垂直轨道。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -59,17 +62,26 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="方向尺度与投影位置">
+<TheorySection id="experiment" title="移动小车寻找最近停车点">
   <p>先自己寻找最近候选，再比较方向放大、正交和零方向预设；区分零投影与没有合法参考方向。</p>
   <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
     <InteractivePanel
       title="候选点与解析最近点"
-      instructions="观测默认(3,2)，方向默认(1,0)，候选系数t默认1。观测与t范围±5，方向分量±3，均无量纲；非法输入保留有效值。"
+      instructions="先前进或后退半步，寻找距离读数的最低处；再切换方向放大与零方向预设。精确控制范围：目标与t为±5，方向分量±3，均无量纲。"
       meaning="v为观测，p为投影，c=t u为当前候选；辅助虚线从v连接p。下方分别报告当前误差与不受滑块范围限制的最小距离。"
       limitations="二维欧氏内积；零方向未定义。视域随端点等比例调整。极小方向可能使最优标量超出浮点范围，仍报告可表示的几何投影；有限t范围不保证覆盖最优系数。"
       onreset={() => select('axis')}
     >
       <PresetSelector {presets} value={selected} defaultId="axis" onchange={select} />
+      <ObjectWorkbench
+        v={result.v}
+        u={result.u}
+        candidate={result.candidate}
+        p={result.p}
+        {t}
+        distance={result.candidateDistance}
+        onmove={(n) => change('t', n)}
+      />
       <div class="parameters">
         {#each [{ name: 'x', label: '观测 x', value: x, max: 5 }, { name: 'y', label: '观测 y', value: y, max: 5 }, { name: 'ux', label: '方向 x', value: ux, max: 3 }, { name: 'uy', label: '方向 y', value: uy, max: 3 }, { name: 't', label: '候选系数 t', value: t, max: 5 }] as input (input.name)}<ParameterSlider
             label={input.label}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ObjectWorkbench from './ObjectWorkbench.svelte';
   import PredictionLab from '../../components/lesson/PredictionLab.svelte';
   import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
@@ -15,6 +16,8 @@
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
   let resetVersion = $state(0);
+  let command1 = $state(1),
+    command2 = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let mode = $state('dependent'),
     epsilon = $state(1),
@@ -25,6 +28,8 @@
     if (id === 'dependent') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
+      command1 = 1;
+      command2 = 0;
       mode = p.mode;
       epsilon = p.epsilon;
       tolerance = p.tolerance;
@@ -33,8 +38,10 @@
   }
 </script>
 
-<TheorySection id="motivation" title="矩阵有两列，就一定保留两份独立信息吗？">
-  <p>矩阵两列为(1,2)和(2,4)。所有输出能铺满平面吗？</p>
+<TheorySection id="motivation" title="两路执行器就能到达任意方向吗？">
+  <p>
+    定位台有两路执行器，但它们可能沿同一方向推动。分别推动再相互抵消，观察平台能否离开直线，再讨论独立输出方向的数量。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -48,17 +55,31 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="逐步缩小一个方向">
+<TheorySection id="experiment" title="推动执行器，测试可达方向">
   <p>比较倍数列与单位矩阵，再固定微小ε只调τ。说明精确秩和数值秩各依赖什么。</p>
-  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+  <PredictionLab
+    {...exploration}
+    context={JSON.stringify([result, command1, command2])}
+    {resetVersion}
+  >
     <InteractivePanel
       title="相同矩阵，不同判定尺度"
-      instructions="默认倍数列矩阵。选择对角矩阵预设后可调ε（0–1，默认1）；相对阈值τ默认1e−6，范围1e−12至0.5。数值框支持科学记数法，非法值保留有效结果。"
+      instructions="先分别推动两路执行器，再试抵消；切换单位矩阵与微弱方向，比较可达区域和秩。指令±1；ε为0–1，相对阈值τ为1e−12至0.5，数值框支持科学记数法。"
       meaning="矩阵与列方向图显示实际变换，数值区分别报告精确秩、阈值和数值秩。ε低于1e−6时不画难以分辨的第二列箭头，矩阵与科学记数法保留真实非零值。"
       limitations="只对这两个结构化矩阵族给出解析秩，非通用秩求解器。数值秩依赖阈值；省略不可分辨箭头不代表其为零，精确数据以矩阵和数值区为准。"
       onreset={() => select('dependent')}
     >
       <PresetSelector {presets} value={selected} defaultId="dependent" onchange={select} />
+      <ObjectWorkbench
+        matrix={result.matrix}
+        threshold={result.threshold}
+        {command1}
+        {command2}
+        oncommand={(a, b) => {
+          command1 = a;
+          command2 = b;
+        }}
+      />
       <div class="parameters">
         <NumericInput
           label="第二奇异值 ε（仅对角族）"

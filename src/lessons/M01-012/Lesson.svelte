@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ObjectWorkbench from './ObjectWorkbench.svelte';
   import PredictionLab from '../../components/lesson/PredictionLab.svelte';
   import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
@@ -46,8 +47,10 @@
   }
 </script>
 
-<TheorySection id="motivation" title="只知道两个单位方向的去处，够不够画出整个变换？">
-  <p>矩阵两列分别是(2,0)和(0,1)。单位方形右上角(1,1)会去哪里？</p>
+<TheorySection id="motivation" title="改变印章形状，内部标记会去哪里？">
+  <p>
+    把缺角印章拉宽、剪切或压扁，预测缺角和内部圆点的位置。再用同一矩阵检查整个图形，而不只计算一个角点。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -61,19 +64,26 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="变换网格和单位正方形">
+<TheorySection id="experiment" title="变形印章，再核对矩阵与网格">
   <p>
     对比拉伸、剪切与压成直线；试着只改一列，预测哪个基方向的像变化。原网格和新网格用相同坐标读数比较。
   </p>
   <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
     <InteractivePanel
       title="两列决定整个网格"
-      instructions="默认A=diag(2,1)。四个元素范围±2、无量纲；修改任一元素即时变换所有网格端点，非法输入保留有效值。"
+      instructions="先拉宽、推上边或旋转印章，跟踪缺角和内部标记；再用下方矩阵元素精确调整。元素无量纲、范围±2，非法输入保留有效值。普通线性模型固定原点。"
       meaning="虚线网格与虚线正方形是变换前；实线网格及粗实线多边形是变换后。圆形端点表示第一列，方形端点表示第二列；原点不动。"
       limitations="二维、有界解析计算；视域随矩阵等比例调整，比较大小时读取坐标。压缩时网格真实重合，不人为拉开；原始方格仅覆盖[−1,1]²，不代表变换的全部定义域。"
       onreset={() => select('stretch')}
     >
       <PresetSelector {presets} value={selected} defaultId="stretch" onchange={select} />
+      <ObjectWorkbench
+        {a}
+        onchange={(matrix) => {
+          a = matrix;
+          selected = 'custom';
+        }}
+      />
       <div class="parameters">
         {#each a as row, r (r)}{#each row as value, c (c)}<ParameterSlider
               label={`A 第${r + 1}行第${c + 1}列`}

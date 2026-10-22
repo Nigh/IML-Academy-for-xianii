@@ -54,8 +54,10 @@
   }
 </script>
 
-<TheorySection id="motivation" title="检索分数变大，是方向更接近，还是特征变长了？">
-  <p>保持两向量方向，只把b放大2倍，点积会怎样？</p>
+<TheorySection id="motivation" title="把候选卡的特征增强，检索分数就更可靠吗？">
+  <p>
+    简化检索器给查询卡和候选卡各记录两个特征。把候选卡的两个值同时减半或加倍，卡片的方向没有变：原始分数和只比较方向的分数会怎样变化？
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -69,8 +71,10 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="先预测符号，再移动端点">
-  <p>比较平行、反向和正交，再只改变长度。用零向量检查：点积能计算时，夹角是否一定存在？</p>
+<TheorySection id="experiment" title="先操作特征卡，再用几何图解释分数">
+  <p>
+    先减半候选卡强度，再恢复，分开比较逐项贡献、点积与方向分数。切换平行、反向、正交场景后再试；最后清空候选卡，检查没有方向时哪些分数仍有定义。
+  </p>
   <PredictionLab {...exploration} context={JSON.stringify([a, b, guides, process])} {resetVersion}>
     <InteractivePanel
       title="方向与尺度的对照实验"
@@ -79,6 +83,58 @@
       limitations="二维欧氏空间、同一坐标系、无量纲特征；零向量方向不定义。"
       onreset={reset}
     >
+      <section
+        class="object-workbench"
+        data-testid="object-workbench"
+        aria-label="双特征检索评分台"
+      >
+        <h3>同一份特征增强后，检索分数会怎样？</h3>
+        <p>
+          两张卡各有两个无量纲特征。增强或减弱候选卡 b，不改方向；点击清空检验缺少方向时的边界。
+        </p>
+        <div class="feature-cards">
+          {#each [{ name: '查询卡 a', v: a }, { name: '候选卡 b', v: b }] as card (card.name)}
+            <div>
+              <h4>{card.name}</h4>
+              {#each ['x', 'y'] as axis (axis)}
+                <label
+                  >{axis}：{card.v[axis as 'x' | 'y']}
+                  <meter
+                    min="-5"
+                    max="5"
+                    value={card.v[axis as 'x' | 'y']}
+                    aria-label={`${card.name} ${axis}特征`}
+                  ></meter>
+                </label>
+              {/each}
+            </div>
+          {/each}
+        </div>
+        <div class="actions">
+          <button
+            class="btn btn-outline"
+            disabled={Math.max(Math.abs(b.x), Math.abs(b.y)) > 2.5}
+            onclick={() => change(1, b.x * 2, b.y * 2)}>候选卡强度加倍</button
+          >
+          <button class="btn btn-outline" onclick={() => change(1, b.x / 2, b.y / 2)}
+            >候选卡强度减半</button
+          >
+          <button class="btn btn-outline" onclick={() => change(1, -b.y, b.x)}
+            >候选卡自身旋转90°</button
+          >
+          <button class="btn btn-outline" onclick={() => change(1, 0, 0)}>清空候选卡</button>
+        </div>
+        <output data-testid="object-result"
+          >逐项贡献 {fmt(a.x * b.x)} + ({fmt(a.y * b.y)}) = {fmt(result.dot)}；方向分数 {result.angle ===
+          null
+            ? '未定义'
+            : fmt(Math.cos((result.angle * Math.PI) / 180))}</output
+        >
+        <p>
+          特征是简化的数据表示，不是物理传感器读数。下方可逐维编辑；卡片、点积和几何图使用同一组
+          a、b。
+        </p>
+      </section>
       <PresetSelector {presets} value={preset} defaultId="arbitrary" onchange={select} />
       <div class="vector-lab">
         <div>
@@ -218,3 +274,42 @@
     related={['M01-002', 'M01-008']}
   /></TheorySection
 >
+
+<style>
+  .feature-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: 1rem;
+  }
+  .feature-cards label {
+    display: block;
+  }
+  .feature-cards meter {
+    display: block;
+    width: 100%;
+  }
+
+  .object-workbench {
+    padding: 1rem;
+    border: 1px solid var(--color-base-content);
+    border-radius: 0.75rem;
+    background: var(--color-base-200);
+    margin-block: 1rem;
+  }
+  .object-workbench .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-workbench button {
+    min-height: 44px;
+    height: auto;
+    white-space: normal;
+  }
+  .object-workbench output {
+    display: block;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

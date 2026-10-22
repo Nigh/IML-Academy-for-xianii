@@ -38,7 +38,9 @@
 </script>
 
 <TheorySection id="motivation" title="三点不共线，怎样判断一条拟合线已经无法整体改善？">
-  <p>最小二乘拟合的残差与模型每列都正交，是否代表每个点都拟合准确？</p>
+  <p>
+    一组标定读数无法同时落在同一条直线上。调仪表零点和增益时，怎样比较整组误差？一张样本卡更准，是否意味着整组也更准？
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -61,7 +63,7 @@
   >
     <InteractivePanel
       title="投影条件不要求每点零残差"
-      instructions="默认三点。勾选增加第四观测(t=2,b=3+δ)，δ默认0，范围−8至8，步长0.5，无量纲；非法数值保留有效值，可键盘编辑。预设离群点δ=6。复位恢复三点。"
+      instructions="先操作标定台的零点、增益按钮，比较每张样本卡。默认三点。勾选增加第四观测(t=2,b=3+δ)，δ默认0，范围−8至8，步长0.5，无量纲；非法数值保留有效值，可键盘编辑。预设离群点δ=6。复位恢复三点。"
       meaning="圆点为观测，实线为我的候选，虚线为解析最优。表格显示候选的逐点残差和平方贡献；展开对照查看最优参数及Aᵀr。"
       limitations="确定性小样本解析计算，无随机性。仅最小化训练样本未加权平方和，不保证鲁棒、因果或泛化。视域随数据自适应，跨场景比较应看轴刻度与系数。"
       onreset={() => select('three')}
@@ -88,6 +90,49 @@
             selected = 'custom';
           }}
         />{/if}
+      <section class="object-workbench" data-testid="object-workbench" aria-label="测量标定工作台">
+        <h3>调零点和增益，让一组标定读数整体接近记录</h3>
+        <p>
+          合成标定记录：输入 t 和响应 b 均已归一化。零点对应截距 c，增益对应斜率
+          a；下方每张卡是一次测量，不是真实硬件数据。
+        </p>
+        <div class="object-actions">
+          <button
+            class="btn"
+            disabled={candidateIntercept > 7.5}
+            onclick={() => (candidateIntercept = Math.min(8, candidateIntercept + 0.5))}
+            >零点提高半单位</button
+          >
+          <button
+            class="btn"
+            disabled={candidateIntercept < -7.5}
+            onclick={() => (candidateIntercept = Math.max(-8, candidateIntercept - 0.5))}
+            >零点降低半单位</button
+          >
+          <button
+            class="btn"
+            disabled={candidateSlope > 7.5}
+            onclick={() => (candidateSlope = Math.min(8, candidateSlope + 0.5))}
+            >增益提高半单位</button
+          >
+          <button
+            class="btn"
+            disabled={candidateSlope < -7.5}
+            onclick={() => (candidateSlope = Math.max(-8, candidateSlope - 0.5))}
+            >增益降低半单位</button
+          >
+        </div>
+        <div class="object-cards" data-testid="sample-readings" aria-live="polite">
+          {#each r.points as point, i (i)}<output class="object-card"
+              >样本 {i + 1}：输入 {point[0]}；记录 {point[1]}；仪表预测 {fmt(
+                trial.predicted[i],
+              )}；误差 {fmt(trial.residual[i])}；平方贡献 {fmt(trial.residual[i] ** 2)}</output
+            >{/each}
+        </div>
+        <p>
+          只调零点时，每张卡的预测同增同减；调增益时，负输入和正输入如何变化？先预测，再操作。比较总平方误差，不要求每张卡各自达到零误差。
+        </p>
+      </section>
       <p>
         先调整自己的直线，尝试降低总平方误差。观察改进一个点时，其他点怎样变化；需要对照时再查看解析最优值。
       </p>
@@ -233,6 +278,39 @@
 >
 
 <style>
+  .object-workbench {
+    border: 1px solid var(--color-base-300);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-block: 1rem;
+    background: var(--color-base-100);
+  }
+  .object-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-actions button {
+    min-height: 44px;
+    white-space: normal;
+  }
+  .object-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    gap: 0.75rem;
+  }
+  .object-card {
+    border: 1px solid var(--color-base-300);
+    padding: 0.75rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .object-workbench output {
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+
   p {
     overflow-wrap: anywhere;
   }

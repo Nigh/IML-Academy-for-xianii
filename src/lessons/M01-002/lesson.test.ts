@@ -11,8 +11,18 @@ it('课程协议有效且交互结果与输入一致、可复位', async () => {
   const view = render(Lesson, { metadata: lessonById.get('M01-002')! });
   await fireEvent.click(view.getByRole('button', { name: '直接探索' }));
   expect(view.getByText('(1, 3) m')).toBeTruthy();
+  await fireEvent.click(view.getByRole('button', { name: '执行第一段' }));
+  expect(view.getByTestId('platform-position').textContent).toContain('(2, 1) 米');
+  await fireEvent.click(view.getByRole('button', { name: '执行第二段' }));
+  expect(view.getByTestId('platform-position').textContent).toContain('(1, 3) 米');
+  await fireEvent.click(view.getByText('复位 ↺'));
+  expect(view.getByTestId('platform-position').textContent).toContain('等待指令');
   await fireEvent.click(view.getByText('场景二：完全抵消'));
   expect(view.getByText('(0, 0) m')).toBeTruthy();
+  expect(view.getByTestId('platform-position').textContent).toContain('等待指令');
+  await fireEvent.click(view.getByRole('button', { name: '执行第一段' }));
+  await fireEvent.click(view.getByRole('button', { name: '执行第二段' }));
+  expect(view.getByTestId('platform-position').textContent).toContain('(0, 0) 米');
   await fireEvent.click(view.getByText('复位 ↺'));
   expect(view.getByText('(1, 3) m')).toBeTruthy();
   await fireEvent.input(view.getByRole('textbox', { name: '数乘系数 k (无量纲)' }), {

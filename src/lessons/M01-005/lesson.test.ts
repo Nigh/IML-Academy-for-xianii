@@ -9,6 +9,12 @@ it('章节、两场景、系数与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-005');
   const v = render(Lesson, { metadata: lessonById.get('M01-005')! });
   await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  await fireEvent.click(v.getByRole('button', { name: '驱动一后退一份' }));
+  expect(v.getByTestId('object-result').textContent).toContain('平台 (2.00,-2.00)；距目标 1.0000');
+  expect(v.getByTestId('result').textContent).toContain('组合=(2.00,-2.00)');
+  await fireEvent.click(v.getByRole('button', { name: '驱动一前进一份' }));
+  expect(v.getByTestId('object-result').textContent).toContain('已命中目标');
+
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('当前误差=0.0000');
   await fireEvent.click(v.getByText('场景二：两个共线方向'));

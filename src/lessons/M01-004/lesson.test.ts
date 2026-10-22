@@ -9,6 +9,14 @@ it('协议、预设、参数与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-004');
   const v = render(Lesson, { metadata: lessonById.get('M01-004')! });
   await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  await fireEvent.click(v.getByText('场景二：平移直线'));
+  await fireEvent.click(v.getByRole('button', { name: '成员乘以零' }));
+  expect(v.getByTestId('object-result').textContent).toContain('未通过成员检验');
+  await fireEvent.click(v.getByRole('button', { name: '两张卡各取一半' }));
+  expect(v.getByTestId('object-result').textContent).toContain('通过成员检验');
+  expect(v.getByTestId('result').textContent).toContain('当前组合属于集合');
+  await fireEvent.click(v.getByText('复位 ↺'));
+
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('当前组合属于集合');
   await fireEvent.click(v.getByText('场景二：平移直线'));

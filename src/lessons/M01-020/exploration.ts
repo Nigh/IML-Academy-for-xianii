@@ -1,13 +1,13 @@
 export const exploration = {
-  prompt: '最小二乘拟合的残差与模型每列都正交，是否代表每个点都拟合准确？',
+  prompt: '同一组不共线标定读数，只调一个零点和一个增益，能让每张样本卡的误差都变成0吗？',
   options: [
     {
-      text: '代表，正交残差一定为零',
+      text: '能，总能把每次测量都调准',
       correct: false,
-      observation: '默认三点时，对照残差表和两个列内积。',
+      observation: '操作零点和增益，检查一张卡变准时其他卡如何变化。',
     },
     {
-      text: '不代表，列空间外仍可有非零残差',
+      text: '不能，需要在整组误差之间折中',
       correct: true,
       observation: '同时看逐点残差和Aᵀr，分辨两个不同条件。',
     },

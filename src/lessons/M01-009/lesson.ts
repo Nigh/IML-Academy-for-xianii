@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '只能沿一条直线解释观测，哪个点离观测最近？' },
+    { id: 'motivation', title: '小车只能沿直轨走，停在哪里离目标最近？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '方向尺度与投影位置' },
+    { id: 'experiment', title: '移动小车寻找最近停车点' },
     { id: 'intuition', title: '垂足是最近点' },
     { id: 'mathematics', title: '最小距离导出投影' },
     { id: 'pitfalls', title: '系数不是投影向量' },

@@ -1,10 +1,10 @@
 export const exploration = {
-  prompt: '一个90°旋转保持所有长度。它的奇异值可能是什么？',
+  prompt: '印章只转90°，不拉伸。描述长度变化的两个奇异值应该是什么？',
   options: [
     {
       text: '没有实特征值，所以也没有奇异值',
       correct: false,
-      observation: '选择纯旋转，逐阶段查看圆和探针。',
+      observation: '选择纯旋转，取回原始印章并逐道送入工序；比较轮廓尺寸和缺口朝向。',
     },
     {
       text: '1和1',

@@ -34,7 +34,9 @@
 </script>
 
 <TheorySection id="motivation" title="反复应用同一个变换，哪些输入方向最容易追踪？">
-  <p>diag(2,3)作用于(1,1)得到(2,3)。原输入是特征向量吗？</p>
+  <p>
+    一张平面模板经过固定变形后，哪些方向标记还能留在原来的直线上？转动同一标记，比对变形前后的位置；允许长度改变，也允许反向。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -73,6 +75,84 @@
           selected = 'custom';
         }}
       />
+      <section class="object-workbench" data-testid="object-workbench" aria-label="方向标记变换台">
+        <h3>转动模板的方向标记，寻找变换后仍在原直线上的方向</h3>
+        <p>
+          这是可操作的几何模板，不模拟刚体运动。实线是模板标记，虚线是同一标记经过 A
+          后的位置；负比例会翻到另一边。
+        </p>
+        <div class="object-actions">
+          <button
+            class="btn"
+            disabled={angle < -165}
+            onclick={() => {
+              angle = Math.max(-180, angle - 15);
+              selected = 'custom';
+            }}>模板顺时针转15°</button
+          >
+          <button
+            class="btn"
+            disabled={angle > 165}
+            onclick={() => {
+              angle = Math.min(180, angle + 15);
+              selected = 'custom';
+            }}>模板逆时针转15°</button
+          >
+          <button
+            class="btn"
+            onclick={() => {
+              angle = 90;
+              selected = 'custom';
+            }}>模板竖直放置</button
+          >
+        </div>
+        <svg
+          viewBox="0 0 320 240"
+          role="img"
+          aria-label="模板输入标记与变换后的标记，以共同中心和相同比例显示"
+        >
+          <circle
+            cx="160"
+            cy="120"
+            r="95"
+            fill="none"
+            stroke="currentColor"
+            stroke-dasharray="2 5"
+          />
+          <line
+            x1="160"
+            y1="120"
+            x2={160 + 30 * r.v.x}
+            y2={120 - 30 * r.v.y}
+            stroke="currentColor"
+            stroke-width="5"
+          />
+          <line
+            x1="160"
+            y1="120"
+            x2={160 + 30 * r.av.x}
+            y2={120 - 30 * r.av.y}
+            stroke="currentColor"
+            stroke-width="3"
+            stroke-dasharray="7 4"
+          />
+          <circle cx={160 + 30 * r.v.x} cy={120 - 30 * r.v.y} r="5" fill="currentColor" />
+          <rect
+            x={156 + 30 * r.av.x}
+            y={116 - 30 * r.av.y}
+            width="8"
+            height="8"
+            fill="none"
+            stroke="currentColor"
+          />
+        </svg>
+        <p>圆点：输入，方框：输出；一模型单位为30逻辑像素。</p>
+        <output data-testid="template-reading" aria-live="polite"
+          >模板角度 {angle}°；输出 ({fmt(r.av.x)},{fmt(r.av.y)})；偏离原直线 {fmt(
+            r.residual,
+          )}</output
+        >
+      </section>
       <MatrixView values={r.matrix} />
       <VectorDiagram
         range={r.range}
@@ -173,6 +253,35 @@
 >
 
 <style>
+  .object-workbench {
+    border: 1px solid var(--color-base-300);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-block: 1rem;
+    background: var(--color-base-100);
+  }
+  .object-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-actions button {
+    min-height: 44px;
+    white-space: normal;
+  }
+  .object-workbench svg {
+    display: block;
+    width: 100%;
+    max-width: 28rem;
+    margin-inline: auto;
+    color: var(--color-base-content);
+  }
+  .object-workbench output {
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+
   p {
     overflow-wrap: anywhere;
   }

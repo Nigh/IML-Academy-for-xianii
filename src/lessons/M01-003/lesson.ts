@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '24个数足够说明一段数据属于谁、何时、哪个通道吗？' },
+    { id: 'motivation', title: '实验记录有24个数，怎样找到某一时刻的读数？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '切开三阶张量' },
+    { id: 'experiment', title: '在记录台中选择批次、时刻与通道' },
     { id: 'intuition', title: '轴是数据的地址' },
     { id: 'mathematics', title: '阶数、形状与索引' },
     { id: 'pitfalls', title: '元素数不决定语义' },

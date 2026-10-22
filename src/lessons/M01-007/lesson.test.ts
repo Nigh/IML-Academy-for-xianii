@@ -15,6 +15,15 @@ it('协议、章节、主要参数更新和复位', async () => {
   expect(definition.quiz.length).toBeGreaterThanOrEqual(2);
   const v = render(Lesson, { metadata: lessonById.get('M01-007')! });
   await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  await fireEvent.click(v.getByRole('button', { name: '候选卡强度减半' }));
+  expect(v.getByTestId('object-result').textContent).toContain('1.5 + (1.5) = 3');
+  expect(v.getByTestId('dot-result').textContent).toContain('3');
+  await fireEvent.click(v.getByRole('button', { name: '候选卡强度加倍' }));
+  expect(v.getByTestId('dot-result').textContent).toContain('6');
+  await fireEvent.click(v.getByRole('button', { name: '清空候选卡' }));
+  expect(v.getByTestId('object-result').textContent).toContain('方向分数 未定义');
+  await fireEvent.click(v.getByText('复位 ↺'));
+
   for (const section of definition.sections)
     expect(v.container.querySelector(`#${section.id}`)).toBeTruthy();
   expect(v.container.querySelector('[role="alert"]')).toBeNull();

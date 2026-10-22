@@ -12,13 +12,20 @@
   import VectorDiagram from '../../components/charts/VectorDiagram.svelte';
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
-  import { experiment, presets } from './experiment.ts';
+  import { experiment, presets, combineCommands } from './experiment.ts';
   let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let x = $state(0),
     y = $state(1),
     third = $state(false);
   const result = $derived(experiment(x, y, third));
+  let commands = $state([0, 0, 0]);
+  const motion = $derived(
+    combineCommands(result.vectors, commands.slice(0, result.vectors.length)),
+  );
+  const motionRange = $derived(
+    Math.max(2, ...motion.path.flatMap((p) => [Math.abs(p.x), Math.abs(p.y)])) * 1.2,
+  );
   const selected = $derived(
     presets.find((p) => p.x === x && p.y === y && p.third === third)?.id ?? 'custom',
   );
@@ -29,12 +36,15 @@
       x = p.x;
       y = p.y;
       third = p.third;
+      commands = [0, 0, 0];
     }
   }
 </script>
 
-<TheorySection id="motivation" title="删去一个特征，模型的表达能力一定下降吗？">
-  <p>已有(1,0)和(0,1)，再加入(1,1)。能否删掉第三根而保留全部可达输出？</p>
+<TheorySection id="motivation" title="平台接到非零指令，为什么还能停在起点？">
+  <p>
+    平台的每一路驱动提供一个固定移动方向。两路都沿横向时，能否执行非零指令却回到起点？再加入斜向驱动，比较驱动数量与真正可独立控制的方向数。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -48,9 +58,11 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="寻找非平凡零组合">
-  <p>比较独立、共线与第三向量场景；把第二向量的y从0抬起，找出能够独立控制纵向输出的条件。</p>
-  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+<TheorySection id="experiment" title="试出一组能够抵消的驱动指令">
+  <p>
+    选择共线驱动，让第一路执行−2份、第二路执行1份，再自行尝试独立驱动。加入第三路后重新寻找抵消指令；观察路线不是空的，终点却可与起点重合。
+  </p>
+  <PredictionLab {...exploration} context={JSON.stringify([result, commands])} {resetVersion}>
     <InteractivePanel
       title="从两个方向到三个方向"
       instructions="第二向量默认(0,1)，分量范围−2至2，无量纲。第一向量固定(1,0)，可加入第三向量(1,1)。非法输入保留有效值；复位恢复两个标准基。"
@@ -58,6 +70,66 @@
       limitations="只对固定第一/第三向量的结构化小模型解析判别；极接近共线的向量在测量噪声下可能难区分，不代表一般数值秩算法。自定义重合箭头的身份由下方坐标读取。"
       onreset={() => select('basis')}
     >
+      <section
+        class="object-workbench"
+        data-testid="object-workbench"
+        aria-label="驱动指令抵消实验台"
+      >
+        <h3>指令不是全零，平台也能回到起点吗？</h3>
+        <p>
+          先选择驱动配置，再调整每一路的有符号份数。线段按驱动顺序接起；终点由当前指令直接相加，未模拟动力学。
+        </p>
+        <svg
+          viewBox="0 0 360 300"
+          role="img"
+          aria-label={`指令执行后终点${motion.endpoint.x},${motion.endpoint.y}`}
+        >
+          <rect class="floor" x="20" y="20" width="320" height="260" rx="12" />
+          <polyline
+            class="route"
+            points={motion.path
+              .map((p) => `${180 + (p.x / motionRange) * 110},${150 - (p.y / motionRange) * 110}`)
+              .join(' ')}
+          />
+          <circle
+            class="object"
+            cx={180 + (motion.endpoint.x / motionRange) * 110}
+            cy={150 - (motion.endpoint.y / motionRange) * 110}
+            r="11"
+          />
+          <path class="reference" d="M 172 142 L 188 158 M 172 158 L 188 142" />
+        </svg>
+        <p>图例：交叉为起点，圆形为执行终点；实线按各路指令顺序接起，横向向右、纵向向上。</p>
+        {#each result.vectors as v, i (i)}
+          <p>驱动 {i + 1} 每份移动 ({v.x},{v.y})，无量纲。</p>
+          <ParameterSlider
+            label={`驱动 ${i + 1} 的有符号份数`}
+            value={commands[i]}
+            min={-3}
+            max={3}
+            step={0.1}
+            onchange={(n) => (commands = commands.map((c, j) => (i === j ? n : c)))}
+          />
+        {/each}
+        <div class="actions">
+          <button class="btn btn-outline" onclick={() => (commands = [1, 0, 0])}
+            >只执行第一路一份</button
+          >
+          <button class="btn btn-outline" onclick={() => (commands = [0, 0, 0])}
+            >清空全部指令</button
+          >
+        </div>
+        <output data-testid="object-result"
+          >终点 ({motion.endpoint.x.toExponential(3)},{motion.endpoint.y.toExponential(
+            3,
+          )})；{motion.nontrivial ? '指令不全为零' : '指令全为零'}；{motion.returned
+            ? '已回到起点'
+            : '尚未回到起点'}</output
+        >
+        <p>
+          先自行找到抵消组合，再与下方解析系数核对。全零指令当然不移动。非全零且返回的结果是抵消候选，仍需用下方解析条件核对线性相关；浮点显示和有限次操作不构成证明。这里仅在两个计算分量均为零时显示返回，极小的非零移动仍属于移动。
+        </p>
+      </section>
       <PresetSelector {presets} value={selected} defaultId="basis" onchange={select} />
       <ParameterSlider
         label="第二向量 x 分量"
@@ -174,3 +246,55 @@
     related={['M01-005', 'M01-013', 'M01-018']}
   /></TheorySection
 >
+
+<style>
+  .object-workbench {
+    padding: 1rem;
+    border: 1px solid var(--color-base-content);
+    border-radius: 0.75rem;
+    background: var(--color-base-200);
+    margin-block: 1rem;
+  }
+  .object-workbench svg {
+    display: block;
+    width: 100%;
+    max-width: 32rem;
+    margin: auto;
+  }
+  .object-workbench .floor {
+    fill: var(--color-base-100);
+    stroke: var(--color-base-content);
+  }
+  .object-workbench .route {
+    stroke: var(--color-primary);
+    stroke-width: 3;
+    fill: none;
+  }
+  .object-workbench .reference {
+    stroke: var(--color-base-content);
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 5 4;
+  }
+  .object-workbench .object {
+    fill: var(--color-accent);
+    stroke: var(--color-base-content);
+    stroke-width: 2;
+  }
+  .object-workbench .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-workbench button {
+    min-height: 44px;
+    height: auto;
+    white-space: normal;
+  }
+  .object-workbench output {
+    display: block;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+  }
+</style>
