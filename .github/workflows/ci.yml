@@ -1,6 +1,7 @@
 name: CI
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   workflow_call:
   push:
     tags: ['audit-courses-v*']
@@ -14,6 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       selection: ${{ steps.selection.outputs.selection }}
+      browser: ${{ steps.selection.outputs.browser }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -34,11 +36,14 @@ jobs:
       - run: pnpm docs:check
       - run: pnpm scope:check
       - run: pnpm test
-      - name: Select changed courses
+      - name: Select browser regression and changed courses
         id: selection
+        env:
+          FORCE_BROWSER: ${{ contains(github.event.pull_request.labels.*.name, 'ci:e2e') }}
         run: node --import tsx scripts/select-e2e-lessons.ts
   browser:
     needs: quality
+    if: needs.quality.outputs.browser == 'true'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false

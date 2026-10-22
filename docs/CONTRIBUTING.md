@@ -42,7 +42,11 @@ Agent 只需标准协议、任务卡与组件文档，不以阅读全项目为�
 
 PR 按目标分支与当前提交的 merge-base 计算差异；main push 按事件 before/after 比较，覆盖本次推送的全部提交。课程目录或本地实验目录变更只检查对应课程。注册表新增或修改只检查相关课程；删除实现检查 planned 回退，删除身份或修改 slug 检查旧地址的 404 行为。无法获得有效基线时失败，不自动全量或静默跳过。手动部署必须填写 baseline 提交 SHA。
 
-日常 CI 保留固定的核心交互、进度、代表性 ready/planned 页面、主题、响应式和离线回归。共享组件、路由、依赖等变更不触发全量课程遍历；未改课程的特有回归可能延迟到下一次全量审计发现。CI 只安装和运行 Chromium：project base 运行固定回归与选中课程，root base 只运行固定冒烟。无课程变更时课程遍历明确跳过。Firefox/WebKit 核心回归保留在本地 Playwright 配置中，安装对应浏览器后可用 `pnpm test:e2e --project=firefox --project=webkit` 手动运行；CI 不覆盖这两种引擎的特有兼容性问题。
+浏览器任务按变更决定是否执行：仅 `skills/**/*.md`、`docs/**/*.md`、根目录 `README.md` / `AGENTS.md` / `PLAN.md` 或 PR 模板变更时跳过浏览器，所有质量检查仍执行。课程目录中的说明文档不在豁免范围内；其他路径、未知路径及混合变更保守运行浏览器。新增、删除与重命名都参与判断，差异基线无法确定仍失败。工作流始终触发，只跳过 browser 任务，避免必需检查悬空。
+
+为 PR 添加 `ci:e2e` 标签可强制运行现有浏览器回归；添加或移除标签都会重新判断，标签保留期间的新提交也会继续加测。标签不扩大课程遍历范围；全量遍历仍使用 `audit-courses-v*` tag。手动部署始终运行浏览器回归。main push 复用同一自动规则；Pages 构建与部署保持原样。
+
+需要运行浏览器时，日常 CI 保留固定的核心交互、进度、代表性 ready/planned 页面、主题、响应式和离线回归。共享组件、路由、依赖等变更不触发全量课程遍历；未改课程的特有回归可能延迟到下一次全量审计发现。CI 只安装和运行 Chromium：project base 运行固定回归与选中课程，root base 只运行固定冒烟。无课程变更时课程遍历明确跳过。Firefox/WebKit 核心回归保留在本地 Playwright 配置中，安装对应浏览器后可用 `pnpm test:e2e --project=firefox --project=webkit` 手动运行；CI 不覆盖这两种引擎的特有兼容性问题。
 
 只有推送匹配 `audit-courses-v*` 的 tag 才触发全量课程遍历，例如 `audit-courses-v2026.10.21.1`。审计校验 tag 指向的提交，只运行 CI，不部署 Pages；由维护者在需要全量回归时创建并推送 tag，普通 main 发布不触发全量。CI 日志显示模式、基线和选中课程 ID。
 
