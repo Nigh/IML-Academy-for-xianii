@@ -41,7 +41,7 @@
       <div class="actions">
         <span>产品 {k + 1}：{quantity} 件 × {b[k][j]} 资源/件 = {quantity * b[k][j]}</span><button
           class="btn"
-          disabled={quantity >= 1e6}
+          disabled={quantity > 1e6 - 1}
           onclick={() => onquantity(k, Math.min(1e6, quantity + 1))}>产品 {k + 1} 加一件</button
         >
       </div>

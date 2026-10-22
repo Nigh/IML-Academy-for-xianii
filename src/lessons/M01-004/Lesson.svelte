@@ -14,6 +14,17 @@
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
   let resetVersion = $state(0);
+  let chartHost = $state<HTMLDivElement>();
+  $effect(() => {
+    const plot = chartHost?.querySelector('figure');
+    if (!plot || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => {
+      plot.scrollLeft = (plot.scrollWidth - plot.clientWidth) / 2;
+    });
+    observer.observe(plot);
+    return () => observer.disconnect();
+  });
+
   let { metadata }: LessonBodyProps = $props();
   let d = $state(0),
     a = $state(1),
@@ -140,17 +151,19 @@
           onchange={(n) => (b = n)}
         />
       </div>
-      <Plot2D
-        equal
-        series={result.series}
-        xRange={[-5, 5]}
-        yRange={[-12, 12]}
-        xLabel="x"
-        yLabel="y"
-        xUnit="无量纲"
-        yUnit="无量纲"
-        description="折线为候选集合 y=2x+d，散点图例分别标出 u、v、组合 w；横纵坐标均无量纲，固定视域方便比较偏移。"
-      />
+      <div bind:this={chartHost}>
+        <Plot2D
+          equal
+          series={result.series}
+          xRange={[-5, 5]}
+          yRange={[-12, 12]}
+          xLabel="x"
+          yLabel="y"
+          xUnit="无量纲"
+          yUnit="无量纲"
+          description="折线为候选集合 y=2x+d，散点图例分别标出 u、v、组合 w；横纵坐标均无量纲，固定视域方便比较偏移。"
+        />
+      </div>
       <div aria-live="polite">
         <p>u=({result.u.x},{result.u.y})；v=({result.v.x},{result.v.y})</p>
         <p data-testid="result">

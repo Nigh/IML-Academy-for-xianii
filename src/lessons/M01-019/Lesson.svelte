@@ -89,7 +89,7 @@
       <section class="object-workbench" data-testid="object-workbench" aria-label="合成图块重构台">
         <h3>选择传输几层，再比较重构图块</h3>
         <p>
-          四格图块的每格就是一个矩阵元素；固定标度为0至3，填充越深表示值越大，数字给出精确值。模型是合成亮度，不是图片压缩性能测试。
+          原图与重构是四格合成亮度；“丢失”是带符号修正量，可以为负。所有图块的填充深浅统一表示数值绝对量（0至3），格内数字保留正负号。它不是图片压缩性能测试。
         </p>
         <div class="object-actions">
           {#each [0, 1, 2] as count (count)}<button

@@ -43,3 +43,16 @@ it('驱动命令保留中间路线并识别非平凡返回，拒绝越界和非�
     expect(() => combineCommands([{ x: 1, y: 0 }], [c])).toThrow(RangeError);
   expect(() => combineCommands([{ x: 1, y: 0 }], [])).toThrow(RangeError);
 });
+
+it('独立基的微小非零指令不是抵消', () => {
+  const r = combineCommands(
+    [
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+    ],
+    [1e-13, 0],
+  );
+  expect(r.nontrivial).toBe(true);
+  expect(r.returned).toBe(false);
+  expect(r.endpoint.x).toBe(1e-13);
+});

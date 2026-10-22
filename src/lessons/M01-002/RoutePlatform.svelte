@@ -20,31 +20,34 @@
   <p>
     俯视理想移动平台：右为东，上为北；指令以米计。正值向东或北，负值向西或南。忽略障碍、加速和转向时间。
   </p>
-  <svg
-    viewBox="0 0 400 400"
-    role="img"
-    aria-label={`平台在(${fmt(position.x)},${fmt(position.y)})米；横纵等比例，视域半宽${fmt(extent)}米。`}
-  >
-    <rect x="10" y="10" width="380" height="380" rx="12" class="floor" />
-    <text x="24" y="35">北 ↑</text><text x="330" y="375">东 →</text>
-    <path
-      d={`M 25 365 h ${160 / extent} m ${-160 / extent} -5 v 10 m ${160 / extent} -10 v 10`}
-      class="ruler"
-    />
-    <text x="25" y="350">1 m</text>
-    <circle cx="200" cy="200" r="6" class="start" />
-    <text x="210" y="220">起点</text>
-    {#if stage >= 1}
-      <path d={`M 200 200 L ${px(a.x)} ${py(a.y)}`} class="first" />
-    {/if}
-    {#if stage >= 2}
-      <path d={`M ${px(a.x)} ${py(a.y)} L ${px(sum.x)} ${py(sum.y)}`} class="second" />
-    {/if}
-    <g transform={`translate(${px(position.x)},${py(position.y)})`}>
-      <rect x="-11" y="-10" width="22" height="20" rx="4" class="robot" />
-      <path d="M -7 -14 h 14 M -7 14 h 14" class="ruler" />
-    </g>
-  </svg>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex (Keyboard focus enables horizontal diagram scrolling.) -->
+  <div class="scene" tabindex="0" role="region" aria-label="平台路线图，可横向滚动">
+    <svg
+      viewBox="0 0 400 400"
+      role="img"
+      aria-label={`平台在(${fmt(position.x)},${fmt(position.y)})米；横纵等比例，视域半宽${fmt(extent)}米。`}
+    >
+      <rect x="10" y="10" width="380" height="380" rx="12" class="floor" />
+      <text x="24" y="35">北 ↑</text><text x="330" y="375">东 →</text>
+      <path
+        d={`M 25 365 h ${160 / extent} m ${-160 / extent} -5 v 10 m ${160 / extent} -10 v 10`}
+        class="ruler"
+      />
+      <text x="25" y="350">1 m</text>
+      <circle cx="200" cy="200" r="6" class="start" />
+      <text x="210" y="220">起点</text>
+      {#if stage >= 1}
+        <path d={`M 200 200 L ${px(a.x)} ${py(a.y)}`} class="first" />
+      {/if}
+      {#if stage >= 2}
+        <path d={`M ${px(a.x)} ${py(a.y)} L ${px(sum.x)} ${py(sum.y)}`} class="second" />
+      {/if}
+      <g transform={`translate(${px(position.x)},${py(position.y)})`}>
+        <rect x="-11" y="-10" width="22" height="20" rx="4" class="robot" />
+        <path d="M -7 -14 h 14 M -7 14 h 14" class="ruler" />
+      </g>
+    </svg>
+  </div>
   <div class="actions">
     <button class="btn btn-outline" disabled={stage !== 0} onclick={() => (stage = 1)}
       >执行第一段</button
@@ -71,6 +74,12 @@
 </section>
 
 <style>
+  .scene {
+    overflow-x: auto;
+  }
+  .scene svg {
+    min-width: 320px;
+  }
   .platform {
     border: 1px solid var(--color-base-300);
     border-radius: var(--radius-box);

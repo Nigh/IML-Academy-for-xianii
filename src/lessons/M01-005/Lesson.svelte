@@ -14,6 +14,17 @@
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
   let resetVersion = $state(0);
+  let chartHost = $state<HTMLDivElement>();
+  $effect(() => {
+    const plot = chartHost?.querySelector('figure');
+    if (!plot || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => {
+      plot.scrollLeft = (plot.scrollWidth - plot.clientWidth) / 2;
+    });
+    observer.observe(plot);
+    return () => observer.disconnect();
+  });
+
   let { metadata }: LessonBodyProps = $props();
   let mode = $state('plane'),
     a = $state(3),
@@ -134,17 +145,19 @@
           onchange={(n) => (b = n)}
         />
       </div>
-      <Plot2D
-        equal
-        series={result.series}
-        xRange={[-result.extent, result.extent]}
-        yRange={[-result.extent, result.extent]}
-        xLabel="第一特征"
-        yLabel="第二特征"
-        xUnit="无量纲"
-        yUnit="无量纲"
-        description="25组系数网格：两个独立方向铺开平面，共线方向的点重合在一条直线上。目标与组合可能重合，数值区域如实报告。"
-      />
+      <div bind:this={chartHost}>
+        <Plot2D
+          equal
+          series={result.series}
+          xRange={[-result.extent, result.extent]}
+          yRange={[-result.extent, result.extent]}
+          xLabel="第一特征"
+          yLabel="第二特征"
+          xUnit="无量纲"
+          yUnit="无量纲"
+          description="25组系数网格：两个独立方向铺开平面，共线方向的点重合在一条直线上。目标与组合可能重合，数值区域如实报告。"
+        />
+      </div>
       <div aria-live="polite">
         <p>
           u=({result.u.x},{result.u.y})；v=({result.v.x},{result.v.y})；目标=({result.target

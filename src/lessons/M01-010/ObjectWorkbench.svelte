@@ -28,37 +28,40 @@
   <div class="actions">
     <button
       class="btn"
-      disabled={degrees >= 180}
+      disabled={degrees > 165}
       onclick={() => onrotate(Math.min(180, degrees + 15))}>导轨逆时针转 15°</button
     ><button
       class="btn"
-      disabled={degrees <= -180}
+      disabled={degrees < -165}
       onclick={() => onrotate(Math.max(-180, degrees - 15))}>导轨顺时针转 15°</button
-    ><button class="btn" disabled={v.x >= 5} onclick={() => onmove(Math.min(5, v.x + 1), v.y)}
+    ><button class="btn" disabled={v.x > 4} onclick={() => onmove(Math.min(5, v.x + 1), v.y)}
       >目标向右一格</button
     >
   </div>
-  <svg viewBox="0 0 360 350" role="img" aria-label={`导轨角度${degrees}度，小车投影与连接臂垂直`}>
-    <rect x="15" y="15" width="330" height="320" class="floor" />
-    <path
-      d={`M${point({ x: -u.x * 6, y: -u.y * 6 })}L${point({ x: u.x * 6, y: u.y * 6 })}`}
-      class="alternative"
-    />
-    <path d={`M180,175L${point(p)}`} class="path" />
-    <path d={`M${point(p)}L${point(v)}`} class="alternative" />
-    <circle cx="180" cy="175" r="5" class="fixed" />
-    <circle cx={180 + v.x * 22} cy={175 - v.y * 22} r="9" class="fixed" />
-    <rect
-      data-testid="projection-carriage"
-      x={180 + p.x * 22 - 8}
-      y={175 - p.y * 22 - 8}
-      width="16"
-      height="16"
-      class="object"
-    />
-    <text x="28" y="43">实线：沿轨；虚线：垂直臂</text>
-    <text x="28" y="322">固定比例：每单位 22 逻辑像素</text>
-  </svg>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex (Keyboard focus enables horizontal diagram scrolling.) -->
+  <div class="scene" tabindex="0" role="region" aria-label="对象示意图，可横向滚动">
+    <svg viewBox="0 0 360 350" role="img" aria-label={`导轨角度${degrees}度，小车投影与连接臂垂直`}>
+      <rect x="15" y="15" width="330" height="320" class="floor" />
+      <path
+        d={`M${point({ x: -u.x * 6, y: -u.y * 6 })}L${point({ x: u.x * 6, y: u.y * 6 })}`}
+        class="alternative"
+      />
+      <path d={`M180,175L${point(p)}`} class="path" />
+      <path d={`M${point(p)}L${point(v)}`} class="alternative" />
+      <circle cx="180" cy="175" r="5" class="fixed" />
+      <circle cx={180 + v.x * 22} cy={175 - v.y * 22} r="5" class="fixed" />
+      <rect
+        data-testid="projection-carriage"
+        x={180 + p.x * 22 - 4}
+        y={175 - p.y * 22 - 4}
+        width="8"
+        height="8"
+        class="object"
+      />
+      <text x="28" y="43">实线：沿轨；虚线：垂直臂</text>
+      <text x="28" y="322">固定比例：每单位 22 逻辑像素</text>
+    </svg>
+  </div>
   <p data-testid="object-reading" aria-live="polite">
     沿轨长度 {Math.hypot(p.x, p.y).toFixed(3)}；连接臂长度 {Math.hypot(r.x, r.y).toFixed(
       3,
@@ -68,6 +71,12 @@
 </section>
 
 <style>
+  .scene {
+    overflow-x: auto;
+  }
+  .scene svg {
+    min-width: 320px;
+  }
   .workbench {
     border: 1px solid var(--color-base-300);
     border-radius: var(--radius-box);

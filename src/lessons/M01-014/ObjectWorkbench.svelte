@@ -22,31 +22,34 @@
   <div class="actions">
     <button
       class="btn"
-      disabled={!hasKernel || t >= 3}
+      disabled={!hasKernel || t > 2.5}
       onclick={() => onbalance(Math.min(3, t + 0.5))}>第一路加半格，第二路减半格</button
     ><button
       class="btn"
-      disabled={!hasKernel || t <= -3}
+      disabled={!hasKernel || t < -2.5}
       onclick={() => onbalance(Math.max(-3, t - 0.5))}>第一路减半格，第二路加半格</button
     >
   </div>
-  <svg
-    viewBox="0 0 360 230"
-    role="img"
-    aria-label={`输入信号${x.x.toFixed(2)}和${x.y.toFixed(2)}，仪表输出${output.join(',')}`}
-  >
-    <rect x="15" y="15" width="140" height="75" rx="8" class="floor" /><text x="25" y="40"
-      >第一路输入</text
-    ><text data-testid="channel-one" x="25" y="70">{x.x.toFixed(2)}</text>
-    <rect x="15" y="125" width="140" height="75" rx="8" class="floor" /><text x="25" y="150"
-      >第二路输入</text
-    ><text x="25" y="180">{x.y.toFixed(2)}</text>
-    <path d="M155,52H190V110H215 M155,162H190V110" class="path" />
-    <rect x="215" y="55" width="130" height="115" rx="8" class="object" /><text x="225" y="85"
-      >输出仪表</text
-    ><text x="225" y="115">{output.map((n) => Number(n.toFixed(2))).join(' / ')}</text>
-    <text x="20" y="222">所有信号无量纲；读数为解析计算</text>
-  </svg>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex (Keyboard focus enables horizontal diagram scrolling.) -->
+  <div class="scene" tabindex="0" role="region" aria-label="对象示意图，可横向滚动">
+    <svg
+      viewBox="0 0 360 230"
+      role="img"
+      aria-label={`输入信号${x.x.toFixed(2)}和${x.y.toFixed(2)}，仪表输出${output.join(',')}`}
+    >
+      <rect x="15" y="15" width="140" height="75" rx="8" class="floor" /><text x="25" y="40"
+        >第一路输入</text
+      ><text data-testid="channel-one" x="25" y="70">{x.x.toFixed(2)}</text>
+      <rect x="15" y="125" width="140" height="75" rx="8" class="floor" /><text x="25" y="150"
+        >第二路输入</text
+      ><text x="25" y="180">{x.y.toFixed(2)}</text>
+      <path d="M155,52H190V110H215 M155,162H190V110" class="path" />
+      <rect x="215" y="55" width="130" height="115" rx="8" class="floor" /><text x="225" y="85"
+        >输出仪表</text
+      ><text x="225" y="115">{output.map((n) => Number(n.toFixed(2))).join(' / ')}</text>
+      <text x="20" y="222">所有信号无量纲；读数为解析计算</text>
+    </svg>
+  </div>
   <p data-testid="object-reading" aria-live="polite">
     输入 ({x.x.toFixed(3)}, {x.y.toFixed(3)})；输出 {output
       .map((n) => n.toFixed(3))
@@ -58,6 +61,12 @@
 </section>
 
 <style>
+  .scene {
+    overflow-x: auto;
+  }
+  .scene svg {
+    min-width: 320px;
+  }
   .workbench {
     border: 1px solid var(--color-base-300);
     border-radius: var(--radius-box);
@@ -84,11 +93,6 @@
     fill: none;
     stroke: var(--color-primary);
     stroke-width: 3;
-  }
-  .object {
-    fill: var(--color-accent);
-    stroke: var(--color-base-content);
-    stroke-width: 2;
   }
   .actions {
     display: flex;

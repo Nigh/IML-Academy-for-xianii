@@ -37,10 +37,11 @@ export const presets = [
     t: 0,
   },
 ];
-export function experiment(mode: string, b1: number, b2: number, t: number) {
+export function experiment(mode: string, b1: number, b2: number, t: number, minimumExtent = 0) {
   if (
     !['identity', 'dependent', 'shear'].includes(mode) ||
-    ![b1, b2, t].every(Number.isFinite) ||
+    ![b1, b2, t, minimumExtent].every(Number.isFinite) ||
+    minimumExtent < 0 ||
     Math.abs(b1) > 4 ||
     Math.abs(b2) > 4 ||
     Math.abs(t) > 3
@@ -85,7 +86,10 @@ export function experiment(mode: string, b1: number, b2: number, t: number) {
           : [b1 / 2 + t, b1 / 2 - t];
   const output = solution ? matrix.map((r) => r[0] * solution[0] + r[1] * solution[1]) : null;
   const residual = output ? Math.hypot(output[0] - b1, output[1] - b2) : null;
-  const extent = 1.3 * Math.max(2, Math.abs(b1), Math.abs(b2), ...(solution ?? []).map(Math.abs));
+  const extent = Math.max(
+    minimumExtent,
+    1.3 * Math.max(2, Math.abs(b1), Math.abs(b2), ...(solution ?? []).map(Math.abs)),
+  );
   const line = (sum: number) => [
     { x: -extent, y: sum + extent },
     { x: extent, y: sum - extent },

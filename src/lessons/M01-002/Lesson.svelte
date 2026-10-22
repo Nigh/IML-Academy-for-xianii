@@ -82,7 +82,7 @@
       limitations="二维欧氏空间、同一坐标系、同一单位；不描述旋转姿态的复合。"
       onreset={reset}
     >
-      <RoutePlatform {a} {b} {sum} context={JSON.stringify([k, ax, ay, bx, by])} />
+      <RoutePlatform {a} {b} {sum} context={JSON.stringify([resetVersion, k, ax, ay, bx, by])} />
       <ParameterSlider
         label="数乘系数 k"
         value={k}

@@ -29,6 +29,20 @@
     const q = map.toScreen(p);
     return `${q.x + 40},${q.y + 40}`;
   };
+  const stampExtent = $derived(
+    1.15 *
+      Math.max(
+        0.5,
+        ...r.stamp.flatMap((points) => points.flatMap((p) => [Math.abs(p.x), Math.abs(p.y)])),
+      ),
+  );
+  const stampMap = $derived(
+    mapping([-stampExtent, stampExtent], [-stampExtent, stampExtent], 320, 320, true),
+  );
+  const stampPoint = (p: Point) => {
+    const q = stampMap.toScreen(p);
+    return `${q.x + 40},${q.y + 40}`;
+  };
   const fmt = (n: number) => Number(n.toPrecision(5));
   function select(id: string) {
     if (id === 'diagonal') resetVersion += 1;
@@ -99,21 +113,24 @@
           aria-label="同一比例的原始印章虚线轮廓与当前工序实线轮廓"
         >
           <polygon
-            points={r.stamp[0].map(pt).join(' ')}
+            points={r.stamp[0].map(stampPoint).join(' ')}
             fill="none"
             stroke="currentColor"
             stroke-dasharray="5 5"
           />
           <polygon
             data-testid="stamp-shape"
-            points={r.stamp[stage].map(pt).join(' ')}
+            points={r.stamp[stage].map(stampPoint).join(' ')}
             fill="none"
             stroke="currentColor"
             stroke-width="3"
           />
           <circle cx="200" cy="200" r="3" fill="currentColor" />
-          <text x="15" y="390">虚线：原印章；实线：当前印章；中心不平移</text>
         </svg>
+        <p>
+          虚线：原印章；实线：当前印章；中心不平移。印章图按四道工序的联合范围取景，工序间比例固定，半宽
+          {fmt(stampExtent)} 模型单位；下方单位圆图单独取景。
+        </p>
         <output data-testid="stamp-reading" aria-live="polite"
           >工序 {stage}：{['原始印章', 'Vᵀ转向', 'Σ沿轴拉伸', 'U转向或反射'][stage]}；保留方向数 {stage <
           2
@@ -338,15 +355,12 @@
     white-space: normal;
   }
   .object-workbench svg {
+    min-width: 0;
     display: block;
     width: 100%;
     max-width: 28rem;
     margin-inline: auto;
     color: var(--color-base-content);
-  }
-  .object-workbench svg text {
-    fill: currentColor;
-    font-size: 16px;
   }
   .object-workbench output {
     display: block;

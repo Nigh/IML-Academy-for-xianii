@@ -67,6 +67,6 @@ export function combineCommands(
     endpoint,
     path,
     nontrivial: coefficients.some((c) => c !== 0),
-    returned: norm(endpoint) <= 1e-12,
+    returned: endpoint.x === 0 && endpoint.y === 0,
   };
 }

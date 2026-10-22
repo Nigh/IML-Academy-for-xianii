@@ -8,11 +8,20 @@
     { x: 0.65, y: 1 },
     { x: 0, y: 1 },
   ];
-  const before = outline.map((p) => `${180 + p.x * 50},${180 - p.y * 50}`).join(' ');
+  const factor = $derived(
+    110 /
+      Math.max(
+        2,
+        ...outline.map((p) => transform(a, p)).flatMap((p) => [Math.abs(p.x), Math.abs(p.y)]),
+      ),
+  );
+  const before = $derived(
+    outline.map((p) => `${180 + p.x * factor},${155 - p.y * factor}`).join(' '),
+  );
   const after = $derived(
     outline
       .map((p) => transform(a, p))
-      .map((p) => `${180 + p.x * 50},${180 - p.y * 50}`)
+      .map((p) => `${180 + p.x * factor},${155 - p.y * factor}`)
       .join(' '),
   );
   const marker = $derived(transform(a, { x: 0.25, y: 0.75 }));
@@ -65,22 +74,25 @@
         ])}>印章逆时针转 90°</button
     >
   </div>
-  <svg
-    viewBox="0 0 360 310"
-    role="img"
-    aria-label="虚线为原印章，实线为当前印章；缺角和圆点由同一矩阵变换"
-  >
-    <rect x="20" y="20" width="320" height="270" class="floor" />
-    <polygon points={before} class="alternative" /><polygon
-      data-testid="stamp-outline"
-      points={after}
-      class="path"
-    />
-    <circle cx={180 + marker.x * 50} cy={180 - marker.y * 50} r="6" class="object" />
-    <rect x="176" y="176" width="8" height="8" class="fixed" />
-    <text x="30" y="48">方块固定角；圆点随印章变形</text>
-    <text x="30" y="275">固定比例：1 模型单位 = 50 逻辑像素</text>
-  </svg>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex (Keyboard focus enables horizontal diagram scrolling.) -->
+  <div class="scene" tabindex="0" role="region" aria-label="对象示意图，可横向滚动">
+    <svg
+      viewBox="0 0 360 310"
+      role="img"
+      aria-label="虚线为原印章，实线为当前印章；缺角和圆点由同一矩阵变换"
+    >
+      <rect x="20" y="20" width="320" height="270" class="floor" />
+      <polygon points={before} class="alternative" /><polygon
+        data-testid="stamp-outline"
+        points={after}
+        class="path"
+      />
+      <circle cx={180 + marker.x * factor} cy={155 - marker.y * factor} r="6" class="object" />
+      <rect x="176" y="151" width="8" height="8" class="fixed" />
+      <text x="30" y="48">方块固定角；圆点随印章变形</text>
+      <text x="30" y="275">等比例自动取景；跨状态按数值比较</text>
+    </svg>
+  </div>
   <p data-testid="object-reading" aria-live="polite">
     印章内部标记：({marker.x.toFixed(3)}, {marker.y.toFixed(3)})。下方网格、两列和角点与印章共用 A。
   </p>
@@ -88,6 +100,12 @@
 </section>
 
 <style>
+  .scene {
+    overflow-x: auto;
+  }
+  .scene svg {
+    min-width: 320px;
+  }
   .workbench {
     border: 1px solid var(--color-base-300);
     border-radius: var(--radius-box);

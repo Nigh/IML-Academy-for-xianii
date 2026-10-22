@@ -17,37 +17,40 @@
     仓库固定在路口中心。移动收货点，比较只能沿街行驶的车与可直达的理想路线；忽略建筑阻挡和转弯成本。
   </p>
   <div class="actions">
-    <button class="btn" disabled={x >= 5} onclick={() => onmove(Math.min(5, x + 1), y)}
+    <button class="btn" disabled={x > 4} onclick={() => onmove(Math.min(5, x + 1), y)}
       >收货点向东 1 m</button
     >
-    <button class="btn" disabled={x <= -5} onclick={() => onmove(Math.max(-5, x - 1), y)}
+    <button class="btn" disabled={x < -4} onclick={() => onmove(Math.max(-5, x - 1), y)}
       >收货点向西 1 m</button
     >
-    <button class="btn" disabled={y >= 5} onclick={() => onmove(x, Math.min(5, y + 1))}
+    <button class="btn" disabled={y > 4} onclick={() => onmove(x, Math.min(5, y + 1))}
       >收货点向北 1 m</button
     >
-    <button class="btn" disabled={y <= -5} onclick={() => onmove(x, Math.max(-5, y - 1))}
+    <button class="btn" disabled={y < -4} onclick={() => onmove(x, Math.max(-5, y - 1))}
       >收货点向南 1 m</button
     >
   </div>
-  <svg
-    viewBox="0 0 360 340"
-    role="img"
-    aria-label={`收货点东西${x}米、南北${y}米，沿街${l1.toFixed(2)}米，直达${l2.toFixed(2)}米`}
-  >
-    <rect x="35" y="25" width="290" height="290" class="floor" />
-    {#each [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5] as n (n)}<path
-        d={`M${px(n)},45V295 M55,${py(n)}H305`}
-        class="alternative"
-        opacity="0.25"
-      />{/each}
-    <path d={`M180,170H${px(x)}V${py(y)}`} class="path" />
-    <path d={`M180,170L${px(x)},${py(y)}`} class="alternative" />
-    <rect x="172" y="162" width="16" height="16" class="fixed" />
-    <circle data-testid="delivery-target" cx={px(x)} cy={py(y)} r="9" class="object" />
-    <text x="45" y="22">北 ↑ · 每街区 1 m · 东 →</text>
-    <text x="45" y="335">方块：仓库；圆点：收货点</text>
-  </svg>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex (Keyboard focus enables horizontal diagram scrolling.) -->
+  <div class="scene" tabindex="0" role="region" aria-label="对象示意图，可横向滚动">
+    <svg
+      viewBox="0 0 360 340"
+      role="img"
+      aria-label={`收货点东西${x}米、南北${y}米，沿街${l1.toFixed(2)}米，直达${l2.toFixed(2)}米`}
+    >
+      <rect x="35" y="25" width="290" height="290" class="floor" />
+      {#each [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5] as n (n)}<path
+          d={`M${px(n)},45V295 M55,${py(n)}H305`}
+          class="alternative"
+          opacity="0.25"
+        />{/each}
+      <path d={`M180,170H${px(x)}V${py(y)}`} class="path" />
+      <path d={`M180,170L${px(x)},${py(y)}`} class="alternative" />
+      <rect x="172" y="162" width="16" height="16" class="fixed" />
+      <circle data-testid="delivery-target" cx={px(x)} cy={py(y)} r="9" class="object" />
+      <text x="45" y="22">北 ↑ · 每街区 1 m · 东 →</text>
+      <text x="45" y="335">方块：仓库；圆点：收货点</text>
+    </svg>
+  </div>
   <p data-testid="object-reading" aria-live="polite">
     收货点 ({x}, {y}) m；沿街 {l1.toFixed(3)} m；直达 {l2.toFixed(3)} m。实线路线对应 L1，虚线直达对应
     L2。
@@ -56,6 +59,12 @@
 </section>
 
 <style>
+  .scene {
+    overflow-x: auto;
+  }
+  .scene svg {
+    min-width: 320px;
+  }
   .workbench {
     border: 1px solid var(--color-base-300);
     border-radius: var(--radius-box);

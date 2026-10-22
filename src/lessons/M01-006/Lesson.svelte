@@ -120,12 +120,14 @@
           >
         </div>
         <output data-testid="object-result"
-          >终点 ({motion.endpoint.x.toFixed(3)},{motion.endpoint.y.toFixed(3)})；{motion.nontrivial
-            ? '指令不全为零'
-            : '指令全为零'}；{motion.returned ? '已回到起点' : '尚未回到起点'}</output
+          >终点 ({motion.endpoint.x.toExponential(3)},{motion.endpoint.y.toExponential(
+            3,
+          )})；{motion.nontrivial ? '指令不全为零' : '指令全为零'}；{motion.returned
+            ? '已回到起点'
+            : '尚未回到起点'}</output
         >
         <p>
-          先自行找到抵消组合，再与下方解析系数核对。全零指令当然不移动，只有非全零且回到起点才是冗余证据。终点长度不超过1e−12时按返回判定，以容纳浮点舍入；这不代替下方的解析证明。
+          先自行找到抵消组合，再与下方解析系数核对。全零指令当然不移动。非全零且返回的结果是抵消候选，仍需用下方解析条件核对线性相关；浮点显示和有限次操作不构成证明。这里仅在两个计算分量均为零时显示返回，极小的非零移动仍属于移动。
         </p>
       </section>
       <PresetSelector {presets} value={selected} defaultId="basis" onchange={select} />

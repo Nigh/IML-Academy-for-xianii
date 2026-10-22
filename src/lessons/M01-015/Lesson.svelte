@@ -24,7 +24,9 @@
   let drive1 = $state(0),
     drive2 = $state(0);
   const measured = $derived(commandOutput(mode, drive1, drive2));
-  const result = $derived(experiment(mode, b1, b2, t));
+  const result = $derived(
+    experiment(mode, b1, b2, t, 1.3 * Math.max(Math.abs(drive1), Math.abs(drive2))),
+  );
   const viewExtent = $derived(
     Math.max(result.extent, 1.3 * Math.abs(drive1), 1.3 * Math.abs(drive2)),
   );

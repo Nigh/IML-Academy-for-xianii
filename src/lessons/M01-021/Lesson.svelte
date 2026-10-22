@@ -137,7 +137,7 @@
           <div class="object-actions">
             <button
               class="btn"
-              disabled={offset <= -10}
+              disabled={offset < -9}
               onclick={() => {
                 offset = Math.max(-10, offset - 1);
                 selected = 'custom';
@@ -145,7 +145,7 @@
             >
             <button
               class="btn"
-              disabled={offset >= 10}
+              disabled={offset > 9}
               onclick={() => {
                 offset = Math.min(10, offset + 1);
                 selected = 'custom';

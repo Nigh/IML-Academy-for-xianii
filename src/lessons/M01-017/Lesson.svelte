@@ -84,7 +84,7 @@
         <div class="object-actions">
           <button
             class="btn"
-            disabled={angle <= -180}
+            disabled={angle < -165}
             onclick={() => {
               angle = Math.max(-180, angle - 15);
               selected = 'custom';
@@ -92,7 +92,7 @@
           >
           <button
             class="btn"
-            disabled={angle >= 180}
+            disabled={angle > 165}
             onclick={() => {
               angle = Math.min(180, angle + 15);
               selected = 'custom';
@@ -145,8 +145,8 @@
             fill="none"
             stroke="currentColor"
           />
-          <text x="12" y="225">圆点：输入 / 方框：输出 / 单位长度=30</text>
         </svg>
+        <p>圆点：输入，方框：输出；一模型单位为30逻辑像素。</p>
         <output data-testid="template-reading" aria-live="polite"
           >模板角度 {angle}°；输出 ({fmt(r.av.x)},{fmt(r.av.y)})；偏离原直线 {fmt(
             r.residual,
@@ -276,10 +276,6 @@
     max-width: 28rem;
     margin-inline: auto;
     color: var(--color-base-content);
-  }
-  .object-workbench svg text {
-    fill: currentColor;
-    font-size: 16px;
   }
   .object-workbench output {
     display: block;

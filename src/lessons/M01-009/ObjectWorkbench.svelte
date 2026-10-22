@@ -31,7 +31,7 @@
   );
   const point = (q: Vector2) => `${180 + (q.x / extent) * 120},${160 - (q.y / extent) * 120}`;
   const rail = $derived.by(() => {
-    const n = Math.hypot(u.x, u.y);
+    const n = Math.max(Math.abs(u.x), Math.abs(u.y));
     return n ? { x: (u.x / n) * extent, y: (u.y / n) * extent } : null;
   });
 </script>
@@ -43,33 +43,39 @@
     u，坐标与距离均用无量纲模型单位。先找到距离最小的位置，再核对垂足。
   </p>
   <div class="actions">
-    <button class="btn" disabled={t <= -5} onclick={() => onmove(Math.max(-5, t - 0.5))}
+    <button class="btn" disabled={t < -4.5} onclick={() => onmove(Math.max(-5, t - 0.5))}
       >小车后退半步</button
-    ><button class="btn" disabled={t >= 5} onclick={() => onmove(Math.min(5, t + 0.5))}
+    ><button class="btn" disabled={t > 4.5} onclick={() => onmove(Math.min(5, t + 0.5))}
       >小车前进半步</button
     >
   </div>
-  <svg
-    viewBox="0 0 360 320"
-    role="img"
-    aria-label={`小车到目标距离${distance.toFixed(3)}；指令系数${t}`}
-  >
-    <rect x="20" y="20" width="320" height="280" class="floor" />
-    {#if rail}<path d={`M${point({ x: -rail.x, y: -rail.y })}L${point(rail)}`} class="path" />{/if}
-    <path d={`M${point(v)}L${point(candidate)}`} class="alternative" />
-    {#if p}<path d={`M${point(v)}L${point(p)}`} class="path" opacity="0.5" />{/if}
-    <circle cx={180 + (v.x / extent) * 120} cy={160 - (v.y / extent) * 120} r="9" class="fixed" />
-    <rect
-      data-testid="rail-carriage"
-      x={180 + (candidate.x / extent) * 120 - 10}
-      y={160 - (candidate.y / extent) * 120 - 7}
-      width="20"
-      height="14"
-      class="object"
-    />
-    <text x="30" y="45">圆点：固定目标；方车：当前位置</text>
-    <text x="30" y="285">虚线：当前距离；细实线：最短距离</text>
-  </svg>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex (Keyboard focus enables horizontal diagram scrolling.) -->
+  <div class="scene" tabindex="0" role="region" aria-label="对象示意图，可横向滚动">
+    <svg
+      viewBox="0 0 360 320"
+      role="img"
+      aria-label={`小车到目标距离${distance.toFixed(3)}；指令系数${t}`}
+    >
+      <rect x="20" y="20" width="320" height="280" class="floor" />
+      {#if rail}<path
+          d={`M${point({ x: -rail.x, y: -rail.y })}L${point(rail)}`}
+          class="path"
+        />{/if}
+      <path d={`M${point(v)}L${point(candidate)}`} class="alternative" />
+      {#if p}<path d={`M${point(v)}L${point(p)}`} class="path" opacity="0.5" />{/if}
+      <circle cx={180 + (v.x / extent) * 120} cy={160 - (v.y / extent) * 120} r="9" class="fixed" />
+      <rect
+        data-testid="rail-carriage"
+        x={180 + (candidate.x / extent) * 120 - 10}
+        y={160 - (candidate.y / extent) * 120 - 7}
+        width="20"
+        height="14"
+        class="object"
+      />
+      <text x="30" y="45">圆点：固定目标；方车：当前位置</text>
+      <text x="30" y="285">虚线：当前距离；细实线：最短距离</text>
+    </svg>
+  </div>
   <p data-testid="object-reading" aria-live="polite">
     小车位置 ({candidate.x.toFixed(3)}, {candidate.y.toFixed(3)})；到目标 {distance.toFixed(
       3,
@@ -81,6 +87,12 @@
 </section>
 
 <style>
+  .scene {
+    overflow-x: auto;
+  }
+  .scene svg {
+    min-width: 320px;
+  }
   .workbench {
     border: 1px solid var(--color-base-300);
     border-radius: var(--radius-box);

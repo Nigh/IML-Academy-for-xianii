@@ -112,7 +112,7 @@
         <div class="object-actions">
           <button
             class="btn"
-            disabled={t <= -3}
+            disabled={t < -2.5}
             onclick={() => {
               t = Math.max(-3, t - 0.5);
               selected = 'custom';
@@ -120,7 +120,7 @@
           >
           <button
             class="btn"
-            disabled={t >= 3}
+            disabled={t > 2.5}
             onclick={() => {
               t = Math.min(3, t + 0.5);
               selected = 'custom';

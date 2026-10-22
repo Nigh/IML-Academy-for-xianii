@@ -40,3 +40,17 @@ it('对象操作与数学结果同源', async () => {
   expect(v.getByTestId('result').textContent).toContain('精确秩=1');
   await fireEvent.click(v.getByText('复位 ↺'));
 });
+
+it('印章主视图在默认完整变换下有可辨认跨度且保留边界', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-018')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  const points = v
+    .getByTestId('stamp-shape')
+    .getAttribute('points')!
+    .split(' ')
+    .map((p) => p.split(',').map(Number));
+  expect(
+    Math.max(...points.map((p) => p[0])) - Math.min(...points.map((p) => p[0])),
+  ).toBeGreaterThan(240);
+  expect(points.every(([x, y]) => x >= 40 && x <= 360 && y >= 40 && y <= 360)).toBe(true);
+});

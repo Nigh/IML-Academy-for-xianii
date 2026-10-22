@@ -45,26 +45,29 @@
       onclick={() => oncommand(0, 1)}>只推动执行器二</button
     ><button class="btn" onclick={() => oncommand(1, -0.5)}>试着相互抵消</button>
   </div>
-  <svg
-    viewBox="0 0 360 300"
-    role="img"
-    aria-label="定位台可达区域边界与当前平台，所有位置由同一矩阵计算"
-  >
-    <rect x="20" y="20" width="320" height="260" class="floor" />
-    <polygon points={result.corners.map((p) => point(p.x, p.y)).join(' ')} class="alternative" />
-    <path d={`M180,150L${point(result.position.x, result.position.y)}`} class="path" />
-    <rect
-      data-testid="actuator-platform"
-      x={180 + result.position.x * 18 - 8}
-      y={150 - result.position.y * 18 - 8}
-      width="16"
-      height="16"
-      class="object"
-    />
-    <circle cx="180" cy="150" r="4" class="fixed" />
-    <text x="28" y="46">虚线：可达区域边界</text>
-    <text x="28" y="260">固定比例：1 模型单位 = 18 逻辑像素</text>
-  </svg>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex (Keyboard focus enables horizontal diagram scrolling.) -->
+  <div class="scene" tabindex="0" role="region" aria-label="对象示意图，可横向滚动">
+    <svg
+      viewBox="0 0 360 300"
+      role="img"
+      aria-label="定位台可达区域边界与当前平台，所有位置由同一矩阵计算"
+    >
+      <rect x="20" y="20" width="320" height="260" class="floor" />
+      <polygon points={result.corners.map((p) => point(p.x, p.y)).join(' ')} class="alternative" />
+      <path d={`M180,150L${point(result.position.x, result.position.y)}`} class="path" />
+      <rect
+        data-testid="actuator-platform"
+        x={180 + result.position.x * 18 - 8}
+        y={150 - result.position.y * 18 - 8}
+        width="16"
+        height="16"
+        class="object"
+      />
+      <circle cx="180" cy="150" r="4" class="fixed" />
+      <text x="28" y="46">虚线：可达区域边界</text>
+      <text x="28" y="260">固定比例：1 模型单位 = 18 逻辑像素</text>
+    </svg>
+  </div>
   <p data-testid="object-reading" aria-live="polite">
     平台位置 ({result.position.x.toExponential(2)}, {result.position.y.toExponential(2)})；判定阈值 {threshold.toExponential(
       2,
@@ -76,6 +79,12 @@
 </section>
 
 <style>
+  .scene {
+    overflow-x: auto;
+  }
+  .scene svg {
+    min-width: 320px;
+  }
   .workbench {
     border: 1px solid var(--color-base-300);
     border-radius: var(--radius-box);

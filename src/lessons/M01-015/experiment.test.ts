@@ -48,3 +48,14 @@ it('控制器读数服从相同矩阵，重复表不会独立变化', () => {
   expect(() => commandOutput('identity', 9, 0)).toThrow(RangeError);
   expect(() => commandOutput('unknown', 0, 0)).toThrow(RangeError);
 });
+
+it('扩大视域仍将无界约束延伸到绘图边界', () => {
+  const r = experiment('identity', 2, 1, 0, 10.4);
+  expect(r.extent).toBe(10.4);
+  expect(r.series[0].points).toEqual([
+    { x: 2, y: -10.4 },
+    { x: 2, y: 10.4 },
+  ]);
+  expect(() => experiment('identity', 2, 1, 0, NaN)).toThrow();
+  expect(() => experiment('identity', 2, 1, 0, -1)).toThrow();
+});

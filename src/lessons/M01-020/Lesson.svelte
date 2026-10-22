@@ -99,25 +99,25 @@
         <div class="object-actions">
           <button
             class="btn"
-            disabled={candidateIntercept >= 8}
+            disabled={candidateIntercept > 7.5}
             onclick={() => (candidateIntercept = Math.min(8, candidateIntercept + 0.5))}
             >零点提高半单位</button
           >
           <button
             class="btn"
-            disabled={candidateIntercept <= -8}
+            disabled={candidateIntercept < -7.5}
             onclick={() => (candidateIntercept = Math.max(-8, candidateIntercept - 0.5))}
             >零点降低半单位</button
           >
           <button
             class="btn"
-            disabled={candidateSlope >= 8}
+            disabled={candidateSlope > 7.5}
             onclick={() => (candidateSlope = Math.min(8, candidateSlope + 0.5))}
             >增益提高半单位</button
           >
           <button
             class="btn"
-            disabled={candidateSlope <= -8}
+            disabled={candidateSlope < -7.5}
             onclick={() => (candidateSlope = Math.max(-8, candidateSlope - 0.5))}
             >增益降低半单位</button
           >

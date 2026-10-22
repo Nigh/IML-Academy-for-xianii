@@ -15,6 +15,8 @@ it('课程协议有效且交互结果与输入一致、可复位', async () => {
   expect(view.getByTestId('platform-position').textContent).toContain('(2, 1) 米');
   await fireEvent.click(view.getByRole('button', { name: '执行第二段' }));
   expect(view.getByTestId('platform-position').textContent).toContain('(1, 3) 米');
+  await fireEvent.click(view.getByText('复位 ↺'));
+  expect(view.getByTestId('platform-position').textContent).toContain('等待指令');
   await fireEvent.click(view.getByText('场景二：完全抵消'));
   expect(view.getByText('(0, 0) m')).toBeTruthy();
   expect(view.getByTestId('platform-position').textContent).toContain('等待指令');
@@ -35,4 +37,3 @@ it('课程协议有效且交互结果与输入一致、可复位', async () => {
   for (const section of definition.sections)
     expect(view.container.querySelector(`#${section.id}`)).toBeTruthy();
 });
-
