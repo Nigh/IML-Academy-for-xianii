@@ -2,6 +2,16 @@ import { execFileSync } from 'node:child_process';
 import { appendFileSync, readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
+// Only known non-runtime documentation can skip browser regression.
+export function requiresBrowser(files: string[]) {
+  return files.some(
+    (file) =>
+      !/^(?:(?:skills|docs)\/.*\.md|(?:README|AGENTS|PLAN)\.md|\.github\/PULL_REQUEST_TEMPLATE\.md)$/.test(
+        file,
+      ),
+  );
+}
+
 type Lesson = { id: string; slug: string; title: string };
 export function selectLessons(files: string[], before: Lesson[], after: Lesson[]) {
   const ids = new Set(
@@ -54,6 +64,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const git = (...args: string[]) => execFileSync('git', args, { encoding: 'utf8' });
   const after = JSON.parse(readFileSync('curriculum/lessons.json', 'utf8')) as Lesson[];
   let selection;
+  let browser = true;
   if (range) {
     const base = range.mergeBase ? git('merge-base', range.base, range.head).trim() : range.base;
     const before = JSON.parse(git('show', `${base}:curriculum/lessons.json`)) as Lesson[];
@@ -61,6 +72,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       .split('\0')
       .filter(Boolean);
     selection = selectLessons(files, before, after);
+    browser = manual || process.env.FORCE_BROWSER === 'true' || requiresBrowser(files);
     console.log(`课程遍历：按需；基线 ${base}；目标 ${range.head}`);
   } else {
     selection = { lessons: after, removed: [] };
@@ -71,5 +83,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   );
   const compact = (items: Lesson[]) => items.map(({ id, slug, title }) => ({ id, slug, title }));
   selection = { lessons: compact(selection.lessons), removed: compact(selection.removed) };
-  appendFileSync(process.env.GITHUB_OUTPUT!, `selection=${JSON.stringify(selection)}\n`);
+  console.log(`浏览器回归：${browser ? '运行' : '跳过（仅项目文档/skill 文档变更）'}`);
+  appendFileSync(
+    process.env.GITHUB_OUTPUT!,
+    `selection=${JSON.stringify(selection)}\nbrowser=${browser}\n`,
+  );
 }
