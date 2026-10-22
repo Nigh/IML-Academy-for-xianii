@@ -818,13 +818,18 @@ main:focus {
   background: var(--color-interactive-active);
 }
 .quiz-feedback {
-  border-left: 2px solid var(--color-accent);
-  padding-left: 1rem;
+  --feedback-color: var(--color-success);
+  border: 1px solid var(--feedback-color);
+  background: color-mix(in srgb, var(--feedback-color) 10%, var(--color-base-100));
+  padding: 1rem;
   margin-top: 1rem;
   font-size: var(--font-size-sm);
 }
+.quiz-feedback[data-state='incorrect'] {
+  --feedback-color: var(--color-error);
+}
 .quiz-feedback strong {
-  color: var(--color-accent);
+  color: var(--feedback-color);
 }
 .quiz-feedback p {
   margin-top: 0.5rem;

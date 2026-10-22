@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { mapping, validRange, type Range } from '../../lib/math/coordinates.ts';
+  import { mapping, unitGrid, validRange, type Range } from '../../lib/math/coordinates.ts';
   import type { PlotSeries, ReferenceLine } from './types.ts';
   let {
     series,
@@ -12,6 +12,7 @@
     xUnit = '',
     yUnit = '',
     grid = true,
+    equal = false,
     references = [],
     highlight,
     onselect,
@@ -26,6 +27,7 @@
     xUnit?: string;
     yUnit?: string;
     grid?: boolean;
+    equal?: boolean;
     references?: ReferenceLine[];
     highlight?: Range;
     onselect?: (seriesId: string, index: number) => void;
@@ -56,11 +58,31 @@
         )
       )
         return null;
-      return mapping(xRange, yRange, 500, 280);
+      return mapping(xRange, yRange, 500, 280, equal);
     } catch {
       return null;
     }
   });
+  const xGrid = $derived(
+    model
+      ? unitGrid(
+          xRange,
+          Math.abs(
+            model.toScreen({ x: xRange[1], y: 0 }).x - model.toScreen({ x: xRange[0], y: 0 }).x,
+          ),
+        )
+      : null,
+  );
+  const yGrid = $derived(
+    model
+      ? unitGrid(
+          yRange,
+          Math.abs(
+            model.toScreen({ x: 0, y: yRange[1] }).y - model.toScreen({ x: 0, y: yRange[0] }).y,
+          ),
+        )
+      : null,
+  );
   let detail = $state('');
   const fmt = (n: number) => Number(n.toPrecision(4)).toString();
 </script>
@@ -75,92 +97,131 @@
       <title id={`${uid}-title`}>{description}</title>
       <defs><clipPath id={`${uid}-clip`}><rect width="500" height="280" /></clipPath></defs>
       <g transform="translate(75 25)">
-        {#each Array.from({ length: 6 }, (_, i) => i) as i (i)}
-          {@const x = xRange[0] + ((xRange[1] - xRange[0]) * i) / 5}{@const y =
-            yRange[0] + ((yRange[1] - yRange[0]) * i) / 5}
-          {#if grid}<path
-              d={`M${i * 100},0V280 M0,${280 - i * 56}H500`}
-              class="grid-line"
-              fill="none"
-            />{/if}
-          <text x={i * 100} y="302" text-anchor="middle">{fmt(x)}</text><text
-            x="-10"
-            y={284 - i * 56}
-            text-anchor="end">{fmt(y)}</text
-          >
-        {/each}
-        <path d="M0,0V280H500" class="axis-line" fill="none" />
-        <g clip-path={`url(#${uid}-clip)`}>
-          {#if highlight}<rect
-              x={model.toScreen({ x: highlight[0], y: 0 }).x}
-              y="0"
-              width={Math.max(
-                0,
-                model.toScreen({ x: highlight[1], y: 0 }).x -
-                  model.toScreen({ x: highlight[0], y: 0 }).x,
-              )}
-              height="280"
-              fill="var(--color-accent)"
-              opacity="0.12"
-            />{/if}
-          {#each references as r (r)}{@const p = model.toScreen({ x: r.value, y: r.value })}<line
-              x1={r.axis === 'x' ? p.x : 0}
-              x2={r.axis === 'x' ? p.x : 500}
-              y1={r.axis === 'y' ? p.y : 0}
-              y2={r.axis === 'y' ? p.y : 280}
-              stroke="currentColor"
-              stroke-dasharray="3 5"><title>{r.label}: {r.value}</title></line
-            >{/each}
-          {#each series as s, si (s.id)}
-            {#if s.kind === 'line' || s.kind === 'step'}
-              <path
-                data-series={s.id}
-                d={s.points
-                  .map((p, i) => {
-                    const q = model!.toScreen(p);
-                    return i === 0
-                      ? `M${q.x},${q.y}`
-                      : s.kind === 'step'
-                        ? `H${q.x}V${q.y}`
-                        : `L${q.x},${q.y}`;
-                  })
-                  .join(' ')}
+        {#if model}
+          {@const low = model.toScreen({ x: xRange[0], y: yRange[0] })}
+          {@const high = model.toScreen({ x: xRange[1], y: yRange[1] })}
+          {#each xGrid?.values ?? [] as x (x)}
+            {@const q = model.toScreen({ x, y: 0 })}
+            {#if grid}<path
+                data-grid-x={x}
+                d={`M${q.x},${high.y}V${low.y}`}
+                class="grid-line"
                 fill="none"
-                stroke={`var(--color-${s.role})`}
-                stroke-width="2.5"
-                stroke-dasharray={si % 2 ? '7 4' : undefined}
-              />
-            {/if}
-            {#if s.kind === 'scatter'}{#each s.points as p (p)}{@const q = model.toScreen(p)}<circle
-                  cx={q.x}
-                  cy={q.y}
-                  r="5"
-                  fill={`var(--color-${s.role})`}
-                  opacity={s.role === 'secondary' ? 0.55 : 1}
-                  ><title>{s.label}: {p.x}, {p.y}</title></circle
-                >{/each}{/if}
-            {#if s.kind === 'bar'}
-              {#each s.points as p (p)}{@const q = model.toScreen(p)}{@const zero = model.toScreen({
-                  x: p.x,
-                  y: 0,
-                })}<rect
-                  x={q.x - (p.width ? (p.width * 500) / (xRange[1] - xRange[0]) : 6) / 2}
-                  y={Math.min(q.y, zero.y)}
-                  width={p.width ? (p.width * 500) / (xRange[1] - xRange[0]) : 6}
-                  height={Math.abs(q.y - zero.y)}
-                  fill={`var(--color-${s.role})`}
-                  opacity={s.role === 'secondary' ? 0.55 : 1}
-                  ><title>{s.label}: {p.x}, {p.y}</title></rect
-                >{/each}
-            {/if}
+              />{/if}
+            <text x={q.x} y="302" text-anchor="middle">{fmt(x)}</text>
           {/each}
-        </g>
+          {#each yGrid?.values ?? [] as y (y)}
+            {@const q = model.toScreen({ x: 0, y })}
+            {#if grid}<path
+                data-grid-y={y}
+                d={`M${low.x},${q.y}H${high.x}`}
+                class="grid-line"
+                fill="none"
+              />{/if}
+            <text x="-10" y={q.y + 4} text-anchor="end">{fmt(y)}</text>
+          {/each}
+          {#if !xGrid?.values.length || xRange[1] - xRange[0] < 1}
+            <text x={low.x} y="302" text-anchor="middle">{fmt(xRange[0])}</text>
+            <text x={high.x} y="302" text-anchor="middle">{fmt(xRange[1])}</text>
+          {/if}
+          {#if !yGrid?.values.length || yRange[1] - yRange[0] < 1}
+            <text x="-10" y={low.y + 4} text-anchor="end">{fmt(yRange[0])}</text>
+            <text x="-10" y={high.y + 4} text-anchor="end">{fmt(yRange[1])}</text>
+          {/if}
+          {@const origin = model.toScreen({
+            x: Math.max(xRange[0], Math.min(xRange[1], 0)),
+            y: Math.max(yRange[0], Math.min(yRange[1], 0)),
+          })}
+          <path
+            d={`M${low.x},${origin.y}H${high.x} M${origin.x},${high.y}V${low.y}`}
+            class="axis-line"
+            fill="none"
+          />
+          <g clip-path={`url(#${uid}-clip)`}>
+            {#if highlight}<rect
+                x={model.toScreen({ x: highlight[0], y: 0 }).x}
+                y={high.y}
+                width={Math.max(
+                  0,
+                  model.toScreen({ x: highlight[1], y: 0 }).x -
+                    model.toScreen({ x: highlight[0], y: 0 }).x,
+                )}
+                height={low.y - high.y}
+                fill="var(--color-accent)"
+                opacity="0.12"
+              />{/if}
+            {#each references as r (r)}{@const p = model.toScreen({ x: r.value, y: r.value })}<line
+                x1={r.axis === 'x' ? p.x : low.x}
+                x2={r.axis === 'x' ? p.x : high.x}
+                y1={r.axis === 'y' ? p.y : high.y}
+                y2={r.axis === 'y' ? p.y : low.y}
+                stroke="currentColor"
+                stroke-dasharray="3 5"><title>{r.label}: {r.value}</title></line
+              >{/each}
+            {#each series as s, si (s.id)}
+              {#if s.kind === 'line' || s.kind === 'step'}
+                <path
+                  data-series={s.id}
+                  d={s.points
+                    .map((p, i) => {
+                      const q = model!.toScreen(p);
+                      return i === 0
+                        ? `M${q.x},${q.y}`
+                        : s.kind === 'step'
+                          ? `H${q.x}V${q.y}`
+                          : `L${q.x},${q.y}`;
+                    })
+                    .join(' ')}
+                  fill="none"
+                  stroke={`var(--color-${s.role})`}
+                  stroke-width="2.5"
+                  stroke-dasharray={si % 2 ? '7 4' : undefined}
+                />
+              {/if}
+              {#if s.kind === 'scatter'}{#each s.points as p (p)}{@const q =
+                    model.toScreen(p)}<circle
+                    cx={q.x}
+                    cy={q.y}
+                    r="5"
+                    fill={`var(--color-${s.role})`}
+                    opacity={s.role === 'secondary' ? 0.55 : 1}
+                    ><title>{s.label}: {p.x}, {p.y}</title></circle
+                  >{/each}{/if}
+              {#if s.kind === 'bar'}
+                {#each s.points as p (p)}{@const q = model.toScreen(p)}{@const zero =
+                    model.toScreen({
+                      x: p.x,
+                      y: 0,
+                    })}<rect
+                    x={q.x -
+                      (p.width ? Math.abs(model.toScreen({ x: p.x + p.width, y: 0 }).x - q.x) : 6) /
+                        2}
+                    y={Math.min(q.y, zero.y)}
+                    width={p.width
+                      ? Math.abs(model.toScreen({ x: p.x + p.width, y: 0 }).x - q.x)
+                      : 6}
+                    height={Math.abs(q.y - zero.y)}
+                    fill={`var(--color-${s.role})`}
+                    opacity={s.role === 'secondary' ? 0.55 : 1}
+                    ><title>{s.label}: {p.x}, {p.y}</title></rect
+                  >{/each}
+              {/if}
+            {/each}
+          </g>
+        {/if}
         <text x="250" y="333" text-anchor="middle">{xLabel}{xUnit ? ` (${xUnit})` : ''}</text>
         <text transform="translate(-58 140) rotate(-90)" text-anchor="middle"
           >{yLabel}{yUnit ? ` (${yUnit})` : ''}</text
         >
       </g>
     </svg>
+    {#if grid}<p class="grid-caption">
+        单位网格 = 1；{xGrid?.step === 1 && yGrid?.step === 1
+          ? '逐单位绘制'
+          : `密集网格已省略，显示间隔 x=${xGrid?.step}、y=${yGrid?.step}`}。{equal
+          ? '横纵单位等长。'
+          : '各轴按自身单位缩放。'}
+      </p>{/if}
     <div class="legend">
       {#each series as s, i (s.id)}<span
           ><span style={`color:var(--color-${s.role})`}>{i % 2 ? '┄' : '━'}</span> {s.label}</span

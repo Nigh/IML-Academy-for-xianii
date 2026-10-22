@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { mapping } from '../../lib/math/coordinates.ts';
+  import { mapping, unitGrid } from '../../lib/math/coordinates.ts';
   export interface DisplayVector {
     x: number;
     y: number;
@@ -16,6 +16,7 @@
     projection,
     showAngle = false,
     grid = true,
+    axisRotation = 0,
   }: {
     vectors: DisplayVector[];
     range?: number;
@@ -24,12 +25,14 @@
     projection?: { from: { x: number; y: number }; to: { x: number; y: number } };
     showAngle?: boolean;
     grid?: boolean;
+    axisRotation?: number;
   } = $props();
   const uid = $props.id();
   let svg = $state<SVGSVGElement>();
   let dragging = $state<number | null>(null);
   const valid = $derived(
-    Number.isFinite(range) &&
+    Number.isFinite(axisRotation) &&
+      Number.isFinite(range) &&
       range > 0 &&
       range <= 100 &&
       vectors.every((v) => [v.x, v.y, v.origin?.x ?? 0, v.origin?.y ?? 0].every(Number.isFinite)),
@@ -45,6 +48,13 @@
   );
   const px = (x: number) => 50 + map.toScreen({ x, y: 0 }).x,
     py = (y: number) => 30 + map.toScreen({ x: 0, y }).y;
+  const gridExtent = $derived(axisRotation % 90 === 0 ? range : range * Math.SQRT2);
+  const ticks = $derived(
+    unitGrid(
+      [-Math.max(1, Math.min(142, gridExtent || 10)), Math.max(1, Math.min(142, gridExtent || 10))],
+      320,
+    ),
+  );
   function move(e: PointerEvent) {
     if (dragging === null) return;
     const matrix = svg?.getScreenCTM();
@@ -75,6 +85,7 @@
     >
       <title id={`${uid}-title`}>{description}；拖拽端点或使用同步数值输入。</title>
       <defs
+        ><clipPath id={`${uid}-grid-clip`}><rect x="50" y="30" width="320" height="320" /></clipPath
         >{#each ['primary', 'secondary', 'accent'] as role (role)}<marker
             id={`${uid}-${role}`}
             markerWidth="7"
@@ -84,16 +95,55 @@
             orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill={`var(--color-${role})`} /></marker
           >{/each}</defs
       >
-      {#each Array.from({ length: 11 }, (_, i) => ((i - 5) * range) / 5) as n (n)}
-        {#if grid || n === 0}<path
-            d={`M${px(n)},${py(-range)}V${py(range)} M${px(-range)},${py(n)}H${px(range)}`}
-            class={n === 0 ? 'axis-line' : 'grid-line'}
+      <g clip-path={`url(#${uid}-grid-clip)`}>
+        <g
+          data-coordinate-system
+          transform={`translate(210 190) rotate(${-axisRotation}) translate(-210 -190)`}
+        >
+          {#each ticks.values as n (n)}
+            {#if grid && n !== 0}<path
+                data-grid-unit={n}
+                d={`M${px(n)},${py(-gridExtent)}V${py(gridExtent)} M${px(-gridExtent)},${py(n)}H${px(gridExtent)}`}
+                class="grid-line"
+                fill="none"
+              />{/if}
+          {/each}
+          <path
+            d={`M${px(-gridExtent)},${py(0)}H${px(gridExtent)} M${px(0)},${py(-gridExtent)}V${py(gridExtent)}`}
+            class="axis-line"
             fill="none"
-          />{/if}
-      {/each}
-      <text x="380" y="210">x</text><text x="220" y="22">y</text><text x="216" y="208">0</text><text
-        x="50"
-        y="375">每格 {Number((range / 5).toFixed(2))} · 等比例坐标</text
+          />
+          {#each ticks.values.filter((n) => n !== 0 && Math.abs(n) < range * 0.8) as n (n)}
+            <text
+              x={px(n)}
+              y={py(0) + 18}
+              text-anchor="middle"
+              transform={`rotate(${axisRotation} ${px(n)} ${py(0) + 18})`}>{n}</text
+            >
+            <text
+              x={px(0) - 12}
+              y={py(n)}
+              text-anchor="end"
+              transform={`rotate(${axisRotation} ${px(0) - 12} ${py(n)})`}>{n}</text
+            >
+          {/each}
+          <text
+            x={px(range * 0.88)}
+            y={py(0) - 10}
+            transform={`rotate(${axisRotation} ${px(range * 0.88)} ${py(0) - 10})`}
+            >{axisRotation ? 'x′' : 'x'}</text
+          >
+          <text
+            x={px(0) + 10}
+            y={py(range * 0.88)}
+            transform={`rotate(${axisRotation} ${px(0) + 10} ${py(range * 0.88)})`}
+            >{axisRotation ? 'y′' : 'y'}</text
+          >
+        </g>
+      </g>
+      <text x="216" y="208">0</text>
+      <text x="50" y="375"
+        >单位网格 = 1 · 等比例{ticks.step > 1 ? ` · 每 ${ticks.step} 单位显示一线` : ''}</text
       >
       {#if projection}<line
           x1={px(projection.from.x)}
@@ -117,6 +167,7 @@
       {#each vectors as v, i (i)}
         {@const ox = v.origin?.x ?? 0}{@const oy = v.origin?.y ?? 0}
         <line
+          data-vector={i}
           x1={px(ox)}
           y1={py(oy)}
           x2={px(ox + v.x)}
