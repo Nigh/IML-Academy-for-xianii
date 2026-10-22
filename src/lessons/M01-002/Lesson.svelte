@@ -51,7 +51,7 @@
 
 <TheorySection id="motivation" title="两段路都走了，为什么还能回到原点？">
   <p>
-    机器人完成位移(2,1)m，再走(−2,−1)m。记录最终位置和走过的路，能得到同一个数吗？给平台下达两段移动指令，分步执行后比较终点与经过的路线。
+    平台第一段移到起点以东2m、以北1m处，第二段沿原路返回。记录最终位置和走过的路，能得到同一个数吗？给平台下达两段移动指令，分步执行后比较终点与经过的路线。
   </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
@@ -101,6 +101,7 @@
           <span class="vector-key primary-key">第一段移动指令 a · m</span>
           <ParameterSlider
             label="第一段东西位移"
+            unit="m"
             value={ax}
             min={-5}
             max={5}
@@ -109,6 +110,7 @@
           />
           <ParameterSlider
             label="第一段南北位移"
+            unit="m"
             value={ay}
             min={-5}
             max={5}
@@ -118,6 +120,7 @@
           <span class="vector-key secondary-key">第二段移动指令 b · m</span>
           <ParameterSlider
             label="第二段东西位移"
+            unit="m"
             value={bx}
             min={-5}
             max={5}
@@ -126,6 +129,7 @@
           />
           <ParameterSlider
             label="第二段南北位移"
+            unit="m"
             value={by}
             min={-5}
             max={5}

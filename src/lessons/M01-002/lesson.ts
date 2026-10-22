@@ -6,7 +6,7 @@ export default {
   sections: [
     { id: 'motivation', title: '两段路都走了，为什么还能回到原点？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '亲手合成两个向量' },
+    { id: 'experiment', title: '给移动平台安排两段路线' },
     { id: 'intuition', title: '把箭头首尾相接' },
     { id: 'mathematics', title: '回到数学定义' },
     { id: 'pitfalls', title: '长度不能代替方向' },
