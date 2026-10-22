@@ -38,38 +38,12 @@
       {#if last}<p class="metadata">最近访问：{last.id} · {last.title}</p>{/if}
     </div>
     <div class="hero-figure">
-      <svg viewBox="0 0 420 320" role="img" aria-labelledby="hero-plot-title"
-        ><title id="hero-plot-title">向量加法示意：向量 a=(3,1)，b=(1,3)，合向量为 (4,4)。</title
-        ><defs
-          ><pattern id="hero-grid" width="30" height="30" patternUnits="userSpaceOnUse"
-            ><path d="M30 0H0V30" class="grid-line" fill="none" /></pattern
-          ><marker id="hero-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"
-            ><path d="M0 0L8 4L0 8" fill="var(--color-primary)" /></marker
-          ></defs
-        ><rect x="20" y="20" width="360" height="270" fill="url(#hero-grid)" /><path
-          d="M50 260H390M80 290V20"
-          class="axis-line"
-        /><path d="M80 260L260 200" stroke="var(--color-secondary)" stroke-width="3" /><path
-          d="M260 200L320 20"
-          stroke="var(--color-accent)"
-          stroke-width="3"
-          stroke-dasharray="7 4"
-        /><path
-          d="M80 260L320 20"
-          stroke="var(--color-primary)"
-          stroke-width="3"
-          marker-end="url(#hero-arrow)"
-        /><text x="180" y="250" fill="var(--color-secondary)">a</text><text
-          x="310"
-          y="130"
-          fill="var(--color-accent)">b</text
-        ><text x="160" y="112" fill="var(--color-primary)">a + b</text><circle
-          cx="80"
-          cy="260"
-          r="4"
-          fill="var(--color-base-content)"
-        /></svg
-      ><span class="figure-caption mono">01 / VECTOR ADDITION</span>
+      <img
+        src={`${import.meta.env.BASE_URL}logo.webp`}
+        alt="IML Academy 学习伙伴：手持笔与书本，身边环绕神经网络和函数图像"
+        width="1254"
+        height="1254"
+      />
     </div>
   </section>
   <section class="learning-strip" aria-label="课程建设与学习进度">
