@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '观测太少或互相矛盾时' },
     { id: 'intuition', title: '先最小残差，再最小范数' },
     { id: 'mathematics', title: 'Moore–Penrose伪逆' },
@@ -20,7 +21,8 @@ export default {
         {
           id: 'norm',
           text: '欧氏范数更小',
-          explanation: '前者范数√2，后者2；全部精确解中(1,1)范数最小。',
+          explanation:
+            '先最小化输出误差，再比较输入长度。前者范数√2，后者2；全部精确解中(1,1)范数最小。',
         },
         {
           id: 'fit',

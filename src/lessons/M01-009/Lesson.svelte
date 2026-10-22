@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -38,30 +40,60 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    已有点积和勾股定理。本课的“L2范数”就是欧氏长度，即各分量平方和开根；不要求先学习所有范数，也不使用求导作为必要步骤。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="只能沿一个方向解释观测"
   ><p>
     一组传感器观测或特征向量只能由某个方向的强度解释时，哪个强度最合适？{metadata.title}寻找这个方向张成直线上的最近向量。所有分量和系数均无量纲，本课使用解析计算而非训练。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="垂足是最近点"
-  ><p>
-    在参考直线上滑动候选点。离观测最近的位置是垂足，因为任何沿线偏移都会额外增加一段正交分量的平方长度。方向向量变长只改变系数的记法，不改变它所张成的直线，也不改变垂足。
-  </p>
+<TheorySection id="intuition" title="垂足是最近点">
   <p>
-    投影向量是二维结果，投影系数是一个标量；有符号投影长度又是另一种量。三者不能混用。方向的负倍数也张成同一直线，因此允许负系数。
-  </p></TheorySection
->
+    投影（projection）回答一个受限问题：只允许沿给定非零方向的整条直线选择结果，哪一个最接近观测向量？这不是任意截断分量。把观测向直线作垂线，垂足对应的向量就是正交投影；正交在这里就是垂直。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\mathbf v=(3,2)^\mathsf T,\quad\mathbf u=(1,0)^\mathsf T,\quad\mathbf p=(3,0)^\mathsf T,\quad d(\alpha)^2=(3-\alpha)^2+4`}
+    description="u为参考方向，候选为αu=(α,0)，p为最近点；距离的平方由勾股定理计算，各量无量纲。"
+  />
+  <p>
+    最后一项4固定，前一项是平方，最小只能是0，所以系数为3。这已经用高中配方解释了最小值，无需求导。一般方向也可这样做：用点积展开平方，把关于系数的二次式配方。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\|\mathbf v-\alpha\mathbf u\|_2^2=(\mathbf u\cdot\mathbf u)\left(\alpha-\frac{\mathbf v\cdot\mathbf u}{\mathbf u\cdot\mathbf u}\right)^2+\|\mathbf v\|_2^2-\frac{(\mathbf v\cdot\mathbf u)^2}{\mathbf u\cdot\mathbf u}`}
+    description="u非零，故平方项的系数严格为正；后两项不随α变化。α为实数，范数下标2仅表示欧氏长度。"
+  />
+  <p>
+    投影系数是一个数，投影向量是把方向乘该系数后得到的箭头；有符号长度还要考虑方向本身是否为单位长度。将方向放大2倍，系数缩为一半，投影位置不动。方向为零时没有一条参考直线，本课将结果标为未定义。
+  </p>
+  <KnowledgeCheck prompt="把参考方向放大2倍，最近点是否移动？"
+    >{#snippet answer()}<p>
+        不移动。同一整条直线没变，系数减半，系数乘方向所得投影不变。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="最小距离导出投影"
   ><FormulaBlock
     latex={String.raw`\min_{\alpha\in\mathbb R}\|\mathbf v-\alpha\mathbf u\|_2^2,\quad \alpha_*={\mathbf v^\mathsf T\mathbf u\over\mathbf u^\mathsf T\mathbf u},\quad\mathbf p=\alpha_*\mathbf u,\quad\mathbf u\ne\mathbf0`}
     description="v为2×1观测列向量，u为2×1非零参考方向，α为实系数，p为投影向量；本课均无量纲。最小化对整条直线而非射线进行。"
   />
   <p>
-    展开平方损失，对系数求导并令其为零，就得到上式；二次项系数是方向的平方范数，严格为正，因此驻点是唯一最小值。代入投影后，观测减投影得到的残差与方向正交。实现先归一化方向再计算，避免不必要的平方溢出或下溢。
+    用上面的配方，把平方项取到0便得到最优系数；二次项系数是方向的平方长度，严格为正，因此最小值位置唯一。代入投影后，观测减投影得到的残差与方向正交。实现先归一化方向再计算，避免不必要的平方溢出或下溢。
   </p></TheorySection
 >
 <TheorySection id="experiment" title="方向尺度与投影位置"
-  ><InteractivePanel
+  ><p>
+    先预测再操作：把参考方向放大2倍，最近点是否移动？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
+  <InteractivePanel
     title="候选点与解析最近点"
     instructions="观测默认(3,2)，方向默认(1,0)，候选系数t默认1。观测与t范围±5，方向分量±3，均无量纲；非法输入保留有效值。"
     meaning="v为观测，p为投影，c=t u为当前候选；辅助虚线从v连接p。下方分别报告当前误差与不受滑块范围限制的最小距离。"

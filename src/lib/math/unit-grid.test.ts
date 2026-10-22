@@ -20,7 +20,7 @@ it('等比例映射及反向映射使用同一尺度', () => {
   const m = mapping([-5, 5], [-12, 12], 500, 280, true);
   const o = m.toScreen({ x: 0, y: 0 });
   expect(m.toScreen({ x: 1, y: 0 }).x - o.x).toBeCloseTo(o.y - m.toScreen({ x: 0, y: 1 }).y, 12);
-  const back = m.toData(m.toScreen({x:3,y:-2}));
-  expect(back.x).toBeCloseTo(3,12);
-  expect(back.y).toBeCloseTo(-2,12);
+  const back = m.toData(m.toScreen({ x: 3, y: -2 }));
+  expect(back.x).toBeCloseTo(3, 12);
+  expect(back.y).toBeCloseTo(-2, 12);
 });

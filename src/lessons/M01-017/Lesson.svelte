@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -27,19 +29,42 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    前课已经能解释矩阵如何改变平面。这里新增特征值与特征向量；它们不要求先学逆矩阵课，本课会解释用到的二维行列式。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="哪些方向在反复变换中最简单"
   ><p>
     一个线性状态更新反复作用时，普通向量可能同时转向和伸缩，但某些方向只按一个比例变化。这让动力学模态、协方差主方向和迭代算法更容易分析。{metadata.title}寻找这些特殊方向。本课用无量纲二维实矩阵解析计算，不以小模型证明真实系统稳定性。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="共线可以同向也可以反向"
-  ><p>
-    特征向量（eigenvector）是一根非零输入向量，变换后的输出仍在它张成的同一条直线上。比例为正时同向，为负时反向，为零时被压到原点。特征值（eigenvalue）就是这个比例。不是所有向量都具有这种性质：不同轴缩放时，斜向输入通常会转向。
+<TheorySection id="intuition" title="共线可以同向也可以反向">
+  <p>
+    特征向量是一根非零输入向量，变换后仍在原来的直线上；特征值是长度和正反方向的有符号倍率。它与机器学习中的“特征列”不是同一层含义。
+  </p>
+  <FormulaBlock
+    latex={String.raw`A=\begin{pmatrix}2&0\\0&3\end{pmatrix},\quad A(1,0)^\mathsf T=2(1,0)^\mathsf T,\quad A(1,1)^\mathsf T=(2,3)^\mathsf T`}
+    description="二维无量纲例子：横轴方向的特征值为2；斜向输入的输出不再与输入共线，因此该输入不是特征向量。"
+  />
+  <p>
+    倍率为负会反向，为0会压到原点；输入必须非零，否则任意倍率乘它都得0，无法识别方向。90°旋转使所有非零箭头垂直于原方向，所以实平面中没有特征向量。这个反例只用几何就能理解。
   </p>
   <p>
-    diag(2,3)分别沿横轴和纵轴放大，两个轴都是特征方向；90°旋转保持长度，却把每根非零箭头转到垂直方向，实平面里没有任何特征方向。
-  </p></TheorySection
->
+    下面的单位矩阵I保持每个分量；A减去λI表示在每个对角元素上减λ。二维行列式是主对角乘积减另一条对角乘积，等于0表示两列不能独立覆盖平面。因此这里的核（kernel）就是所有零输出输入的集合。寻找非零的零输出输入时，要检查该乘积差是否为0。复数特征值和实对角化只作补充，不要求在此掌握。
+  </p>
+  <KnowledgeCheck prompt="矩阵把一根非零箭头反向放大2倍，它还是特征向量吗？"
+    >{#snippet answer()}<p>
+        是，对应特征值−2。特征方向要求共线，不要求同向。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="非零向量与实数条件">
   <FormulaBlock
     latex={String.raw`Av=\lambda v,\quad A\in\mathbb R^{n\times n},\ v\in\mathbb R^n\setminus\{0\},\ \lambda\in\mathbb R`}
@@ -51,7 +76,7 @@
   />
   <FormulaBlock
     latex={String.raw`R=\begin{bmatrix}0&-1\\1&0\end{bmatrix},\quad\det(R-\lambda I)=\lambda^2+1>0\quad(\lambda\in\mathbb R)`}
-    description="R为90°逆时针旋转，故没有实特征值及非零实特征向量；在复数域其特征值是±i。diag(2,3)的特征多项式为(2−λ)(3−λ)，两根为2、3。"
+    description="R为90°逆时针旋转，故没有实特征值及非零实特征向量；若继续学习复数特征值，先掌握虚数单位i满足i²=−1以及复数乘法；本课不要求求复数方向。diag(2,3)的特征多项式为(2−λ)(3−λ)，两根为2、3。"
   />
   <FormulaBlock
     latex={String.raw`\rho=\frac{v^\top Av}{v^\top v},\quad e=\|Av-\rho v\|_2`}
@@ -62,6 +87,9 @@
   </p>
 </TheorySection>
 <TheorySection id="experiment" title="旋转输入寻找特征方向">
+  <p>
+    先预测再操作：矩阵把一根非零箭头反向放大2倍，它还是特征向量吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="同一输入与它的像"
     instructions="选择固定矩阵。单位输入角θ默认0°，范围−180°至180°，步长1°，可用键盘数值框；非法值保留有效角度。横轴正向为0°，逆时针为正。"

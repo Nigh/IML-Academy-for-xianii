@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '一层模型如何同时计算多个输出' },
     { id: 'intuition', title: '一格是一次行列匹配' },
     { id: 'mathematics', title: '内维度收缩，外维度保留' },
@@ -17,7 +18,11 @@ export default {
       version: 1,
       prompt: '2×3的A乘3×2的B，AB的形状是什么？',
       options: [
-        { id: 'two', text: '2×2', explanation: '中间的3对应求和轴，保留左行数2与右列数2。' },
+        {
+          id: 'two',
+          text: '2×2',
+          explanation: '先核对行列数，再逐项配对。中间的3对应求和轴，保留左行数2与右列数2。',
+        },
         { id: 'three', text: '3×3', explanation: '3×3是此处BA的形状，不能交换保留维度。' },
       ],
       answerId: 'two',

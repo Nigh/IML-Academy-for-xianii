@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '模型能合成哪些目标' },
     { id: 'intuition', title: '固定方向，改变系数' },
     { id: 'mathematics', title: '从一次组合到整个张成空间' },
@@ -20,7 +21,8 @@ export default {
         {
           id: 'right',
           text: '3 和 −2',
-          explanation: '第一向量提供全部 x 分量，第二向量提供全部 y 分量，逐分量相加得到目标。',
+          explanation:
+            '先判断目标是否属于可达集合，再调系数。第一向量提供全部 x 分量，第二向量提供全部 y 分量，逐分量相加得到目标。',
         },
         {
           id: 'positive',

@@ -63,26 +63,14 @@
       return null;
     }
   });
-  const xGrid = $derived(
-    model
-      ? unitGrid(
-          xRange,
-          Math.abs(
-            model.toScreen({ x: xRange[1], y: 0 }).x - model.toScreen({ x: xRange[0], y: 0 }).x,
-          ),
-        )
-      : null,
+  const visibleX = $derived<Range>(
+    model ? [model.toData({ x: 0, y: 0 }).x, model.toData({ x: 500, y: 0 }).x] : xRange,
   );
-  const yGrid = $derived(
-    model
-      ? unitGrid(
-          yRange,
-          Math.abs(
-            model.toScreen({ x: 0, y: yRange[1] }).y - model.toScreen({ x: 0, y: yRange[0] }).y,
-          ),
-        )
-      : null,
+  const visibleY = $derived<Range>(
+    model ? [model.toData({ x: 0, y: 280 }).y, model.toData({ x: 0, y: 0 }).y] : yRange,
   );
+  const xGrid = $derived(model ? unitGrid(visibleX, 500) : null);
+  const yGrid = $derived(model ? unitGrid(visibleY, 280) : null);
   let detail = $state('');
   const fmt = (n: number) => Number(n.toPrecision(4)).toString();
 </script>
@@ -98,8 +86,8 @@
       <defs><clipPath id={`${uid}-clip`}><rect width="500" height="280" /></clipPath></defs>
       <g transform="translate(75 25)">
         {#if model}
-          {@const low = model.toScreen({ x: xRange[0], y: yRange[0] })}
-          {@const high = model.toScreen({ x: xRange[1], y: yRange[1] })}
+          {@const low = model.toScreen({ x: visibleX[0], y: visibleY[0] })}
+          {@const high = model.toScreen({ x: visibleX[1], y: visibleY[1] })}
           {#each xGrid?.values ?? [] as x (x)}
             {@const q = model.toScreen({ x, y: 0 })}
             {#if grid}<path
@@ -120,17 +108,17 @@
               />{/if}
             <text x="-10" y={q.y + 4} text-anchor="end">{fmt(y)}</text>
           {/each}
-          {#if !xGrid?.values.length || xRange[1] - xRange[0] < 1}
-            <text x={low.x} y="302" text-anchor="middle">{fmt(xRange[0])}</text>
-            <text x={high.x} y="302" text-anchor="middle">{fmt(xRange[1])}</text>
+          {#if !xGrid?.values.length || visibleX[1] - visibleX[0] < 1}
+            <text x={low.x} y="302" text-anchor="middle">{fmt(visibleX[0])}</text>
+            <text x={high.x} y="302" text-anchor="middle">{fmt(visibleX[1])}</text>
           {/if}
-          {#if !yGrid?.values.length || yRange[1] - yRange[0] < 1}
-            <text x="-10" y={low.y + 4} text-anchor="end">{fmt(yRange[0])}</text>
-            <text x="-10" y={high.y + 4} text-anchor="end">{fmt(yRange[1])}</text>
+          {#if !yGrid?.values.length || visibleY[1] - visibleY[0] < 1}
+            <text x="-10" y={low.y + 4} text-anchor="end">{fmt(visibleY[0])}</text>
+            <text x="-10" y={high.y + 4} text-anchor="end">{fmt(visibleY[1])}</text>
           {/if}
           {@const origin = model.toScreen({
-            x: Math.max(xRange[0], Math.min(xRange[1], 0)),
-            y: Math.max(yRange[0], Math.min(yRange[1], 0)),
+            x: Math.max(visibleX[0], Math.min(visibleX[1], 0)),
+            y: Math.max(visibleY[0], Math.min(visibleY[1], 0)),
           })}
           <path
             d={`M${low.x},${origin.y}H${high.x} M${origin.x},${high.y}V${low.y}`}
@@ -276,7 +264,7 @@
   }
   .plot svg {
     width: 100%;
-    min-width: 480px;
+    min-width: 540px;
     height: auto;
     display: block;
     color: var(--color-base-content);

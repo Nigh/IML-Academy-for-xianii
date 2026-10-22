@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -27,9 +29,20 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    前课已经解释集合、向量加法、数乘和子空间的封闭性。本课固定几根向量，研究只靠调整系数能够到达哪些位置。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="模型能合成哪些目标">
   <p>
-    线性模型把固定特征方向按权重相加。即使不断调权重，如果这些方向都沿同一条线，也不可能命中线外的目标。{metadata.title}把“调参没调好”和“模型根本表达不了”区分开来。
+    手里有两个固定方向，能不能只靠放大、反向和相加，到达任意目标？本课先让你合成一个具体向量，再研究所有可能结果；这就是“线性组合”与“张成”的区别。
   </p>
   <p>
     本课使用无量纲二维特征。给定两个方向与一个固定目标，只改变两个实数系数，实时计算合成向量；不进行训练，不使用随机或预计算结果。
@@ -37,14 +50,39 @@
 </TheorySection>
 <TheorySection id="intuition" title="固定方向，改变系数">
   <p>
-    把第一方向的贡献与第二方向的贡献相加，得到一次线性组合（linear
-    combination）。让所有系数取遍实数，得到的所有向量构成张成空间（span）。系数可以为负，也不要求和为一。
+    固定两个方向，把各自的贡献缩放再相加，得到一个结果，这叫一次线性组合（linear
+    combination）。系数就是每个方向贡献多少的数，可以为负、为零，也不要求相加等于1。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\mathbf u=(1,0)^\mathsf T,\quad\mathbf v=(0,1)^\mathsf T,\qquad 3\mathbf u-2\mathbf v=(3,-2)^\mathsf T`}
+    description="u和v是固定方向，3和−2是本次选取的无量纲系数；结果是二维无量纲向量。"
+  />
+  <p>
+    如果把系数换一遍，就会到另一个位置。让系数取遍所有实数，把所有可能到达的向量收集起来，就是这组向量的张成空间（span）。“张成”不是一种额外运算，而是描述这些方向合起来能覆盖哪些结果。一次组合是一个点，张成空间是全部可达点的集合。
   </p>
   <p>
-    两个互不共线的平面方向可以独立控制两个分量。若第二方向只是第一方向的两倍，两个权重最终只控制一个合成强度，仍只有一条可达直线。图中的25个点来自明确的整数系数网格，用来显示可达结构；不是整个张成集合。
+    两个坐标轴方向可以分别控制横、纵分量，因此能覆盖整个平面。换成沿同一直线的两个方向，即使系数再多，也只能沿这条线前进和后退。
   </p>
+  <FormulaBlock
+    latex={String.raw`a(1,1)^\mathsf T+b(2,2)^\mathsf T=(a+2b,a+2b)^\mathsf T`}
+    description="a、b为任意实系数。两个结果分量总相等，所以目标(1,0)永远无法由这两个方向组合得到。"
+  />
+  <p>
+    “张成维数”数的是可独立变化的方向：只有零向量是0维，一条过原点的直线是1维，整个二维平面是2维。它不是数手上有几根箭头。新增一根原有方向的倍数不会增加维数；下一课会用线性独立和基给出更正式的解释。
+  </p>
+  <p>
+    下面图中的有限点只是若干系数组合的示例。点之间以及视域外也可能属于张成空间；滑块的有限范围是操作边界，不是数学定义的范围。先判断能否命中目标，再调参数验证。
+  </p>
+  <KnowledgeCheck prompt="再加一根原方向的三倍向量，会让可达直线变成平面吗？"
+    >{#snippet answer()}<p>
+        不会。它仍可由原方向表示，没有新增独立方向；可达集合仍是一条线。
+      </p>{/snippet}</KnowledgeCheck
+  >
 </TheorySection>
 <TheorySection id="mathematics" title="从一次组合到整个张成空间">
+  <p>
+    下面Σ读作求和：逐个取方向乘它的系数，再把结果相加；i是编号，m是向量数量。花括号和冒号表示“收集所有满足冒号后条件的结果”，不是再算出一个向量。
+  </p>
   <FormulaBlock
     latex={String.raw`\mathbf w=\sum_{i=1}^{m}a_i\mathbf u_i,\quad\operatorname{span}\{\mathbf u_1,\ldots,\mathbf u_m\}=\left\{\sum_{i=1}^{m}a_i\mathbf u_i:a_i\in\mathbb R\right\}`}
     description="m 是方向向量个数（正整数）；u_i 与 w 是2×1实列向量，a_i 为实系数；本课均无量纲。span 是集合，w 是其中一个元素；系数不受UI范围限制。"
@@ -58,6 +96,9 @@
   </p>
 </TheorySection>
 <TheorySection id="experiment" title="尝试命中目标">
+  <p>
+    先预测再操作：再加一根原方向的三倍向量，会让可达直线变成平面吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="组合与不可消除的距离"
     instructions="场景一默认 a=3、b=−2；场景二默认 a=1、b=0。两个系数范围均−3至3、无量纲，非法输入不会进入模型。先预测再切换场景，尝试把当前组合移到目标。"
@@ -84,6 +125,7 @@
       />
     </div>
     <Plot2D
+      equal
       series={result.series}
       xRange={[-result.extent, result.extent]}
       yRange={[-result.extent, result.extent]}
@@ -108,16 +150,24 @@
           4,
         )}；张成维数={result.dimension}
       </p>
-      <p>
-        目标在span中的最近点=({result.nearest.x.toFixed(2)},{result.nearest.y.toFixed(
-          2,
-        )})；最小距离={result.distance.toFixed(4)}
-      </p>
+      <details>
+        <summary>进阶：目标到可达集合的最近距离</summary>
+        <p>
+          这是到整条可达直线的垂直距离，不是当前滑块结果的误差。系统解释见 <a
+            href={lessonHref('M01-009')}>M01-009 投影</a
+          >；不需要先掌握它才能理解张成。
+        </p>
+        <p>
+          目标在span中的最近点=({result.nearest.x.toFixed(2)},{result.nearest.y.toFixed(
+            2,
+          )})；最小距离={result.distance.toFixed(4)}
+        </p>
+      </details>
     </div>
   </InteractivePanel>
   <p>
     场景一先打乱权重再恢复3和−2，确认误差可为零。场景二无论如何调系数，组合的两个分量相等，无法命中
-    (1,0)；最近点 (0.5,0.5) 与最小距离约0.7071提示了不可消除的表达误差。令
+    (1,0)；两分量始终相等这一条件，已经足以解释为什么调参也无法命中目标。令
     a=−2b，可以让两个非零贡献完全抵消；复位恢复独立方向场景。
   </p>
 </TheorySection>

@@ -22,8 +22,8 @@
 | M01-014 | 零空间与解空间 | M01-013 | math/linear-algebra/null-space |
 | M01-015 | 线性方程组与逆矩阵 | M01-014 | math/linear-algebra/inverse-systems |
 | M01-016 | 伪逆 | M01-015、M01-010 | math/linear-algebra/pseudoinverse |
-| M01-017 | 特征值与特征向量 | M01-012 | math/linear-algebra/eigenvectors |
-| M01-018 | 奇异值分解 SVD | M01-017、M01-010 | math/linear-algebra/svd |
+| M01-017 | 特征值与特征向量 | M01-012、M01-006、M01-007 | math/linear-algebra/eigenvectors |
+| M01-018 | 奇异值分解 SVD | M01-017、M01-010、M01-013 | math/linear-algebra/svd |
 | M01-019 | 低秩近似 | M01-018 | math/linear-algebra/low-rank |
 | M01-020 | 最小二乘的几何解释 | M01-016、M01-010 | math/linear-algebra/least-squares |
 | M01-021 | 张量运算与 Broadcasting | M01-003、M01-011 | math/linear-algebra/broadcasting |

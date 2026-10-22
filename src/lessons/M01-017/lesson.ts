@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '哪些方向在反复变换中最简单' },
     { id: 'intuition', title: '共线可以同向也可以反向' },
     { id: 'mathematics', title: '非零向量与实数条件' },
@@ -17,7 +18,7 @@ export default {
       version: 1,
       prompt: 'diag(2,3)作用在(0,1)ᵀ，特征值是什么？',
       options: [
-        { id: 'three', text: '3', explanation: '输出(0,3)ᵀ等于原向量3倍。' },
+        { id: 'three', text: '3', explanation: '比较输入输出是否共线。输出(0,3)ᵀ等于原向量3倍。' },
         { id: 'two', text: '2', explanation: '2对应横轴方向，不是纵轴方向。' },
       ],
       answerId: 'three',

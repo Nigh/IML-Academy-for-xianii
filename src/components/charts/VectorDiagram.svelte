@@ -37,23 +37,22 @@
       range <= 100 &&
       vectors.every((v) => [v.x, v.y, v.origin?.x ?? 0, v.origin?.y ?? 0].every(Number.isFinite)),
   );
-  const map = $derived(
-    mapping(
-      [-Math.max(1, Math.min(100, range || 10)), Math.max(1, Math.min(100, range || 10))],
-      [-Math.max(1, Math.min(100, range || 10)), Math.max(1, Math.min(100, range || 10))],
-      320,
-      320,
-      true,
-    ),
-  );
+  const safeRange = $derived(Number.isFinite(range) && range > 0 && range <= 100 ? range : 10);
+  const map = $derived(mapping([-safeRange, safeRange], [-safeRange, safeRange], 320, 320, true));
   const px = (x: number) => 50 + map.toScreen({ x, y: 0 }).x,
     py = (y: number) => 30 + map.toScreen({ x: 0, y }).y;
   const gridExtent = $derived(axisRotation % 90 === 0 ? range : range * Math.SQRT2);
   const ticks = $derived(
     unitGrid(
-      [-Math.max(1, Math.min(142, gridExtent || 10)), Math.max(1, Math.min(142, gridExtent || 10))],
+      [
+        -safeRange * (axisRotation % 90 === 0 ? 1 : Math.SQRT2),
+        safeRange * (axisRotation % 90 === 0 ? 1 : Math.SQRT2),
+      ],
       320,
     ),
+  );
+  const labelStep = $derived(
+    ticks.step * Math.max(1, Math.ceil((safeRange * 80) / (320 * ticks.step))),
   );
   function move(e: PointerEvent) {
     if (dragging === null) return;
@@ -113,7 +112,7 @@
             class="axis-line"
             fill="none"
           />
-          {#each ticks.values.filter((n) => n !== 0 && Math.abs(n) < range * 0.8) as n (n)}
+          {#each ticks.values.filter((n) => n !== 0 && Math.abs(n) < range * 0.8 && Math.abs(n / labelStep - Math.round(n / labelStep)) < 1e-10) as n (n)}
             <text
               x={px(n)}
               y={py(0) + 18}
@@ -141,7 +140,7 @@
           >
         </g>
       </g>
-      <text x="216" y="208">0</text>
+      <text x="190" y="214">0</text>
       <text x="50" y="375"
         >单位网格 = 1 · 等比例{ticks.step > 1 ? ` · 每 ${ticks.step} 单位显示一线` : ''}</text
       >

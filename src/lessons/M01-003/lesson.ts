@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '一段数据属于谁、何时、哪个通道' },
     { id: 'intuition', title: '轴是数据的地址' },
     { id: 'mathematics', title: '阶数、形状与索引' },
@@ -20,7 +21,8 @@ export default {
         {
           id: 'no',
           text: '不能，批次与时间轴的语义和索引解释不同',
-          explanation: '乘积相同只保证元素数相同，不保证每个位置代表同一个批次和时刻。',
+          explanation:
+            '先说清每根轴代表什么，再比较元素总数。乘积相同只保证元素数相同，不保证每个位置代表同一个批次和时刻。',
         },
         {
           id: 'yes',
@@ -32,18 +34,18 @@ export default {
     },
     {
       id: 'channels',
-      version: 1,
-      prompt: '8 批、100 时刻的时序，通道从 1 变为 3，元素数和 float32 原始数据字节数是多少？',
+      version: 2,
+      prompt: '8 批、100 时刻的时序，通道从 1 变为 3，阶数和元素数如何变化？',
       options: [
         {
           id: 'triple',
-          text: '2400 个元素，9600 字节',
-          explanation: '8×100×3=2400；float32 每元素4字节。这里不计对象和框架额外开销。',
+          text: '仍是3阶，2400个元素',
+          explanation: '批次、时间、通道仍是三根轴；通道长度变为3，元素数8×100×3=2400。',
         },
         {
           id: 'same',
-          text: '800 个元素，3200 字节',
-          explanation: '这是单通道的数量，忽略了新增两个通道。',
+          text: '变为4阶，仍是800个元素',
+          explanation: '通道数增加改变的是一根轴的长度，并没有新增轴；800也只是单通道时的元素数。',
         },
       ],
       answerId: 'triple',
@@ -53,7 +55,12 @@ export default {
       version: 1,
       prompt: '形状 (8,100,1) 中最后一轴长度为 1，张量阶数是多少？',
       options: [
-        { id: 'three', text: '3 阶', explanation: '阶数是轴的个数；长度为1的轴仍是一个轴。' },
+        {
+          id: 'three',
+          text: '3 阶',
+          explanation:
+            '阶数是找一个元素所需的索引个数；长度为1的通道轴依然要指定索引0，所以仍是3阶。',
+        },
         {
           id: 'two',
           text: '2 阶',

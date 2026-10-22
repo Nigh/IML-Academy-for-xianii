@@ -22,7 +22,7 @@ it('课程协议有效且交互结果与输入一致、可复位', async () => {
   expect(view.container.querySelectorAll('.vector-diagram line')).toHaveLength(5);
   await fireEvent.click(view.getByText('复位 ↺'));
   expect(view.getByText('(1, 3) m')).toBeTruthy();
-  expect(view.container.querySelectorAll('details')).toHaveLength(2);
+  expect(view.container.querySelectorAll('details')).toHaveLength(3);
   for (const section of definition.sections)
     expect(view.container.querySelector(`#${section.id}`)).toBeTruthy();
 });

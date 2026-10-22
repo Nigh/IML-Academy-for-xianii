@@ -46,6 +46,9 @@ it('等比例绘图的参考线和柱宽随同一映射变化', () => {
   });
   const width = Number(v.container.querySelector('rect[opacity]')?.getAttribute('width'));
   expect(width).toBeCloseTo(280 / 24, 10);
+  const reference = v.container.querySelector('line[stroke-dasharray]')!;
+  expect(reference.getAttribute('x1')).toBe('0');
+  expect(reference.getAttribute('x2')).toBe('500');
   expect(v.getByText(/横纵单位等长/)).toBeTruthy();
 });
 it('错答、重新选择、正确答案与保存答案分别呈现', async () => {

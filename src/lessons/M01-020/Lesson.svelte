@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -26,23 +28,49 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    已有伪逆、列空间和正交残差。本课将它们用于一组具体观测，建立逐点误差、平方和与最优预测之间的联系。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="无法同时穿过每个观测"
   ><p>
     用直线校准传感器或拟合特征与响应，观测常不共线，无法让每个点误差同时为0。{metadata.title}选择让残差平方和最小的参数，并解释这种折中为什么是投影。本课只有3或4个无量纲合成观测，解析拟合，不声称这些点来自真实设备或能代表泛化能力。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="观测空间中的正交投影"
-  ><p>
-    把全部观测排成向量b。模型能产生的所有预测组成A的列空间，最优预测Ax⋆是b在这个空间上的正交投影。残差r=Ax⋆−b与每个模型列都正交；若还带着某个列方向的分量，就能沿该参数方向继续降低误差。
+<TheorySection id="intuition" title="观测空间中的正交投影">
+  <p>
+    每个输入位置t对应一个观测响应。候选直线给出预测，预测减观测就是该点残差。本课用这个符号约定；它与前面“观测减投影”的写法相差负号，但平方和与正交条件不变。
   </p>
   <p>
-    数据图里的横轴是观测输入t、纵轴是响应，不是列空间本身。3个观测对应R³、4个对应R⁴；网页用Aᵀr的两个数验证高维投影条件，避免把二维散点图误当观测空间。
-  </p></TheorySection
->
+    最小二乘把所有残差平方后相加，选总和最小的参数。一处改善可能要让另一处变差，它并不是让每个点都单独达到自己的最小误差。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\widehat b_i=c+at_i,\qquad L(c,a)=\sum_{i=1}^{n}(c+at_i-b_i)^2`}
+    description="t_i为输入、b_i为观测、带帽的b为预测，a为斜率、c为截距，i编号观测，n为观测数。本课全部无量纲。"
+  />
+  <p>
+    设计矩阵把每个观测的常数1和输入t排成一行，参数列按截距、斜率排列。每一列分别描述调一个参数时，全体预测会怎样一起变化。因此列空间位于观测空间：3个观测需要3个坐标，不能把下面二维数据散点图当成这个空间。
+  </p>
+  <p>
+    最优预测是观测在列空间上的投影，正交残差无法再沿任一模型列缩短。下面Aᵀr给出每列与残差的点积。梯度是各参数单独变化时的变化率组成的向量，凸表示平方目标不会藏着更低的局部谷底；两者用于补充说明，核心结论可直接由已有的投影和展开平方验证。
+  </p>
+  <KnowledgeCheck prompt="一个点误差变小，能保证平方和也变小吗？"
+    >{#snippet answer()}<p>
+        不能。其他点可能变差；要计算全部残差平方的总和。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="最优性条件与线性拟合">
   <FormulaBlock
-    latex={String.raw`L(x)=\|Ax-b\|_2^2,\quad r=Ax-b,\quad\nabla_x L=2A^\mathsf T r,\quad A^\mathsf Tr=0`}
-    description="A为n×p实设计矩阵，b为n维观测，x为p维参数；r为n维残差。n是观测数，p是参数数，所有量无量纲。平方目标为凸函数，梯度为0是全局最小条件；本课n=3或4，p=2，不除以n，也不含1/2。"
+    latex={String.raw`L(x)=\|Ax-b\|_2^2,\quad r=Ax-b,\quad A^\mathsf Tr=0`}
+    description="A为n×p实设计矩阵，b为n维观测，x为p维参数；r为n维残差。n是观测数，p是参数数，所有量无量纲。最优残差与每个模型列的内积为0；本课n=3或4，p=2，不除以n，也不含1/2。"
   />
   <FormulaBlock
     latex={String.raw`\widehat b_i=c+a t_i,\quad A_i=[1\ \ t_i],\quad x=(c,a)^\top,\quad a=\frac{\sum_i(t_i-\bar t)(b_i-\bar b)}{\sum_i(t_i-\bar t)^2},\ c=\bar b-a\bar t`}
@@ -58,6 +86,9 @@
   />
 </TheorySection>
 <TheorySection id="experiment" title="三点残差与离群点影响">
+  <p>
+    先预测再操作：一个点误差变小，能保证平方和也变小吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="投影条件不要求每点零残差"
     instructions="默认三点。勾选增加第四观测(t=2,b=3+δ)，δ默认0，范围−8至8，步长0.5，无量纲；非法数值保留有效值，可键盘编辑。预设离群点δ=6。复位恢复三点。"

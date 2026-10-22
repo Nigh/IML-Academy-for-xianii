@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '矩阵改变的不只是数字' },
     { id: 'intuition', title: '看两根基向量去哪里' },
     { id: 'mathematics', title: '列向量决定整个映射' },
@@ -20,7 +21,8 @@ export default {
         {
           id: 'right',
           text: '(2,1)',
-          explanation: '第一坐标乘2，第二坐标乘1；不是所有方向都等比例放大。',
+          explanation:
+            '从两根单位方向的输出检查。第一坐标乘2，第二坐标乘1；不是所有方向都等比例放大。',
         },
         { id: 'uniform', text: '(2,2)', explanation: '这对应diag(2,2)，不是题目的非均匀缩放。' },
       ],

@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '模型允许哪些输出' },
     { id: 'intuition', title: '封闭意味着组合后仍合法' },
     { id: 'mathematics', title: '子空间判据与反例' },
@@ -20,7 +21,8 @@ export default {
         {
           id: 'zero',
           text: '不包含零向量，数乘零就会离开集合',
-          explanation: '任何成员乘零都应得到仍在子空间内的零向量，但 (0,0) 不满足 y=2x+1。',
+          explanation:
+            '用任意成员及任意系数检查，而不是只看直线外观。任何成员乘零都应得到仍在子空间内的零向量，但 (0,0) 不满足 y=2x+1。',
         },
         {
           id: 'line',

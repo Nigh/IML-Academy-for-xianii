@@ -1,7 +1,9 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import type { Vector2 } from '../../lib/math/vector.ts';
-  import { mapping } from '../../lib/math/coordinates.ts';
+  import { mapping, unitGrid } from '../../lib/math/coordinates.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
   import MatrixView from '../../components/math/MatrixView.svelte';
@@ -40,16 +42,42 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    前课已经能够按行列计算矩阵乘法。本课把同一个计算应用到整个平面的点，而不只是一个数字列表，解释“变换”和“线性”的含义。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="矩阵改变的不只是数字"
   ><p>
     传感器标定矩阵把测量坐标映射到校准坐标，线性层把输入特征映射到新表示。{metadata.title}让我们直接观察网格与形状如何改变。此处坐标和矩阵系数均无量纲，使用二维解析模型，不代表真实设备标定精度。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="看两根基向量去哪里"
-  ><p>
-    把输入拆成沿两根标准基的分量，分别变换，再按原系数合成。矩阵第一列就是第一根基的像，第二列就是第二根基的像；两列决定整张网格的变化。不退化为点的直线像保持平行或重合；降秩时直线也可能压成点。长度、直角和面积一般不保持。
-  </p></TheorySection
->
+<TheorySection id="intuition" title="看两根基向量去哪里">
+  <p>
+    映射（mapping）是一条把输入变成输出的规则；向量的“像”就是应用规则后的输出。“线性”要求先把输入缩放、相加再变换，与先分别变换再按原系数组合得到同一结果。只把图画成一条直线，不足以定义线性。
+  </p>
+  <p>
+    标准基在二维是向右和向上各一单位的两个向量。任意输入都能按它们分解。前课的矩阵乘法说明第一列是第一个单位方向的输出，第二列是第二个单位方向的输出；无需给每个点单独设计规则。
+  </p>
+  <FormulaBlock
+    latex={String.raw`A=\begin{pmatrix}2&0\\0&1\end{pmatrix},\quad A\begin{pmatrix}3\\2\end{pmatrix}=3\begin{pmatrix}2\\0\end{pmatrix}+2\begin{pmatrix}0\\1\end{pmatrix}=\begin{pmatrix}6\\2\end{pmatrix}`}
+    description="二维无量纲输入；diag(2,1)是只在主对角线上放2、1，其余元素为0的简写。"
+  />
+  <p>
+    剪切让某个输出分量加上另一个输入分量，方格因而变成平行四边形。某方向被乘0时，整片平面也可能压成一条线；后续秩课程会正式命名这个方向数量。固定平移则会移动原点，因此通常不满足线性性。参考坐标的单位格不变，被变换的教学方格可以真实拉伸或重合。
+  </p>
+  <KnowledgeCheck prompt="把原点固定平移一段距离，还是严格线性变换吗？"
+    >{#snippet answer()}<p>
+        不是。严格线性变换把零输入映到零输出；非零固定偏移不满足该条件。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="列向量决定整个映射"
   ><FormulaBlock
     latex={String.raw`T(\mathbf x)=A\mathbf x=x_1A\mathbf e_1+x_2A\mathbf e_2,\quad T(a\mathbf x+b\mathbf y)=aT(\mathbf x)+bT(\mathbf y)`}
@@ -60,7 +88,10 @@
   </p></TheorySection
 >
 <TheorySection id="experiment" title="变换网格和单位正方形"
-  ><InteractivePanel
+  ><p>
+    先预测再操作：把原点固定平移一段距离，还是严格线性变换吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
+  <InteractivePanel
     title="两列决定整个网格"
     instructions="默认A=diag(2,1)。四个元素范围±2、无量纲；修改任一元素即时变换所有网格端点，非法输入保留有效值。"
     meaning="虚线网格与虚线正方形是变换前；实线网格及粗实线多边形是变换后。圆形端点表示第一列，方形端点表示第二列；原点不动。"
@@ -86,6 +117,12 @@
         aria-label="等比例坐标：x横轴、y纵轴，无量纲；虚线为原网格、实线为变换后网格和单位正方形，圆/方端点区别两列。"
       >
         <title>矩阵作用于所有网格端点；压缩时保留重合关系。</title>
+        {#each unitGrid([-result.extent, result.extent], 320).values as tick (tick)}
+          <path
+            d={`M${screen({ x: tick, y: -result.extent }).x},${screen({ x: tick, y: -result.extent }).y}V${screen({ x: tick, y: result.extent }).y} M${screen({ x: -result.extent, y: tick }).x},${screen({ x: -result.extent, y: tick }).y}H${screen({ x: result.extent, y: tick }).x}`}
+            class="reference-grid"
+          />
+        {/each}
         <path d="M50,190H370 M210,30V350" class="axes" />
         {#each result.before as line, i (i)}<line
             x1={screen(line[0]).x}
@@ -117,15 +154,15 @@
           height="10"
           class="column-two"
         />
-        {#each [-1, -0.5, 0, 0.5, 1] as tick (tick)}<text
-            x={screen({ x: tick * result.extent, y: 0 }).x}
+        {#each unitGrid([-result.extent, result.extent], 320).values as tick (tick)}<text
+            x={screen({ x: tick, y: 0 }).x}
             y="375"
-            text-anchor="middle">{Number((tick * result.extent).toFixed(2))}</text
-          ><text x="44" y={screen({ x: 0, y: tick * result.extent }).y + 4} text-anchor="end"
-            >{Number((tick * result.extent).toFixed(2))}</text
+            text-anchor="middle">{Number(tick.toFixed(2))}</text
+          ><text x="44" y={screen({ x: 0, y: tick }).y + 4} text-anchor="end"
+            >{Number(tick.toFixed(2))}</text
           >{/each}
         <text x="380" y="195">x</text><text x="215" y="22">y</text><text x="50" y="405"
-          >等比例 · x/y均无量纲</text
+          >单位参考网格=1 · x/y均无量纲</text
         >
       </svg>
     </div>
@@ -177,6 +214,11 @@
 >
 
 <style>
+  .reference-grid {
+    stroke: var(--color-base-content);
+    stroke-opacity: 0.12;
+    fill: none;
+  }
   .parameters {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));

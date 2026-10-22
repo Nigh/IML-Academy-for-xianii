@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '标定能否唯一反推参数' },
     { id: 'intuition', title: '约束直线的三种关系' },
     { id: 'mathematics', title: '逆矩阵需要什么条件' },
@@ -17,7 +18,11 @@ export default {
       version: 1,
       prompt: 'I₂x=(2,−1)ᵀ，解是什么？',
       options: [
-        { id: 'b', text: '(2,−1)ᵀ', explanation: '单位矩阵保持输入，逆矩阵仍是自身。' },
+        {
+          id: 'b',
+          text: '(2,−1)ᵀ',
+          explanation: '先看约束是否独立且一致。单位矩阵保持输入，逆矩阵仍是自身。',
+        },
         { id: 'zero', text: '(0,0)ᵀ', explanation: '零输入只会产生零输出，无法得到非零右端项。' },
       ],
       answerId: 'b',

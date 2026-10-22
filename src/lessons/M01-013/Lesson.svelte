@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -27,34 +29,69 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    前置课程已建立基、维数与矩阵变换。本课把“独立方向有几个”应用到矩阵的全部可能输出，并首次命名列空间和秩。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="输出还能保留几个方向"
   ><p>
     两个特征列看似提供两份输入，但若始终成比例，就只提供一个独立变化方向。{metadata.title}从线性映射的输出空间判断信息是否被压缩。本课用两个已知解析奇异值的矩阵族，不运行通用SVD或真实训练，全部量无量纲。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="列空间决定可达输出"
-  ><p>
-    矩阵输出是各列的线性组合。列若独立，可以控制多个输出方向；列若成倍数，只能沿同一直线变化。精确秩（rank）就是列空间维数。图中两列端点分开并不代表独立，关键是方向是否冗余。
-  </p>
+<TheorySection id="intuition" title="列空间决定可达输出">
   <p>
-    把单位矩阵第二个对角元素不断缩小，只要它仍非零，数学上仍保留二维；但很小的方向可能被浮点误差或测量噪声淹没。数值秩（numerical
-    rank）要声明可分辨阈值，不能仅凭屏幕上是否看得见判断。
-  </p></TheorySection
->
-<TheorySection id="mathematics" title="精确秩与阈值下的数值秩"
-  ><FormulaBlock
-    latex={String.raw`\operatorname{rank}(A)=\dim\operatorname{col}(A),\qquad r_\tau=\#\{i:\sigma_i>\tau\sigma_{\max}\}`}
-    description="A为2×2实矩阵；col(A)为列空间，dim为维数；σ_i为非负奇异值，σ_max为最大奇异值，τ为正的无量纲相对阈值。本课约定严格大于阈值才计入数值秩；不是所有软件的统一默认规则。"
-  /><FormulaBlock
-    latex={String.raw`A_\varepsilon=\operatorname{diag}(1,\varepsilon),\quad\sigma=(1,\varepsilon),\quad0\le\varepsilon\le1`}
-    description="ε为第二方向的无量纲缩放；ε非零时精确秩2，为零时精确秩1。另一预设矩阵是向量(1,2)与自身外积，其非零奇异值等于1²+2²=5。"
+    列空间（column
+    space）是矩阵各列张成的集合，也就是全部可能输出。秩（rank）是这个集合的维数：问“输出能独立沿几个方向变化”，而不是数表有几行几列。
+  </p>
+  <FormulaBlock
+    latex={String.raw`A=\begin{pmatrix}1&2\\2&4\end{pmatrix},\quad A\begin{pmatrix}a\\b\end{pmatrix}=(a+2b)\begin{pmatrix}1\\2\end{pmatrix}`}
+    description="A为2×2无量纲矩阵，a、b为任意实输入；所有输出都在一个非零方向的直线上，因此秩为1。"
   />
   <p>
-    奇异值刻画输入单位方向经映射后的主轴伸缩，后续SVD课会展开。这里利用已知矩阵结构直接得到奇异值，再按明确阈值计数，没有把有限精度判定冒充精确符号计算。
-  </p></TheorySection
->
+    零矩阵只输出原点，秩为0；二维单位矩阵能输出任意点，秩为2。两列端点不同不代表独立，若一列只是另一列的倍数，仍只有一个方向。
+  </p>
+  <p>
+    数值秩是在有限精度下回答“多小的方向可以忽略”。对沿横轴保留1倍、沿纵轴缩放ε倍的矩阵，只要ε非零，数学上仍是二维；设相对阈值为百万分之一时，亿分之一的纵向伸缩就会被忽略。矩阵没变，改变的是可分辨标准。
+  </p>
+  <p>
+    下方“奇异值”可先理解为选定主方向的长度伸缩倍数；本课矩阵结构已知，直接使用这些已知倍数计数。一般矩阵如何找主方向留到SVD课，下面的补充公式不作为理解精确秩的前提。
+  </p>
+  <KnowledgeCheck prompt="纵向缩放很小但非零，数学上就只有一个方向了吗？"
+    >{#snippet answer()}<p>
+        不是。精确秩仍为2；在指定阈值下，数值秩可以忽略该小方向。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
+<TheorySection id="mathematics" title="精确秩与阈值下的数值秩">
+  <FormulaBlock
+    latex={String.raw`\operatorname{rank}(A)=\dim\operatorname{col}(A)`}
+    description="col(A)为矩阵各列的张成空间，dim表示维数；秩是无量纲整数。"
+  />
+  <details>
+    <summary>补充：用已知伸缩倍数计算数值秩</summary><FormulaBlock
+      latex={String.raw`\operatorname{rank}(A)=\dim\operatorname{col}(A),\qquad r_\tau=\#\{i:\sigma_i>\tau\sigma_{\max}\}`}
+      description="A为2×2实矩阵；col(A)为列空间，dim为维数；σ_i为非负奇异值，σ_max为最大奇异值，τ为正的无量纲相对阈值。本课约定严格大于阈值才计入数值秩；不是所有软件的统一默认规则。"
+    /><FormulaBlock
+      latex={String.raw`A_\varepsilon=\operatorname{diag}(1,\varepsilon),\quad\sigma=(1,\varepsilon),\quad0\le\varepsilon\le1`}
+      description="ε为第二方向的无量纲缩放；ε非零时精确秩2，为零时精确秩1。另一预设矩阵是向量(1,2)与自身外积，其非零奇异值等于1²+2²=5。"
+    />
+    <p>
+      奇异值刻画输入单位方向经映射后的主轴伸缩，后续SVD课会展开。这里利用已知矩阵结构直接得到奇异值，再按明确阈值计数，没有把有限精度判定冒充精确符号计算。
+    </p>
+  </details>
+</TheorySection>
 <TheorySection id="experiment" title="逐步缩小一个方向"
-  ><InteractivePanel
+  ><p>
+    先预测再操作：纵向缩放很小但非零，数学上就只有一个方向了吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
+  <InteractivePanel
     title="相同矩阵，不同判定尺度"
     instructions="默认倍数列矩阵。选择对角矩阵预设后可调ε（0–1，默认1）；相对阈值τ默认1e−6，范围1e−12至0.5。数值框支持科学记数法，非法值保留有效结果。"
     meaning="矩阵与列方向图显示实际变换，数值区分别报告精确秩、阈值和数值秩。ε低于1e−6时不画难以分辨的第二列箭头，矩阵与科学记数法保留真实非零值。"

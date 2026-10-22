@@ -35,13 +35,13 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 
 ## 图表
 
-| 组件             | Props / callbacks                                                                                                                                  | 用途、无障碍与边界                                                                                                                                                                                                     |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Plot2D           | series、xRange、yRange、xLabel、yLabel、description；title?、xUnit?、yUnit?、grid=true、references=[]、highlight?:Range、onselect?(seriesId,index) | 轴刻度、折线/散点/柱/右连续阶梯、图例、参考线、范围高亮；无效输入显示错误、空数据有空态。图例文字与实虚线区分系列。details 内原生 range 提供键盘逐点数值与回调。超过 2000 点/序列拒绝；越界图形 clip。                 |
-| VectorDiagram    | vectors: `{x,y,label,role,origin?,draggable?}[]`、description、range=10；onchange?(index,x,y)、projection?:{from,to}、showAngle=false、grid=true   | 等比例正交坐标、箭头、网格、标签；显示范围 ±range（0<range≤100）。Pointer Events + capture；屏幕坐标逆映射，拖动输出四舍五入至 0.1。带 origin 时输出相对分量。需要父层提供键盘数值输入。投影辅助线和非零向量角弧可选。 |
-| DistributionPlot | points、xRange、yRange、description；discrete=false、cumulative=false、mean?、empirical=[]、highlight?                                             | 只接受已算好的理论/经验数据；PMF 柱、PDF 折线、离散 CDF 阶梯；均值参考线。连续纵轴为密度，CDF 为累计概率。不会替课程计算概率积分。                                                                                     |
-| HistogramPlot    | samples、bins=20、mode=count/frequency/density（默认 density）、theory=[]                                                                          | 原始样本计算直方图。bin 1–200，空/退化样本有处理；density 柱面积总和为 1。理论叠加必须与纵轴同单位，组件不推断理论单位。非法数据进入空态，数学函数独立抛错。                                                           |
-| ContourPlot      | contours:PlotSeries[]、path、current、xRange、yRange、description；gradient?                                                                       | 等高线由课程纯函数生成，叠加路径、当前点和负梯度方向线段；gradient 为课程已缩放的显示向量，坐标图不计算函数。                                                                                                          |
+| 组件             | Props / callbacks                                                                                                                                                | 用途、无障碍与边界                                                                                                                                                                                                     |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Plot2D           | series、xRange、yRange、xLabel、yLabel、description；title?、xUnit?、yUnit?、grid=true、equal=false、references=[]、highlight?:Range、onselect?(seriesId,index)  | 轴刻度、折线/散点/柱/右连续阶梯、图例、参考线、范围高亮；无效输入显示错误、空数据有空态。图例文字与实虚线区分系列。details 内原生 range 提供键盘逐点数值与回调。超过 2000 点/序列拒绝；越界图形 clip。                 |
+| VectorDiagram    | vectors: `{x,y,label,role,origin?,draggable?}[]`、description、range=10；onchange?(index,x,y)、projection?:{from,to}、showAngle=false、grid=true、axisRotation=0 | 等比例正交坐标、箭头、网格、标签；显示范围 ±range（0<range≤100）。Pointer Events + capture；屏幕坐标逆映射，拖动输出四舍五入至 0.1。带 origin 时输出相对分量。需要父层提供键盘数值输入。投影辅助线和非零向量角弧可选。 |
+| DistributionPlot | points、xRange、yRange、description；discrete=false、cumulative=false、mean?、empirical=[]、highlight?                                                           | 只接受已算好的理论/经验数据；PMF 柱、PDF 折线、离散 CDF 阶梯；均值参考线。连续纵轴为密度，CDF 为累计概率。不会替课程计算概率积分。                                                                                     |
+| HistogramPlot    | samples、bins=20、mode=count/frequency/density（默认 density）、theory=[]                                                                                        | 原始样本计算直方图。bin 1–200，空/退化样本有处理；density 柱面积总和为 1。理论叠加必须与纵轴同单位，组件不推断理论单位。非法数据进入空态，数学函数独立抛错。                                                           |
+| ContourPlot      | contours:PlotSeries[]、path、current、xRange、yRange、description；gradient?                                                                                     | 等高线由课程纯函数生成，叠加路径、当前点和负梯度方向线段；gradient 为课程已缩放的显示向量，坐标图不计算函数。                                                                                                          |
 
 图表最小逻辑宽度保持文字可读，移动端只在图内横向滚动；SVG 高 DPI 自适应，无外部字体/CDN。
 关键结果必须另外放在正文或 aria-live output；图形标题不能替代所有数学解释。
@@ -90,3 +90,10 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 输入须有 label、错误文本、可见焦点和键盘操作。图表提供单位、文字说明与非颜色区分。
 必须检查亮暗主题、320px、缩放、reduced motion、复位、卸载清理和非法值。
 共享接口、课程、规范文档分别提交独立 PR；CI 与内容审阅完成前，不将本地通过写成正式发布。
+
+## 单位网格与坐标旋转
+
+`unitGrid(range,pixels)` 返回整数单位格的显示位置及省略间隔step，每轴最多81条。密集时跳过整数线，不把一格重新定义为视域的五分之一；少于一单位的视域可仅显示边界读数。
+`Plot2D.equal=true` 使横纵坐标单位等长，短轴的可见范围扩展以填满绘图区；输入范围仍全部可见。统一映射作用于曲线、柱宽、参考线和高亮；几何课程显式启用，不同单位统计曲线保持默认独立轴比例。
+`VectorDiagram.axisRotation` 为坐标系逆时针角度（度），默认0。网格、坐标轴和刻度整体旋转，向量仍使用原物理坐标。拖拽回调保留原物理分量约定，调用者若显示旋转坐标需自行转换；不要再用两根短向量冒充坐标轴。
+答题反馈用error/success语义色及文字区分错误与正确，重新选择后隐藏上次反馈。

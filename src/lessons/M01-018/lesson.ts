@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '找出变换最强与最弱的方向' },
     { id: 'intuition', title: '换轴、拉伸、再换轴' },
     { id: 'mathematics', title: '正交因子与非负奇异值' },
@@ -17,7 +18,11 @@ export default {
       version: 1,
       prompt: 'diag(3,1)的两个奇异值是什么？',
       options: [
-        { id: 'yes', text: '3和1', explanation: 'AᵀA=diag(9,1)，非负平方根为3和1。' },
+        {
+          id: 'yes',
+          text: '3和1',
+          explanation: '比较单位方向变换前后的长度。AᵀA=diag(9,1)，非负平方根为3和1。',
+        },
         { id: 'squares', text: '9和1', explanation: '9是AᵀA的特征值，取平方根后才是A的奇异值。' },
       ],
       answerId: 'yes',

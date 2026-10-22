@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -29,10 +31,20 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    上一课用两个有顺序的分量表示一个向量。现在把这种“每个位置有含义”的想法扩展到列表、表格和多张表，不要求学过矩阵运算。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="一段数据属于谁、何时、哪个通道">
   <p>
-    训练一个时序分类器时，8 段录音、每段 100 个时刻、每时刻 3 个特征，不能只交付“2400
-    个数”。模型还需要知道哪一维是样本批次（batch）、时间（time）和通道（channel）。{metadata.title}把这些信息写进数据形状。
+    假设有两段实验记录，每段三个时刻，每个时刻记录四个通道。把这些数交给别人时，只说“24个数”不够：对方还要知道每个数属于哪段实验、哪个时刻、哪个通道。张量的形状就是组织这些地址的办法。
   </p>
   <p>
     本课没有录音采样或训练；表中数据是按地址生成的无量纲整数编码，用来追踪元素在哪里。真实特征的单位要单独登记，例如振幅或频率，形状本身不包含单位。
@@ -40,23 +52,57 @@
 </TheorySection>
 <TheorySection id="intuition" title="轴是数据的地址">
   <p>
-    把每个批次看作一张表：行沿时间，列沿通道。切换批次就是翻到另一张表。标量有零根轴，向量有一根轴，矩阵有两根轴；这里用三根轴形成三阶张量（tensor）。阶数是轴数，不是矩阵的秩。
+    张量（tensor）在本课采用机器学习里的数组含义：把数按若干个有顺序的方向组织起来。这里不展开物理学中张量随坐标变换的严格定义。先不用公式，想象连续记录温度：一个时刻得到一个数，三个时刻得到一列数。
   </p>
   <p>
-    这份轴语义由数据协议指定，框架不会自动知道。将同一串数字解释成不同形状，通常会改变数字对应的地址。转置（transpose）会交换轴和数据索引；重塑（reshape）在保留展平顺序时只重新解释地址，不能代替转置。
+    如果每个时刻同时记录温度与湿度，就得到一张表：每行是一个时刻，每列是一种通道。再记录两段独立实验，每段各有一张同样大小的表，把两张表叠起来，就是三个轴的数据。通道不是几何方向，而是每个时刻记录的不同数值种类。
   </p>
-</TheorySection>
-<TheorySection id="mathematics" title="阶数、形状与索引">
+  <p>
+    轴（axis）是选择元素时需要指定的一个位置方向；阶数（order）是轴的个数；形状（shape）按约定顺序列出每个轴有多长。一个数没有轴，零阶；一列数一阶；表格二阶；一叠表三阶。阶数不等于元素总数，也不等于矩阵的秩。
+  </p>
   <FormulaBlock
-    latex={String.raw`X\in\mathbb R^{B\times T\times C},\quad N=BTC,\quad q=(bT+t)C+c`}
-    description="X 是确定性的三阶实数数组（此处不是随机变量），B 为批次数、T 为时刻数、C 为通道数，均为无量纲正整数。N 是元素个数。零起始索引 b∈[0,B−1]、t∈[0,T−1]、c∈[0,C−1]。q 是行主序、通道变化最快的展平索引，无量纲。"
+    latex={String.raw`\operatorname{shape}(X)=(B,T,C)=(2,3,4),\qquad N=2\times3\times4=24`}
+    description="B为实验片段的个数（批次），T为每段时刻数，C为每时刻通道数；N为元素总数，所有计数无量纲。X是确定性教学数组。"
   />
   <p>
-    每跨过一个时间步，跳过 C 个通道；每跨过一个批次，跳过 TC 个元素，因此得到上面的地址公式。float32
-    每个元素占 4 字节，原始连续数组的存储量是元素数乘 4；框架对象开销不包含在内。
+    找一个元素就像报地址：“第几张表、第几行、第几列”。程序从0开始编号，因此地址(1,2,3)表示第二段实验、第三个时刻、第四个通道；不是把这三个数相乘。下面的实验用地址编码代替真实温湿度，所有格子无量纲。
   </p>
+  <p>
+    形状(3,2,4)虽然也有24个数，却意味着三段实验、每段两个时刻。同样数量的纸张文字，分成不同表格就有不同地址含义。形状只说大小；每个轴代表什么、数值单位是什么，需要另行约定。长度为1的轴仍然存在，例如单通道数据仍可有批次、时间、通道三个轴。
+  </p>
+  <KnowledgeCheck prompt="形状(2,3,1)有几根轴？地址(1,2,0)表示哪里？"
+    >{#snippet answer()}<p>
+        3根轴；第二段实验、第三个时刻、唯一的通道。轴长为1仍保留这个轴。
+      </p>{/snippet}</KnowledgeCheck
+  >
 </TheorySection>
+<TheorySection id="mathematics" title="阶数、形状与索引">
+  <p>
+    先确认你能说明(2,3,4)为什么是三阶、24个元素，并用三个索引定位一个元素。下面把这个地址进一步换成一条长列表中的位置；这是存储表示，不是张量概念本身。
+  </p>
+  <details>
+    <summary>进阶：展平地址与存储量</summary>
+    <p>
+      重塑（reshape）把同一条数字序列重新分组，例如2行3列改成3行2列；转置（transpose）则把行列角色互换并移动对应元素。这两种操作一般给出不同的排列，不能仅凭元素总数相同互相替代。
+    </p>
+    <FormulaBlock
+      latex={String.raw`X\in\mathbb R^{B\times T\times C},\quad N=BTC,\quad q=(bT+t)C+c`}
+      description="X 是确定性的三阶实数数组（此处不是随机变量），B 为批次数、T 为时刻数、C 为通道数，均为无量纲正整数。N 是元素个数。零起始索引 b∈[0,B−1]、t∈[0,T−1]、c∈[0,C−1]。q 是行主序、通道变化最快的展平索引，无量纲。"
+    />
+    <p>
+      每跨过一个时间步，跳过 C 个通道；每跨过一个批次，跳过 TC
+      个元素，因此得到上面的地址公式。float32 每个元素占 4 字节，原始连续数组的存储量是元素数乘
+      4；框架对象开销不包含在内。
+    </p>
+    <p>
+      按行主序，最内层通道先变化：地址(1,2,3)前面有1整批、2整行、3个通道值，因此展平位置是23，从0编号。float32是一种每个数占4字节的数值格式；字节是存储单位，不是形状的一根轴。
+    </p>
+  </details></TheorySection
+>
 <TheorySection id="experiment" title="切开三阶张量">
+  <p>
+    先预测再操作：形状(2,3,1)有几根轴？地址(1,2,0)表示哪里？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="带语义的切片"
     instructions="B 默认2（1–8），T 默认3（1–100），C 默认4（1–8）；全部为无量纲整数。输入非法时保留有效值。选批次和起始时刻，查看最多8行、全部通道；所有时刻可通过起始索引访问。"
