@@ -1,0 +1,213 @@
+<script lang="ts">
+  import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
+  import TheorySection from '../../components/lesson/TheorySection.svelte';
+  import FormulaBlock from '../../components/math/FormulaBlock.svelte';
+  import MatrixView from '../../components/math/MatrixView.svelte';
+  import InteractivePanel from '../../components/interactive/InteractivePanel.svelte';
+  import NumericInput from '../../components/interactive/NumericInput.svelte';
+  import ParameterSlider from '../../components/interactive/ParameterSlider.svelte';
+  import PresetSelector from '../../components/interactive/PresetSelector.svelte';
+  import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
+  import LessonSummary from '../../components/lesson/LessonSummary.svelte';
+  import { experiment, parseShape, presets } from './experiment.ts';
+  let { metadata }: LessonBodyProps = $props();
+  let a = $state('2,3,4'),
+    b = $state('4'),
+    offset = $state(10),
+    selected = $state('channels'),
+    flat = $state(0);
+  const outcome = $derived.by(() => {
+    try {
+      return { result: experiment(parseShape(a), parseShape(b), offset), error: '' };
+    } catch (e) {
+      return { result: null, error: e instanceof Error ? e.message : '输入无效' };
+    }
+  });
+  const current = $derived(
+    outcome.result?.rows[Math.min(flat, (outcome.result?.rows.length ?? 1) - 1)],
+  );
+  function select(id: string) {
+    const p = presets.find((p) => p.id === id);
+    if (p) {
+      a = p.a;
+      b = p.b;
+      offset = 10;
+      flat = 0;
+      selected = id;
+    }
+  }
+  const fmt = (s: readonly number[]) => `(${s.join(',')}${s.length === 1 ? ',' : ''})`;
+</script>
+
+<TheorySection id="motivation" title="给每个通道加偏置，不写三重循环"
+  ><p>
+    批次、时间和通道构成一个三维特征张量，模型需要给每个通道加一个偏置。{metadata.title}用尾轴对齐规则描述同一个偏置如何在多个位置复用。这个规则减少显式循环，却也容易让形状正确、业务含义错误的表达式悄悄运行。本课使用无量纲地址编码合成数据，执行真正的逐元素加法，不涉及训练。
+  </p></TheorySection
+>
+<TheorySection id="intuition" title="从最后一轴开始对齐"
+  ><p>
+    把两个形状从右向左排列，缺失的前轴视为长度1。每对轴长度相等，或其中一个为1，就能相加；单例轴的那个值被逻辑复用到对应位置。若两个长度都不是1且不相等，广播（broadcasting）失败。
+  </p>
+  <p>
+    (3,1)与(1,4)先沿不同单例轴扩展，形成3×4的外和；(3,)和(4,)都是一维形状，尾轴冲突，不会自动被猜成列向量和行向量。
+  </p></TheorySection
+>
+<TheorySection id="mathematics" title="兼容条件与索引映射">
+  <FormulaBlock
+    latex={String.raw`Y_{btc}=X_{btc}+\beta_c,\quad X,Y\in\mathbb R^{B\times T\times C},\quad\beta\in\mathbb R^C`}
+    description="X、Y为确定性张量名称，不表示随机变量；B、T、C为批次、时间、通道轴长度，b、t、c为从0开始的样本/时间/通道索引，β为通道偏置。所有元素无量纲，加法要求相同量纲。例中(B,T,C)=(2,3,4)，偏置缺失的前轴视为1。"
+  />
+  <FormulaBlock
+    latex={String.raw`a_j=d_j\ \lor\ a_j=1\ \lor\ d_j=1,\quad s_j=\max(a_j,d_j)`}
+    description="a_j、d_j为尾对齐后第j轴的正整数长度，s_j为输出长度；每轴都满足兼容条件才可广播。完整库还可支持标量和空轴，本课限定1–3轴、每轴1–4，最多64个输出，避免无界计算。"
+  />
+  <FormulaBlock
+    latex={String.raw`q_j=\begin{cases}0,&a_j=1\\i_j,&a_j>1\end{cases},\qquad Y_i=A_q+D_r`}
+    description="i为输出多重索引，q为第一个输入的来源索引，r按第二个输入同理构造；缺失前轴不属于原输入索引。A、D为两个输入张量，Y为结果，均为确定性数组。此为逐元素加法，不是矩阵乘法或张量缩并。"
+  />
+  <p>
+    广播语义不要求先把输入物理复制成完整输出大小；实现可能使用步幅等机制。但输出计算和后续操作仍有成本，不能把广播理解为任意大张量都不占内存。
+  </p>
+</TheorySection>
+<TheorySection id="experiment" title="追踪每个输出来自哪里">
+  <InteractivePanel
+    title="尾轴对齐与真实加法"
+    instructions="形状用逗号分隔1–3个整数，每轴1–4，默认2,3,4和4；不输入括号。偏置起点默认10，范围±10，步长1，可键盘编辑。输出位置从0起；形状非法或不兼容时显示原因并停止计算。"
+    meaning="第一个输入A按行优先扁平索引i赋值A[i]=i；第二个输入D[j]=偏置起点+j。这是确定性地址编码，便于查来源，不代表实测特征。选择任意输出，查看完整坐标、两个来源和实际求和。"
+    limitations="仅演示正长度小张量加法，不含标量、空轴、其他运算或实际框架内存分配。表格只列前12项，全部最多64项都可用输出位置检查器访问。形状合法不能证明批次/时间/通道语义正确。"
+    onreset={() => select('channels')}
+  >
+    <PresetSelector {presets} value={selected} defaultId="channels" onchange={select} />
+    <div class="shapes">
+      <label
+        >输入A形状<input
+          class="input"
+          value={a}
+          aria-invalid={!!outcome.error}
+          oninput={(e) => {
+            a = e.currentTarget.value;
+            flat = 0;
+            selected = 'custom';
+          }}
+        /></label
+      ><label
+        >输入D形状<input
+          class="input"
+          value={b}
+          aria-invalid={!!outcome.error}
+          oninput={(e) => {
+            b = e.currentTarget.value;
+            flat = 0;
+            selected = 'custom';
+          }}
+        /></label
+      >
+    </div>
+    <ParameterSlider
+      label="偏置起点"
+      value={offset}
+      min={-10}
+      max={10}
+      step={1}
+      onchange={(n) => {
+        offset = n;
+        selected = 'custom';
+      }}
+    />
+    {#if outcome.error}<p role="status" class="error">
+        无法计算：{outcome.error}
+      </p>{:else if outcome.result && current}
+      {@const r = outcome.result}
+      <div aria-live="polite" data-testid="result">
+        <p>
+          尾轴对齐：A={fmt(r.left)}；D={fmt(r.right)}；输出形状={fmt(r.shape)}；元素数={r.rows
+            .length}。
+        </p>
+      </div>
+      <MatrixView values={[r.left, r.right, r.shape]} rowLabels={['A补前轴', 'D补前轴', '输出']} />
+      <NumericInput
+        integer
+        label="输出扁平位置"
+        value={flat}
+        min={0}
+        max={r.rows.length - 1}
+        step={1}
+        onchange={(n) => (flat = n)}
+      />
+      <p data-testid="trace" aria-live="polite">
+        输出坐标{fmt(current.index)}：A来源{fmt(current.left.index)}（扁平{current.left
+          .flat}）={current.av}；D来源{fmt(current.right.index)}（扁平{current.right
+          .flat}）={current.bv}；相加={current.value}。
+      </p>
+      <p>前{Math.min(12, r.rows.length)}项／共{r.rows.length}项：</p>
+      <MatrixView
+        values={r.rows
+          .slice(0, 12)
+          .map((x) => [x.flat, x.left.flat, x.right.flat, x.av, x.bv, x.value])}
+        columnLabels={['输出位置', 'A位置', 'D位置', 'A值', 'D值', '和']}
+      />
+    {/if}
+  </InteractivePanel>
+  <p>
+    场景一检查输出位置0、4、12：偏置跨时间和批次重复，但A值改变。场景二检查行列扩展；切到(3,)+(4,)后观察尾轴错误，不能靠自动转置解决。场景三两个长度都为3，改变输出索引并确认偏置只跟最后一轴走；若本意沿时间加偏置，应显式写(1,3,1)。复位恢复逐通道场景。
+  </p>
+</TheorySection>
+<TheorySection id="pitfalls" title="广播只懂形状，不懂轴的名字"
+  ><CommonMistakes
+    items={[
+      {
+        mistake: '广播会自动理解批次与通道的业务语义。',
+        correction:
+          '它只从尾轴检查长度；当时间与通道长度相同，错误的偏置轴也可能形状合法，必须显式reshape并检查索引。',
+      },
+      {
+        mistake: '两个一维向量总会自动产生外和。',
+        correction: '(3,)+(4,)不兼容；明确写(3,1)+(1,4)才得到(3,4)。',
+      },
+      {
+        mistake: '广播相加等于矩阵乘法，或没有任何内存成本。',
+        correction:
+          '本课每个位置只加两个元素，不做内积；输入可逻辑复用，但大输出及后续运算仍需资源。',
+      },
+    ]}
+  />
+  <p>
+    数学上形状可广播也不能相加不同单位的物理量。真实ML代码还需检查轴约定、dtype、设备与数值范围，这里只验证形状和无量纲数值映射。
+  </p></TheorySection
+>
+<TheorySection id="summary" title="先检查轴，再检查语义"
+  ><LessonSummary
+    points={[
+      '广播从尾轴对齐，缺失前轴视为1。',
+      '每轴必须相同或含单例轴，冲突时应明确报错。',
+      '输出索引沿单例轴映射回0，数值来自真实逐元素计算。',
+      '形状兼容不能替代轴语义、量纲和资源检查。',
+    ]}
+    related={['M01-003', 'M01-011', 'M01-018']}
+  /></TheorySection
+>
+
+<style>
+  p {
+    overflow-wrap: anywhere;
+  }
+  .shapes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .shapes label {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .shapes input {
+    max-width: 100%;
+    min-width: 0;
+  }
+  .error {
+    color: var(--color-error);
+  }
+</style>
