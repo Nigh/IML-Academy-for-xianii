@@ -1,4 +1,5 @@
 <script lang="ts">
+  import RoutePlatform from './RoutePlatform.svelte';
   import PredictionLab from '../../components/lesson/PredictionLab.svelte';
   import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
@@ -50,7 +51,7 @@
 
 <TheorySection id="motivation" title="两段路都走了，为什么还能回到原点？">
   <p>
-    机器人完成位移(2,1)m，再走(−2,−1)m。记录最终位置和走过的路，能得到同一个数吗？下面把箭头首尾相接，再改变第一段的倍率。
+    机器人完成位移(2,1)m，再走(−2,−1)m。记录最终位置和走过的路，能得到同一个数吗？给平台下达两段移动指令，分步执行后比较终点与经过的路线。
   </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
@@ -65,7 +66,7 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="亲手合成两个向量">
+<TheorySection id="experiment" title="给移动平台安排两段路线">
   <p>
     比较转向和抵消；改变k的正负，观察第一段的方向与长度。再切换两种作图方式，检查合向量是否相同。
   </p>
@@ -76,11 +77,12 @@
   >
     <InteractivePanel
       title="方向会改变答案"
-      instructions="调节四个坐标分量。也可以切换作图方式，或直接尝试下面的对照场景。"
+      instructions="设置两段移动指令，点击执行第一段、执行第二段。再用完全抵消场景比较路程和位移。"
       meaning="箭头 ka、虚线箭头 b 与合向量 ka+b 都由当前坐标解析计算；不是预录动画。"
       limitations="二维欧氏空间、同一坐标系、同一单位；不描述旋转姿态的复合。"
       onreset={reset}
     >
+      <RoutePlatform {a} {b} {sum} context={JSON.stringify([k, ax, ay, bx, by])} />
       <ParameterSlider
         label="数乘系数 k"
         value={k}
@@ -96,9 +98,9 @@
       </p>
       <div class="vector-lab">
         <div class="vector-controls">
-          <span class="vector-key primary-key">向量 a · m</span>
+          <span class="vector-key primary-key">第一段移动指令 a · m</span>
           <ParameterSlider
-            label="a 的 x 分量"
+            label="第一段东西位移"
             value={ax}
             min={-5}
             max={5}
@@ -106,16 +108,16 @@
             onchange={(n) => (ax = n)}
           />
           <ParameterSlider
-            label="a 的 y 分量"
+            label="第一段南北位移"
             value={ay}
             min={-5}
             max={5}
             step={0.1}
             onchange={(n) => (ay = n)}
           />
-          <span class="vector-key secondary-key">向量 b · m</span>
+          <span class="vector-key secondary-key">第二段移动指令 b · m</span>
           <ParameterSlider
-            label="b 的 x 分量"
+            label="第二段东西位移"
             value={bx}
             min={-5}
             max={5}
@@ -123,7 +125,7 @@
             onchange={(n) => (bx = n)}
           />
           <ParameterSlider
-            label="b 的 y 分量"
+            label="第二段南北位移"
             value={by}
             min={-5}
             max={5}
