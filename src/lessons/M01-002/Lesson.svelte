@@ -1,22 +1,40 @@
 <script lang="ts">
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
   import InteractivePanel from '../../components/interactive/InteractivePanel.svelte';
   import ParameterSlider from '../../components/interactive/ParameterSlider.svelte';
   import VectorDiagram from '../../components/charts/VectorDiagram.svelte';
-  import { add, magnitude, vector } from './experiment.ts';
+  import { add, magnitude, scale, vector } from './experiment.ts';
   let { metadata }: LessonBodyProps = $props();
+  let k = $state(1);
   let ax = $state(2);
   let ay = $state(1);
   let bx = $state(-1);
   let by = $state(2);
   let mode = $state<'head-tail' | 'parallelogram'>('head-tail');
-  const a = $derived(vector(ax, ay));
+  const a = $derived(scale(vector(ax, ay), k));
   const b = $derived(vector(bx, by));
   const sum = $derived(add(a, b));
   const fmt = (n: number) => Number(n.toFixed(2));
+  const range = $derived(
+    Math.max(
+      5,
+      1.35 *
+        Math.max(
+          Math.abs(a.x),
+          Math.abs(a.y),
+          Math.abs(b.x),
+          Math.abs(b.y),
+          Math.abs(sum.x),
+          Math.abs(sum.y),
+        ),
+    ),
+  );
   function reset() {
+    k = 1;
     ax = 2;
     ay = 1;
     bx = -1;
@@ -47,10 +65,23 @@
   <InteractivePanel
     title="方向会改变答案"
     instructions="调节四个坐标分量。也可以切换作图方式，或直接尝试下面的对照场景。"
-    meaning="箭头 a、虚线箭头 b 与合向量 a+b 都由当前坐标解析计算；不是预录动画。"
+    meaning="箭头 ka、虚线箭头 b 与合向量 ka+b 都由当前坐标解析计算；不是预录动画。"
     limitations="二维欧氏空间、同一坐标系、同一单位；不描述旋转姿态的复合。"
     onreset={reset}
   >
+    <ParameterSlider
+      label="数乘系数 k"
+      value={k}
+      min={-3}
+      max={3}
+      step={0.1}
+      unit="无量纲"
+      onchange={(n) => (k = n)}
+    />
+    <p>
+      默认 k=1。计算 k a + b；k 为负时 a 反向。分量均为 m，范围 −5 至
+      5；非法输入保留上次有效结果。视域随端点变化，比较长度时请读取数值。
+    </p>
     <div class="vector-lab">
       <div class="vector-controls">
         <span class="vector-key primary-key">向量 a · m</span>
@@ -90,10 +121,16 @@
       </div>
       <div>
         <VectorDiagram
+          {range}
           vectors={[
-            { ...a, label: 'a', role: 'primary' },
-            { ...b, label: 'b', role: 'secondary', origin: mode === 'head-tail' ? a : undefined },
-            { ...sum, label: 'a+b', role: 'accent' },
+            { ...a, label: 'ka', role: 'primary' },
+            {
+              ...b,
+              label: mode === 'head-tail' ? '' : 'b',
+              role: 'secondary',
+              origin: mode === 'head-tail' ? a : undefined,
+            },
+            { ...sum, label: magnitude(sum) === 0 ? '' : '和', role: 'accent' },
             ...(mode === 'parallelogram'
               ? [
                   { ...b, origin: a, label: '', role: 'secondary' as const },
@@ -101,7 +138,7 @@
                 ]
               : []),
           ]}
-          description={`向量 a=(${ax},${ay}) 米，b=(${bx},${by}) 米，合向量=(${fmt(sum.x)},${fmt(sum.y)}) 米。`}
+          description={`数乘后的向量 ka=(${fmt(a.x)},${fmt(a.y)}) 米，b=(${bx},${by}) 米，合向量=(${fmt(sum.x)},${fmt(sum.y)}) 米。`}
         />
         <label class="field"
           >作图方式<select class="select select-bordered" bind:value={mode}
@@ -112,8 +149,9 @@
         >
       </div>
     </div>
+    <p>图例：ka 为实线，b 为虚线，和为标有“和”的实线；抵消时合向量落在原点，不画虚假箭头。</p>
     <div class="experiment-result" aria-live="polite">
-      a + b = <strong>({fmt(sum.x)}, {fmt(sum.y)}) m</strong><span
+      k a + b = <strong>({fmt(sum.x)}, {fmt(sum.y)}) m</strong><span
         >合位移长度 {magnitude(sum).toFixed(2)} m · 路程 {(magnitude(a) + magnitude(b)).toFixed(2)} m</span
       >
     </div>
@@ -121,6 +159,8 @@
       <button class="btn btn-sm btn-outline" onclick={reset}>场景一：转向后合成</button><button
         class="btn btn-sm btn-outline"
         onclick={() => {
+          k = 1;
+          mode = 'head-tail';
           ax = 2;
           ay = -1;
           bx = -2;
@@ -135,7 +175,10 @@
     latex={String.raw`\mathbf a+\mathbf b=\begin{bmatrix}a_x+b_x\\a_y+b_y\end{bmatrix}`}
     description="同一坐标系中的向量逐分量相加。a 和 b 均为二维位移向量，各分量单位为米。"
   />
-  <p>加法满足交换律与结合律。零向量不改变任何位移；一个向量与其相反向量相加得到零向量。</p>
+  <p>
+    a、b 均为 2×1 列向量，k 为实数标量，无量纲；数乘后仍以 m
+    计。加法满足交换律与结合律。零向量不改变任何位移；一个向量与其相反向量相加得到零向量。
+  </p>
   <FormulaBlock
     latex={String.raw`k\mathbf a=\begin{bmatrix}ka_x\\ka_y\end{bmatrix}`}
     description="无量纲实数 k 对所有分量同时缩放；k 为负时方向反转，k 为零时得到零向量。"
@@ -150,6 +193,10 @@
     latex={String.raw`\|\mathbf a+\mathbf b\|_2\le\|\mathbf a\|_2+\|\mathbf b\|_2`}
     description="三角不等式。非零向量同向时等号成立，方向不同通常严格小于。零向量的方向未定义。"
   />
+  <p>
+    另一个误区：把负数乘理解为只缩短长度。k=−1 会翻转方向、保持长度；k=0
+    得到零向量，方向未定义。位置也不能无条件相加当作新位置，应先区分位置与位移。
+  </p>
 </TheorySection>
 <TheorySection id="engineering" title="工程中的同一条规则">
   <p>
@@ -157,10 +204,25 @@
   </p>
   <p>旋转的复合有自己的数学结构，不能直接套用本课的自由向量加法。</p>
 </TheorySection>
+<KnowledgeCheck prompt="a=(2,1)m，k=−2。k a 是什么，长度怎样变化？">
+  {#snippet answer()}<p>
+      结果 (−4,−2)m，长度乘 2、方向反转。每个分量都乘 −2；(−1,−0.5)m 是除法结果，(−4,1)m
+      则错误地只改变了一个分量。
+    </p>{/snippet}
+</KnowledgeCheck>
+<KnowledgeCheck prompt="两个非零向量何时满足合向量长度等于长度之和？">
+  {#snippet answer()}<p>
+      两者同向时成立。垂直时合长度由勾股定理计算，严格小于两个非零长度之和；反向时会抵消。只有长度相等不足以判断方向。
+    </p>{/snippet}
+</KnowledgeCheck>
 <TheorySection id="summary" title="带走三个结论">
-  <ol>
-    <li>向量加法同时保留方向与大小，计算时逐分量相加。</li>
-    <li>数乘同时缩放所有分量，负系数使方向反转。</li>
-    <li>合位移与路径长度不同；计算之前先统一坐标系和单位。</li>
-  </ol>
+  <LessonSummary
+    points={[
+      '同坐标同单位的向量逐分量相加，几何上首尾相接。',
+      '数乘同时作用于全部分量，负数翻转方向，零系数消去向量。',
+      '合位移长度不超过两段长度之和；同向或含零向量时等号成立。',
+      '相加前先统一坐标系与单位，区分位置、位移与路程。',
+    ]}
+    related={['M01-001', 'M01-005', 'M01-007']}
+  />
 </TheorySection>
