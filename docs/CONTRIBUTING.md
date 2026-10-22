@@ -4,7 +4,7 @@
 
 ## 分支与 PR
 
-所有课程、文档和基础设施更新都通过 PR 合并到 `main`，不直接推送 main。遵循 Conventional Commits；默认 squash merge，使每个 PR 对应一个可追踪提交。
+所有课程、文档和基础设施更新都通过 PR 合并到 `main`，不直接推送 main。遵循 Conventional Commits；使用 Create a merge commit，保留分支提交与合并节点，让 Git 历史呈现分支开发和 PR 合并的关系。仓库仅启用 merge commit，禁用 squash merge 和 rebase merge；命令行使用 `gh pr merge --merge`，自动合并也选择 merge commit。
 
 | 类型                       | 分支与范围                                                                                                                       |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
