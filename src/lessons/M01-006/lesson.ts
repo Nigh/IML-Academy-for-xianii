@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '冗余特征为何让权重不唯一' },
     { id: 'intuition', title: '能抵消的贡献揭示冗余' },
     { id: 'mathematics', title: '相关、独立与基' },
@@ -20,7 +21,8 @@ export default {
         {
           id: 'nontrivial',
           text: '−2和1',
-          explanation: '−2u+v=0，且系数不全为零，证明一个方向可由另一个表示。',
+          explanation:
+            '检查能否用已有方向替代它。−2u+v=0，且系数不全为零，证明一个方向可由另一个表示。',
         },
         {
           id: 'zero',

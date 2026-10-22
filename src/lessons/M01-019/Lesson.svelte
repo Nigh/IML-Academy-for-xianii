@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -29,20 +31,45 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    前课已经知道SVD的三个因子和奇异方向。本课只新增“保留部分方向”的近似方法，以及如何汇总全部元素的重构误差。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="只保存主要结构会丢什么"
   ><p>
     大型特征矩阵、图像和模型权重常含冗余结构。若只保存几个主要方向，存储和计算可能减少，但遗漏信息如何衡量？{metadata.title}用截断SVD给出明确答案。本课只用无量纲2×2合成矩阵演示误差，不宣称已经压缩真实模型或提升性能。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="保留强方向，舍弃弱方向"
-  ><p>
-    SVD把矩阵拆成若干秩1项，每一项描述一个输入方向到输出方向的映射。按奇异值从大到小保留前k项，得到低秩近似（low-rank
-    approximation）。diag(3,1)的第一项保留横轴伸缩3，却彻底删除纵轴伸缩1；被删的方向不能靠保留项自动恢复。
+<TheorySection id="intuition" title="保留强方向，舍弃弱方向">
+  <p>
+    一个奇异方向对应一份简单变换：只读取输入在该方向的分量，乘伸缩倍数，再沿对应输出方向输出。把全部这些变换相加就还原原矩阵；每份只有一个输出方向，称为秩1项。
   </p>
   <p>
-    换到混合坐标后，遗漏信息会分散到多个矩阵元素，但总的Frobenius误差不变。因此“把小元素设零”和“截断小奇异值”是两种不同操作。
-  </p></TheorySection
->
+    公式中的外积把一列向量与另一列向量的转置相乘，得到矩阵：每个元素是两向量对应位置的乘积。它和产生一个标量的内积不同。截断SVD只保留最大的前k份，k越小，丢弃的方向越多。
+  </p>
+  <FormulaBlock
+    latex={String.raw`A=\begin{pmatrix}3&0\\0&1\end{pmatrix},\quad A_1=\begin{pmatrix}3&0\\0&0\end{pmatrix},\quad A-A_1=\begin{pmatrix}0&0\\0&1\end{pmatrix}`}
+    description="A1表示只保留一项的近似；全部元素无量纲。纵向信息被删除，不能靠横向那份自动补回。"
+  />
+  <p>
+    Frobenius范数把矩阵所有元素当作一个长列表，逐个平方、求和、开根。因此上例误差为1；全部丢弃时为平方根10，全部保留时为0。这是重构误差，不是某个下游任务的预测误差。
+  </p>
+  <p>
+    奇异值平方和常被称为“能量”；本课是数学量，不宣称实际物理能量。截断法在这个未加权误差下最优，不保证保留任务所需的小方向。下面2×2例子的因子反而可能比原矩阵占更多数值，只演示近似原理，不冒充压缩收益。
+  </p>
+  <KnowledgeCheck prompt="保留全部奇异项后，截断误差还有吗？"
+    >{#snippet answer()}<p>
+        数学上为0，实际计算可能有浮点容差；这也意味着没有通过删项减少秩。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="截断SVD与最优误差">
   <FormulaBlock
     latex={String.raw`A_k=\sum_{i=1}^{k}\sigma_i u_i v_i^\mathsf T,\qquad \operatorname{rank}(A_k)\le k`}
@@ -64,6 +91,9 @@
   </p>
 </TheorySection>
 <TheorySection id="experiment" title="逐项恢复矩阵">
+  <p>
+    先预测再操作：保留全部奇异项后，截断误差还有吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="误差来自哪一项"
     instructions="第一奇异值固定3；第二奇异值默认1、范围0–3，步长0.25；保留项数k默认1，仅取0、1、2，可用键盘数值框。非法值保留有效结果。选择对角或固定45°混合坐标场景。"

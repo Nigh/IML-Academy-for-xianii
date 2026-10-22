@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '25°C 与向东走多远' },
     { id: 'intuition', title: '向量与它的坐标不是同一件事' },
     { id: 'mathematics', title: '分量来自基向量' },
@@ -21,7 +22,8 @@ export default {
         {
           id: 'passive',
           text: '(4,−3)m，长度仍为 5m',
-          explanation: '新 x 轴沿旧 y 轴，新 y 轴沿旧负 x 轴；被动坐标变换不改变物理长度。',
+          explanation:
+            '先区分位移本身与它的坐标表示。新 x 轴沿旧 y 轴，新 y 轴沿旧负 x 轴；被动坐标变换不改变物理长度。',
         },
         {
           id: 'active',

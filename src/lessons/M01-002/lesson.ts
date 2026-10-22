@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '从两段位移开始' },
     { id: 'intuition', title: '首尾相接的直觉' },
     { id: 'experiment', title: '亲手合成两个向量' },
@@ -22,7 +23,7 @@ export default {
           id: 'zero',
           text: '合位移为 (0,0)m，路径长度为 2√5m',
           explanation:
-            '两段位移完全抵消，但路径长度仍为两段各 √5m 的路程之和。位移与路程描述的是不同的物理量。',
+            '先逐分量相加，再比较长度。两段位移完全抵消，但路径长度仍为两段各 √5m 的路程之和。位移与路程描述的是不同的物理量。',
         },
         {
           id: 'both-zero',

@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '相同读数背后的不同输入' },
     { id: 'intuition', title: '沿看不见的方向移动' },
     { id: 'mathematics', title: '零空间与全部解' },
@@ -17,7 +18,11 @@ export default {
       version: 1,
       prompt: 'A=[1,1]，输入从(1,1)变为(2,0)，输出如何变化？',
       options: [
-        { id: 'same', text: '仍为2', explanation: '输入变化(1,−1)属于零空间，两次输出相同。' },
+        {
+          id: 'same',
+          text: '仍为2',
+          explanation: '代回矩阵，检查输出是否为零。输入变化(1,−1)属于零空间，两次输出相同。',
+        },
         {
           id: 'increase',
           text: '增加1',

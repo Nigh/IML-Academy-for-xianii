@@ -327,7 +327,7 @@
     "summary": "识别变换中保持方向的向量",
     "difficulty": "intermediate",
     "estimatedMinutes": 25,
-    "prerequisites": ["M01-012"],
+    "prerequisites": ["M01-012", "M01-006", "M01-007"],
     "objectives": [
       "解释特征值与特征向量中的数学对象、假设与适用条件",
       "识别变换中保持方向的向量",
@@ -347,7 +347,7 @@
     "summary": "用旋转、拉伸、旋转解释任意矩阵作用",
     "difficulty": "intermediate",
     "estimatedMinutes": 25,
-    "prerequisites": ["M01-017", "M01-010"],
+    "prerequisites": ["M01-017", "M01-010", "M01-013"],
     "objectives": [
       "解释奇异值分解 SVD中的数学对象、假设与适用条件",
       "用旋转、拉伸、旋转解释任意矩阵作用",

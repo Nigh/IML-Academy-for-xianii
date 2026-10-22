@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -31,19 +33,46 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    前置课程已解释普通逆矩阵和正交投影。本课处理没有普通逆的情形，并明确区分“输出误差最小”和“输入长度最小”两次选择。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="观测太少或互相矛盾时"
   ><p>
     标定可能只有一个总和读数却想恢复两个参数，也可能两个观测要求同一参数取不同值。普通逆矩阵无法处理这些非方阵问题。{metadata.title}给出统一的线性代数答案：最小范数最小二乘解。本课用无量纲合成小模型解析计算，不运行训练或通用数值分解。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="先最小残差，再最小范数"
-  ><p>
-    先找使输出最接近目标的输入；如果这样的输入仍不唯一，再选欧氏范数最小者。欠定方程x₁+x₂=2的解是一条直线，离原点最近的是(1,1)。超定方程x=1与x=3互相矛盾，只能选x=2，让两个残差的平方和最小。
+<TheorySection id="intuition" title="先最小残差，再最小范数">
+  <p>
+    欠定（underdetermined）表示未知分量比独立约束多，可能有很多解；超定（overdetermined）表示方程比未知分量多，含噪或矛盾观测可能没有精确解。伪逆用统一规则选择一个输入，但不会凭空消除观测矛盾。
   </p>
   <p>
-    在输出空间中，最优拟合是把b正交投影到列空间；在输入空间中，最小范数解不带任何多余的核分量。前者解释残差，后者解释如何在多个解中选择，不能混为同一个空间的距离。
-  </p></TheorySection
->
+    第一步比较输出：使预测与目标之差的平方和最小，这叫最小二乘。第二步仅在第一步同样最优的解中比较输入：选长度最小者。因此它有严格先后顺序，不是把两种大小混成一个分数。
+  </p>
+  <FormulaBlock
+    latex={String.raw`x_1+x_2=2:\quad (x_1,x_2)=(1+t,1-t),\quad x_1^2+x_2^2=2+2t^2`}
+    description="所有候选都精确拟合目标；t为实数，平方项非负，所以t=0的输入(1,1)最短，各量无量纲。"
+  /><FormulaBlock
+    latex={String.raw`(x-1)^2+(x-3)^2=2(x-2)^2+2`}
+    description="两个目标分别要求同一参数为1和3；配方说明x=2时平方误差最小，但最小值2仍不为0。"
+  />
+  <p>
+    Moore–Penrose伪逆记为A⁺，是把目标送到上述唯一选中解的矩阵；可逆时它等于普通逆。公式中的min表示最小数值，arg
+    min表示取得这个最小值的输入或输入集合；星号只是最优解的标记。理解这两个配方例子后，再读下面的嵌套公式；一般构造方法留到SVD课。
+  </p>
+  <KnowledgeCheck prompt="两个目标要求同一参数为1和3，伪逆能同时精确满足吗？"
+    >{#snippet answer()}<p>
+        不能。最优参数为2，残差平方和为2；伪逆给最佳折中，不消除矛盾。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="Moore–Penrose伪逆">
   <FormulaBlock
     latex={String.raw`x^\star=A^+b,\quad x^\star=\underset{x\in\arg\min_z\|Az-b\|_2}{\arg\min}\ \|x\|_2`}
@@ -62,6 +91,9 @@
   </p>
 </TheorySection>
 <TheorySection id="experiment" title="比较伪逆与候选解">
+  <p>
+    先预测再操作：两个目标要求同一参数为1和3，伪逆能同时精确满足吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="哪一种误差还可以降低"
     instructions="选择欠定或超定预设。b₁默认2、b₂默认0，范围±4；t默认1，范围±3，步长0.25，均无量纲。欠定模式只用b₁，b₂仅超定模式显示。非法数值保留有效结果；键盘可编辑。"

@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '观测中哪些部分能被模型解释' },
     { id: 'intuition', title: '沿线分量与垂直剩余' },
     { id: 'mathematics', title: '正交性消去交叉项' },
@@ -20,7 +21,7 @@ export default {
         {
           id: 'right',
           text: '(0,2)',
-          explanation: '观测减投影：(3,2)−(3,0)=(0,2)，与x轴内积为零。',
+          explanation: '先求投影，再用观测减去投影。观测减投影：(3,2)−(3,0)=(0,2)，与x轴内积为零。',
         },
         { id: 'projection', text: '(3,0)', explanation: '这是投影向量，不是残差。' },
       ],

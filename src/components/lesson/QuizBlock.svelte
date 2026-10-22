@@ -39,7 +39,11 @@
       >{/each}
   </fieldset>
   <button class="btn btn-sm btn-primary" disabled={!selected} type="submit">检查理解</button>
-  {#if submitted && option}<div class="quiz-feedback" role="status">
+  {#if submitted && option}<div
+      class="quiz-feedback"
+      data-state={selected === question.answerId ? 'correct' : 'incorrect'}
+      role="status"
+    >
       <strong>{selected === question.answerId ? '回答正确' : '再想一想'}</strong>
       <p>{option.explanation}</p>
     </div>{/if}

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -29,19 +31,42 @@
   const fmt = (n: number) => (Math.abs(n) < 0.0005 ? 0 : n).toFixed(3);
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    前课已经求出直线上的最近点，也区分了投影向量与系数。本课用向量相减得到剩余部分，并解释为什么这个剩余部分必与参考方向垂直。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="观测中哪些部分能被模型解释"
   ><p>
     标定模型只包含一个已知响应方向时，可以解释观测的多少部分？{metadata.title}把观测拆成沿模型方向的拟合分量和剩余残差。它是理解最小二乘几何的基础，而不只是作图技巧。本课使用无量纲的二维确定性向量，不进行真实训练。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="沿线分量与垂直剩余"
-  ><p>
-    先找到参考直线上离观测最近的投影，再从投影终点走到观测终点，这一步就是残差。若残差还含有参考方向分量，就能继续沿线移动投影来缩短距离，原来的点便不是最优点。因此最小二乘残差必须与参考方向正交。
+<TheorySection id="intuition" title="沿线分量与垂直剩余">
+  <p>
+    本课的参考子空间就是那条允许结果沿其变化的过原点直线。残差（residual）是“观测减去模型能解释的部分”。先求投影，再相减；不是任选一段箭头都可以叫投影残差。例如将观测(3,2)投影到横轴，模型解释(3,0)，剩余(0,2)。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\mathbf v=\mathbf p+\mathbf r,\quad (3,2)^\mathsf T=(3,0)^\mathsf T+(0,2)^\mathsf T,\quad 3^2+2^2=9+4`}
+    description="v为观测，p为投影，r为残差，各分量无量纲。长度的平方相加来自两份分量垂直。"
+  />
+  <p>
+    为什么剩余一定垂直？如果它仍有一份沿参考方向的贡献，就可以把那份挪到投影里，让残差更短，这与投影已经是最近点矛盾。因此正交是最近点的结果，而不是画图时强行规定的装饰。
   </p>
   <p>
-    改变参考方向会重新分配可解释部分和残差，但二者相加仍还原同一观测。平方范数也守恒；这里的平方范数只是数学量，不能未经物理模型就称为实际能量。
-  </p></TheorySection
->
+    平方范数在这里是长度的平方；只有物理模型说明比例关系和单位后，才能解释成能量。把任意向量分成两份时，平方展开还含两份向量的内积交叉项，只有正交时该项为0。概率独立属于后续统计知识，不能从几何垂直直接推出。
+  </p>
+  <KnowledgeCheck prompt="任意两份向量相加还原观测，就能把长度平方直接相加吗？"
+    >{#snippet answer()}<p>
+        不能。还需两份向量正交；否则平方展开中的内积交叉项不为0。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="正交性消去交叉项"
   ><FormulaBlock
     latex={String.raw`\mathbf p=\operatorname{proj}_{\mathbf u}(\mathbf v),\quad \mathbf r=\mathbf v-\mathbf p,\quad \mathbf u^\mathsf T\mathbf r=0,\quad\mathbf v=\mathbf p+\mathbf r`}
@@ -55,7 +80,10 @@
   </p></TheorySection
 >
 <TheorySection id="experiment" title="旋转参考方向再分解"
-  ><InteractivePanel
+  ><p>
+    先预测再操作：任意两份向量相加还原观测，就能把长度平方直接相加吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
+  <InteractivePanel
     title="同一观测的平方范数账本"
     instructions="默认观测(3,2)，分量范围±5、无量纲，方向角默认0°、范围±180°。非法输入保留有效值；方向始终由单位圆构造为非零向量。"
     meaning="v是观测，p是投影，从p出发的虚线是残差r；残差端点与v重合，因此残差名称放在表格中。显示内积残差与平方范数恒等式的数值误差。"

@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '换单位为何改变近邻' },
     { id: 'intuition', title: '直达与沿轴移动' },
     { id: 'mathematics', title: '从范数定义距离' },
@@ -17,7 +18,11 @@ export default {
       version: 1,
       prompt: '差向量 (3,4) 的 L1 与 L2 范数分别是多少？',
       options: [
-        { id: 'right', text: '7和5', explanation: 'L1相加绝对分量，L2取平方和的平方根。' },
+        {
+          id: 'right',
+          text: '7和5',
+          explanation: '先统一坐标和单位。L1相加绝对分量，L2取平方和的平方根。',
+        },
         {
           id: 'squared',
           text: '7和25',

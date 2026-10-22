@@ -43,7 +43,7 @@ export function transform(a: readonly (readonly number[])[], p: Vector2): Vector
 export function experiment(a: number[][]) {
   transform(a, { x: 0, y: 0 });
   const before: Vector2[][] = [];
-  for (const n of [-1, -0.5, 0, 0.5, 1]) {
+  for (const n of [-1, 0, 1]) {
     before.push(
       [
         { x: n, y: -1 },

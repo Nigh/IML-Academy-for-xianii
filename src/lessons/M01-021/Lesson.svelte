@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -39,19 +41,42 @@
   const fmt = (s: readonly number[]) => `(${s.join(',')}${s.length === 1 ? ',' : ''})`;
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    已有张量的阶数、形状与索引，也会区分矩阵乘法。本课新增广播：让一个较小数组中的值在逐元素运算中重复使用。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="给每个通道加偏置，不写三重循环"
   ><p>
     批次、时间和通道构成一个三维特征张量，模型需要给每个通道加一个偏置。{metadata.title}用尾轴对齐规则描述同一个偏置如何在多个位置复用。这个规则减少显式循环，却也容易让形状正确、业务含义错误的表达式悄悄运行。本课使用无量纲地址编码合成数据，执行真正的逐元素加法，不涉及训练。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="从最后一轴开始对齐"
-  ><p>
-    把两个形状从右向左排列，缺失的前轴视为长度1。每对轴长度相等，或其中一个为1，就能相加；单例轴的那个值被逻辑复用到对应位置。若两个长度都不是1且不相等，广播（broadcasting）失败。
+<TheorySection id="intuition" title="从最后一轴开始对齐">
+  <p>
+    先做一张表的加法：每行有4个通道，想给第一个通道加10、第二个加20，以此类推。同一份4个偏置要在每行重复使用，程序把这种按规则复用称为广播（broadcasting）。它不执行矩阵乘法里的行列求和。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\begin{pmatrix}0&1&2&3\\4&5&6&7\end{pmatrix}+(10,20,30,40)=\begin{pmatrix}10&21&32&43\\14&25&36&47\end{pmatrix}`}
+    description="左数组形状(2,4)，偏置形状(4,)，结果(2,4)；元素无量纲。偏置按末尾通道轴对齐，在每行使用相同通道值。"
+  />
+  <p>
+    形状中的逗号用于区分一维列表记法：(4,)只有一个轴；(4,1)有两个轴。比较时从右向左对齐，缺少的前轴当作长度1；每对长度相同或有一个为1才兼容。长度1表示这里总是复用索引0的数，不表示丢弃这一轴。
   </p>
   <p>
-    (3,1)与(1,4)先沿不同单例轴扩展，形成3×4的外和；(3,)和(4,)都是一维形状，尾轴冲突，不会自动被猜成列向量和行向量。
-  </p></TheorySection
->
+    例如(3,1)与(1,4)，前者每行只有一个值，后者只有一行，每个输出取对应行值加对应列值，形成3×4表；(3,)与(4,)末轴3和4不兼容，会失败。形状兼容并不能证明通道意义正确，程序不会自动理解业务语义。
+  </p>
+  <KnowledgeCheck prompt="两个一维形状(3,)和(4,)能自动组成3×4表吗？"
+    >{#snippet answer()}<p>
+        不能。尾轴冲突；应明确写出(3,1)与(1,4)才能得到该外和。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="兼容条件与索引映射">
   <FormulaBlock
     latex={String.raw`Y_{btc}=X_{btc}+\beta_c,\quad X,Y\in\mathbb R^{B\times T\times C},\quad\beta\in\mathbb R^C`}
@@ -70,6 +95,9 @@
   </p>
 </TheorySection>
 <TheorySection id="experiment" title="追踪每个输出来自哪里">
+  <p>
+    先预测再操作：两个一维形状(3,)和(4,)能自动组成3×4表吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="尾轴对齐与真实加法"
     instructions="形状用逗号分隔1–3个整数，每轴1–4，默认2,3,4和4；不输入括号。偏置起点默认10，范围±10，步长1，可键盘编辑。输出位置从0起；形状非法或不兼容时显示原因并停止计算。"

@@ -1,7 +1,8 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
-  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
   import InteractivePanel from '../../components/interactive/InteractivePanel.svelte';
@@ -43,6 +44,17 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    上一课已经区分了物理位移、坐标分量和长度。本课固定同一个坐标系，学习怎样合并位移和改变位移的大小；不再重复标量与向量的完整定义。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="从两段位移开始">
   <p>
     机器人先移动到位置 a，再沿方向 b
@@ -54,14 +66,31 @@
 </TheorySection>
 <TheorySection id="intuition" title="把箭头首尾相接">
   <p>
-    向量用一个箭头表示，长度代表大小，箭头朝向代表方向。将第二个箭头平移到第一个箭头的终点；从起点连到最终终点，就是合向量。
+    向量相加表示连续完成两段位移：先向右走2m，再向上走1m，总位移从最初起点指向最终终点。把第二根箭头平移到第一根末端，不改变它本身的方向和长度，这叫首尾相接。
   </p>
   <p>
-    这里的位移是<strong>自由向量</strong
-    >：平移箭头不改变它的分量。交换两段位移的先后顺序，终点不变。
+    也可以分别记账：横向贡献只与横向相加，纵向贡献只与纵向相加。两段位移必须使用同一组轴和同样单位；不能把不同坐标系的两列数字直接相加。
   </p>
+  <FormulaBlock
+    latex={String.raw`(2,0)^\mathsf T+(0,1)^\mathsf T=(2,1)^\mathsf T,\qquad 2(2,1)^\mathsf T=(4,2)^\mathsf T`}
+    description="分量单位为m；系数2无量纲。数乘将每一个分量乘以同一个数。"
+  />
+  <p>
+    正系数保持方向，绝对值表示长度变为几倍；负系数还会反向，零系数得到零向量。数乘不是“只改变横分量”。
+  </p>
+  <p>
+    长度的相加是另一件事。向右2m再向上1m，实际路程为3m，但起点到终点的直线距离为平方根5m。只有两段非零位移同向共线时，合位移长度才等于两段长度之和。
+  </p>
+  <KnowledgeCheck prompt="先向右2m，再向上1m，合位移长度会是3m吗？"
+    >{#snippet answer()}<p>
+        不会。3m是两段路程之和，起终点的直线距离是平方根5m。
+      </p>{/snippet}</KnowledgeCheck
+  >
 </TheorySection>
 <TheorySection id="experiment" title="亲手合成两个向量">
+  <p>
+    先预测再操作：先向右2m，再向上1m，合位移长度会是3m吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="方向会改变答案"
     instructions="调节四个坐标分量。也可以切换作图方式，或直接尝试下面的对照场景。"

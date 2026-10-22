@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -42,16 +44,45 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    只需前置课程的分量、数乘与相加。这里从头介绍矩阵的行列和乘法，不默认你已经读过编号更早的张量或内积课程。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="一层模型如何同时计算多个输出"
   ><p>
     线性层需要把多个输入特征按不同权重组合成多个输出。{metadata.title}把这些内积组织成一个规则，便于同时描述形状和计算。本课矩阵元素全部无量纲，最多3行3列，结果为真实解析计算，不进行训练。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="一格是一次行列匹配"
-  ><p>
-    左矩阵的一行提供一组系数，右矩阵的一列提供一组被组合的数；沿相同位置相乘后相加，填进对应结果格子。左列数必须等于右行数，才能逐项配对。每个结果位置都使用完整内维度，不是同位置两个元素相乘。
-  </p></TheorySection
->
+<TheorySection id="intuition" title="一格是一次行列匹配">
+  <p>
+    矩阵（matrix）是一张有行、有列的数表。横向是一行，纵向是一列；形状“2×3”表示2行3列，不是一个数乘法结果。某个元素的下标依次是行号、列号。下面公式从1编号，操作面板从0编号。
+  </p>
+  <p>
+    例如用三个特征分别乘三个权重再相加，得到一个输出。如果还想用另一套权重得到另一个输出，就把两套权重放成两行；每一列对应同一输入特征。这是矩阵为何适合记录多个输出的原因。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\begin{pmatrix}1&2&3\\4&5&6\end{pmatrix}\begin{pmatrix}7\\9\\11\end{pmatrix}=\begin{pmatrix}1\times7+2\times9+3\times11\\4\times7+5\times9+6\times11\end{pmatrix}=\begin{pmatrix}58\\139\end{pmatrix}`}
+    description="左矩阵2×3，输入3×1，输出2×1；本课数值无量纲。一行有3个权重，必须配3个输入。"
+  />
+  <p>
+    右边放多列输入时，对每一列重复同样计算，结果也逐列排列。每个格子都取左矩阵的一整行、右矩阵的一整列，同位置相乘再求和；这个运算也叫行列内积，但不需要先学几何内积课。
+  </p>
+  <p>
+    内维度是左列数与右行数，它们必须相同才能配对；外维度是左行数与右列数，保留为结果形状。求和符号Σ表示把下标遍历到的各项加起来。转置T表示交换行和列；复合映射表示把一次输出继续送进下一次计算，矩阵写法按从右到左的顺序作用。
+  </p>
+  <KnowledgeCheck prompt="一个2×3矩阵能乘一个2×1输入吗？"
+    >{#snippet answer()}<p>
+        不能。每行3个系数需要3个输入配对；合法输入应有3行。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="内维度收缩，外维度保留"
   ><FormulaBlock
     latex={String.raw`A\in\mathbb R^{m\times n},\ B\in\mathbb R^{n\times p},\quad C=AB\in\mathbb R^{m\times p},\quad C_{ij}=\sum_{k=1}^{n} A_{ik}B_{kj}`}
@@ -62,7 +93,10 @@
   </p></TheorySection
 >
 <TheorySection id="experiment" title="编辑矩阵并逐格检查"
-  ><InteractivePanel
+  ><p>
+    先预测再操作：一个2×3矩阵能乘一个2×1输入吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
+  <InteractivePanel
     title="每一个乘积从哪里来"
     instructions="默认2×3乘3×2。矩阵单元格可键盘编辑，有限值范围±1e6；非法输入不传播。结果行/列索引从0开始，数学公式从1开始。预设切换和复位同时重置索引。"
     meaning="A中高亮当前行，B中高亮当前列，AB高亮当前结果。下方列出实际逐项乘积及相加结果；另显示BA，比较形状与顺序。"

@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     {
       id: 'motivation',
       title: '两个特征朝向是否一致？',
@@ -42,7 +43,7 @@ export default {
         {
           id: 'a',
           text: '夹角不变，点积加倍',
-          explanation: '正数缩放保持方向；点积对 b 线性。',
+          explanation: '先算对应分量乘积，再求和。正数缩放保持方向；点积对 b 线性。',
         },
         {
           id: 'b',

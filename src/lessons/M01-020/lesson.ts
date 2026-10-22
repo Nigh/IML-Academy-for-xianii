@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '无法同时穿过每个观测' },
     { id: 'intuition', title: '观测空间中的正交投影' },
     { id: 'mathematics', title: '最优性条件与线性拟合' },
@@ -20,7 +21,7 @@ export default {
         {
           id: 'no',
           text: '不是，残差只需与全部模型列正交',
-          explanation: '三点不共线时残差非零，仍可与常数列和输入列正交。',
+          explanation: '同时比较全部观测的误差。三点不共线时残差非零，仍可与常数列和输入列正交。',
         },
         {
           id: 'yes',

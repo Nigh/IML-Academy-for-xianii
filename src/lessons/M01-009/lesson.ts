@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '只能沿一个方向解释观测' },
     { id: 'intuition', title: '垂足是最近点' },
     { id: 'mathematics', title: '最小距离导出投影' },
@@ -20,7 +21,8 @@ export default {
         {
           id: 'same',
           text: '仍为(3,0)，系数由3变为1.5',
-          explanation: '方向张成的直线不变，系数与u的长度反比，二者乘积不变。',
+          explanation:
+            '把候选点限制在同一条参考直线上。方向张成的直线不变，系数与u的长度反比，二者乘积不变。',
         },
         { id: 'double', text: '变成(6,0)', explanation: '这忽略了公式分母随方向长度平方增加。' },
       ],

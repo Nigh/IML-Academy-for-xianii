@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '只保存主要结构会丢什么' },
     { id: 'intuition', title: '保留强方向，舍弃弱方向' },
     { id: 'mathematics', title: '截断SVD与最优误差' },
@@ -17,7 +18,11 @@ export default {
       version: 1,
       prompt: 'diag(3,1)只保留第一奇异项，Frobenius误差是多少？',
       options: [
-        { id: 'one', text: '1', explanation: '剩余矩阵diag(0,1)的元素平方和为1，开根号为1。' },
+        {
+          id: 'one',
+          text: '1',
+          explanation: '先写出被删掉的奇异项。剩余矩阵diag(0,1)的元素平方和为1，开根号为1。',
+        },
         { id: 'three', text: '3', explanation: '3是被保留的奇异值，误差来自被舍弃的一项。' },
       ],
       answerId: 'one',

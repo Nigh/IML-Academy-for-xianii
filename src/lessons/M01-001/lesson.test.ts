@@ -12,7 +12,13 @@ it('协议、全部章节、三个场景、输入与复位', async () => {
   for (const section of definition.sections)
     expect(view.container.querySelector(`#${section.id}`)).toBeTruthy();
   expect(view.getByTestId('components').textContent).toContain('(3.000, 4.000) m');
+  const arrow = view.container.querySelector('[data-vector="0"]')!;
+  const endpoint = [arrow.getAttribute('x2'), arrow.getAttribute('y2')];
   await fireEvent.click(view.getByRole('button', { name: '场景二：坐标轴旋转 90°' }));
+  expect(
+    view.container.querySelector('[data-coordinate-system]')?.getAttribute('transform'),
+  ).toContain('rotate(-90)');
+  expect([arrow.getAttribute('x2'), arrow.getAttribute('y2')]).toEqual(endpoint);
   expect(view.getByTestId('components').textContent).toContain('(4.000, -3.000) m');
   await fireEvent.click(view.getByRole('button', { name: '场景三：零位移' }));
   expect(view.getByText('原坐标方向：未定义（零向量）')).toBeTruthy();

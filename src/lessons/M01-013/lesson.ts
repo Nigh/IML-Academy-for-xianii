@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '输出还能保留几个方向' },
     { id: 'intuition', title: '列空间决定可达输出' },
     { id: 'mathematics', title: '精确秩与阈值下的数值秩' },
@@ -20,7 +21,8 @@ export default {
         {
           id: 'one',
           text: '第二列是第一列的2倍，且第一列非零',
-          explanation: '所有输出都在(1,2)张成的直线上，只有一个独立方向。',
+          explanation:
+            '计算独立方向，而不是统计矩阵元素。所有输出都在(1,2)张成的直线上，只有一个独立方向。',
         },
         {
           id: 'two',

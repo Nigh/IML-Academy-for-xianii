@@ -41,3 +41,18 @@ export function canvasSize(width: number, height: number, dpr = 1) {
     throw new RangeError('Canvas 尺寸或 DPR 无效');
   return { width: Math.round(width * dpr), height: Math.round(height * dpr), scale: dpr };
 }
+
+/** Integer unit lattice; omit crowded lines without redefining a coordinate unit. */
+export function unitGrid(range: Range, pixels: number) {
+  validRange(range);
+  finite(pixels);
+  if (pixels <= 0) throw new RangeError('网格尺寸必须为正');
+  const limit = Math.max(1, Math.min(80, Math.floor(pixels / 16)));
+  const step = Math.max(1, Math.ceil((range[1] - range[0]) / limit));
+  const first = Math.ceil(range[0] / step) * step;
+  const count = Math.max(0, Math.min(limit + 1, Math.floor((range[1] - first) / step) + 1));
+  const values = Array.from({ length: count }, (_, i) => first + i * step).filter(
+    (n) => Number.isFinite(n) && n >= range[0] && n <= range[1],
+  );
+  return { step, values: [...new Set(values.map((n) => (n === 0 ? 0 : n)))] };
+}

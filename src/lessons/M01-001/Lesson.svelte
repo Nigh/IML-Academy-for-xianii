@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -28,12 +30,20 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    课程从高中平面坐标、实数、勾股定理和正弦余弦开始。不需要先会矩阵乘法或内积；本课先教会读向量，再理解同一位移为什么有不同坐标。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="25°C 与向东走多远">
   <p>
-    在{metadata.title}中，先问数据需要保留什么信息：温度计报告
-    25°C，已经描述了一个标量（scalar）。导航记录若只说“移动
-    5m”，你仍不知道终点；平面位移还需要方向。选择向东为 x 轴、向北为 y 轴后，向东 3m、向北 4m
-    的位移可以用一个列向量（vector）表示。
+    温度计报告25°C，一个数值和单位就足够。导航若只说“移动5m”，终点却可能在很多方向。我们先用向东3m、向北4m的位移，学习如何在同一个坐标系里保留大小和方向。
   </p>
   <p>
     温度的单位不是方向。标量也可以有单位、可以为负；向量则用多个分量记录相对于基的关系。本课是二维欧氏平面的解析教学模型，没有采样或训练。
@@ -41,29 +51,51 @@
 </TheorySection>
 <TheorySection id="intuition" title="向量与它的坐标不是同一件事">
   <p>
-    把一根指向终点的箭头留在桌上，再转动桌面的坐标纸。箭头没有动，但沿新两条坐标轴的分量会改变。图中的实线
-    v 是物理位移，虚线表示新 x 轴方向 e₁′，另一根实线表示新 y 轴方向
-    e₂′；基的名称与数值列在图外，避免原点附近标签重叠。这两个方向的箭头长度代表 1m 的坐标刻度。
+    先把向量读成一段位移：从原点出发，向右走3m，再向上走4m。终点的位置需要两个数；只说走了5m，无法区分向东北还是向西北。标量（scalar）只需一个数值和单位，例如温度25°C；向量（vector）还要保留各方向的贡献。
   </p>
   <p>
-    向量不是两个脱离上下文的数字。分量的顺序、轴方向和单位共同定义位移表示；平移原点不改变自由位移的分量。若表示位置，才还需要指定原点。正交坐标轴旋转保留长度；任意非正交基的分量不能直接套用勾股定理。
+    分量是沿某根坐标轴计量的有符号数：正数沿正方向，负数沿反方向。横纵分量按顺序写成一列，就是列向量。“2×1”只表示2行、1列；上标T表示把横排改成竖排，不是幂次。
   </p>
+  <FormulaBlock
+    latex={String.raw`\mathbf v=\begin{pmatrix}3\\4\end{pmatrix}\mathrm{m},\qquad \|\mathbf v\|_2=\sqrt{3^2+4^2}\mathrm{m}=5\mathrm{m}`}
+    description="二维位移的两个分量单位均为m；双竖线和下标2在本课表示勾股定理算出的长度。"
+  />
+  <p>
+    现在固定这根箭头，只把坐标纸逆时针转90°。新横轴指向原来的上方，所以新横分量为4m；新纵轴指向原来的左方，而位移向右3m，所以新纵分量为−3m。长度仍是5m。图中旋转的是完整坐标系，箭头不转。
+  </p>
+  <p>
+    基向量是给坐标轴选定的单位方向，例如向右和向上各一份。向量可由“横分量乘横方向，再加纵分量乘纵方向”重建。本课仅用互相垂直、同尺度的坐标轴；任意斜坐标不在这里讨论。
+  </p>
+  <KnowledgeCheck prompt="坐标系转90°后，位移箭头也应该跟着转吗？"
+    >{#snippet answer()}<p>
+        不应该。这里只更换描述位移的轴；箭头保持原位，新分量变为(4,−3)m。
+      </p>{/snippet}</KnowledgeCheck
+  >
 </TheorySection>
 <TheorySection id="mathematics" title="分量来自基向量">
   <FormulaBlock
     latex={String.raw`\mathbf v=(v_1,v_2)^\mathsf T=v_1\mathbf e_1+v_2\mathbf e_2,\qquad \|\mathbf v\|_2=\sqrt{v_1^2+v_2^2}`}
     description="v 是平面位移（2×1，m）；v₁、v₂ 是实数分量（m），e₁、e₂ 是无量纲的正交单位基。长度公式只适用于本课的正交归一坐标。"
   />
-  <FormulaBlock
-    latex={String.raw`\mathbf e'_1=(\cos\theta,\sin\theta)^\mathsf T,\quad \mathbf e'_2=(-\sin\theta,\cos\theta)^\mathsf T,\quad \begin{pmatrix}v'_1\\v'_2\end{pmatrix}=\begin{pmatrix}\cos\theta&\sin\theta\\-\sin\theta&\cos\theta\end{pmatrix}\begin{pmatrix}v_1\\v_2\end{pmatrix}`}
-    description="θ 是坐标轴逆时针转角，公式用弧度、控件显示度；新基 e′ 的形状为 2×1，无量纲。变换矩阵为 2×2、无量纲；新分量 v′ 的单位仍为 m，来自位移与每根新单位轴的内积。"
-  />
-  <p>
-    第一行把位移沿新 x
-    轴的贡献相加；第二行同理。把两份贡献乘回新基再相加，就还原原来的物理位移。正弦平方与余弦平方之和为一，交叉项抵消，因此旋转前后长度相同。
-  </p>
+  <details>
+    <summary>补充：把一般角度的分量关系写成矩阵</summary>
+    <p>
+      括号中的方阵按行记录两条分量计算式：每行先把对应数相乘，再相加，分别得到新横、纵分量。矩阵乘法在M01-011系统学习；不影响先理解90°几何例子。
+    </p>
+    <FormulaBlock
+      latex={String.raw`\mathbf e'_1=(\cos\theta,\sin\theta)^\mathsf T,\quad \mathbf e'_2=(-\sin\theta,\cos\theta)^\mathsf T,\quad \begin{pmatrix}v'_1\\v'_2\end{pmatrix}=\begin{pmatrix}\cos\theta&\sin\theta\\-\sin\theta&\cos\theta\end{pmatrix}\begin{pmatrix}v_1\\v_2\end{pmatrix}`}
+      description="θ 是坐标轴逆时针转角，公式用弧度、控件显示度；新基 e′ 的形状为 2×1，无量纲。变换矩阵为 2×2、无量纲；新分量 v′ 的单位仍为 m，可由各方向的正弦、余弦分量相加得到，无需先学内积。"
+    />
+    <p>
+      第一行把位移沿新 x
+      轴的贡献相加；第二行同理。把两份贡献乘回新基再相加，就还原原来的物理位移。正弦平方与余弦平方之和为一，交叉项抵消，因此旋转前后长度相同。
+    </p>
+  </details>
 </TheorySection>
 <TheorySection id="experiment" title="移动坐标轴，保持位移">
+  <p>
+    先预测再操作：坐标系转90°后，位移箭头也应该跟着转吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="同一位移，两套分量"
     instructions="默认位移为 (3,4)m、转角为 0°。分量范围 −5 至 5m，转角 −180 至 180°；非法或非有限输入不会进入计算。固定分量后只改转角，观察新分量与长度。"
@@ -103,18 +135,15 @@
     </div>
     <VectorDiagram
       range={7}
-      vectors={[
-        { ...result.original, label: x === 0 && y === 0 ? '' : 'v', role: 'primary' },
-        { ...result.basisX, label: '', role: 'secondary' },
-        { ...result.basisY, label: '', role: 'accent' },
-      ]}
-      description="物理位移 v 与旋转后的两根正交坐标轴；横轴 x、纵轴 y，坐标单位 m，固定等比例视域 ±7m。零位移在原点，没有方向箭头。"
+      axisRotation={degrees}
+      vectors={[{ ...result.original, label: x === 0 && y === 0 ? '' : 'v', role: 'primary' }]}
+      description="物理位移v固定；完整网格、刻度与坐标轴按转角旋转，正方向标为x′和y′，每单位为1m。零位移没有方向箭头。"
     />
     <div class="readout" aria-live="polite">
       <p>
-        基方向图例（无量纲）：虚线 e₁′ = ({result.basisX.x.toFixed(3)}, {result.basisX.y.toFixed(
+        新坐标轴的单位方向（无量纲）：e₁′ = ({result.basisX.x.toFixed(3)}, {result.basisX.y.toFixed(
           3,
-        )})；实线 e₂′ = ({result.basisY.x.toFixed(3)}, {result.basisY.y.toFixed(3)})。
+        )})；e₂′ = ({result.basisY.x.toFixed(3)}, {result.basisY.y.toFixed(3)})。
       </p>
       <p>标量对照：温度 25°C；原分量：{formatVector(result.original)}</p>
       <p data-testid="components">新坐标分量：{formatVector(result.components)}</p>
@@ -130,7 +159,7 @@
     steps={[
       '场景一：温度 25°C 是标量；位移 (3,4)m 长度为 5m，却还保留了方向。',
       '场景二：坐标轴转 90°，确认新分量 (4,−3)m，而重构仍为 (3,4)m。',
-      '场景三：零位移长度为零、方向未定义。单位基只占较小范围是为了和 5m 位移保持真实比例；标签与数值在独立结果区读取。',
+      '场景三：零位移长度为零、方向未定义。网格与轴一起转动，物理位移箭头保持不动；结果区报告新轴的单位方向。',
       '修改任一分量再调转角，观察重构与长度；最后复位，恢复全部默认参数。',
     ]}
   />

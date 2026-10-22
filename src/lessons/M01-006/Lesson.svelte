@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -27,21 +29,49 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    前课的张成空间收集全部实系数组合。本课进一步问：哪些方向是重复的？最少保留几根向量，才能保持同样的表达能力？
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="冗余特征为何让权重不唯一"
   ><p>
     两个传感器通道若始终互为倍数，线性模型就可以把一份权重转移到另一通道而保持输出不变。{metadata.title}解释这种冗余，并回答：怎样挑选足够表达空间、又没有多余方向的一组向量？本课为无量纲二维解析模型。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="能抵消的贡献揭示冗余"
-  ><p>
-    若若干非零权重的贡献能够完全抵消，就能把其中一项移到另一边，用其余向量表示它。这样的向量组线性相关（linearly
-    dependent）。如果只有全部权重为零才会抵消，就称线性独立（independent）。独立且张成指定空间的一组向量叫基（basis）。
+<TheorySection id="intuition" title="能抵消的贡献揭示冗余">
+  <p>
+    两个方向都能参与组合，不代表它们提供两份独立能力。例如第二向量是第一向量的2倍，那么“第一份−2倍，加第二份1倍”正好抵消。这个抵消式反过来说明，第二向量完全可以由第一向量替代。
   </p>
   <p>
-    两根独立平面方向决定两个坐标；第三根方向可以由前两根生成，因而引入冗余。这里的秩是张成空间的维数，不能混同于张量的轴数。
-  </p></TheorySection
->
+    把“不全为零的系数能组合出零”称为线性相关。这里“不全为零”允许部分系数是0，只要求至少一个不是0；全部系数为0的组合任何向量组都有，不能说明冗余。
+  </p>
+  <FormulaBlock
+    latex={String.raw`-2(1,0)^\mathsf T+1(2,0)^\mathsf T=\mathbf0,\qquad a(1,0)^\mathsf T+b(0,1)^\mathsf T=(a,b)^\mathsf T`}
+    description="左侧给出一组非全零系数，因此相关；右侧要得到零向量只能a=b=0，因此两个方向独立。各量无量纲。"
+  />
+  <p>
+    线性独立表示没有某根向量能被其余向量替代。能够张成指定空间、同时又独立的一组向量叫基（basis）；基中向量的数量定义该空间的维数（dimension）。基不唯一，但同一有限维空间的所有基都有相同数量。
+  </p>
+  <p>
+    一个非零向量就能作为它所在直线的基，却不能作为整个平面的基。两个独立平面向量构成平面的基；若硬加第三根，它必能由前两根表示。下方实验把第二方向从横轴抬起来，观察零组合的条件如何改变。
+  </p>
+  <KnowledgeCheck prompt="一根非零向量能不能成为基？"
+    >{#snippet answer()}<p>
+        能，作为它张成直线的基；但不能作为整个二维平面的基。基必须说明针对哪个空间。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="相关、独立与基">
+  <p>
+    符号∃表示“至少存在一个”，不等号表示该系数不是0；下标i用于逐个编号。本课讨论的是确定性向量的线性相关，不是随机变量的统计相关。
+  </p>
   <FormulaBlock
     latex={String.raw`\sum_{i=1}^{m}a_i\mathbf u_i=\mathbf0,\qquad \exists i:a_i\ne0`}
     description="相关性的判据：m为向量个数，u_i为2×1实列向量，a_i为实系数；存在不全为零的系数满足等式。本课所有量无量纲。若等式仅有全零系数解则独立。"
@@ -55,6 +85,9 @@
   </p>
 </TheorySection>
 <TheorySection id="experiment" title="寻找非平凡零组合">
+  <p>
+    先预测再操作：一根非零向量能不能成为基？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="从两个方向到三个方向"
     instructions="第二向量默认(0,1)，分量范围−2至2，无量纲。第一向量固定(1,0)，可加入第三向量(1,1)。非法输入保留有效值；复位恢复两个标准基。"

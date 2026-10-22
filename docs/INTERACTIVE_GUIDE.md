@@ -6,7 +6,7 @@ Phase 1 的实际实现位于 `src/components`、`src/lib/math`、`src/lib/simul
 `Interactive Component Contract v1` 的接口见 [COMPONENTS](COMPONENTS.md)。
 数学状态属于课程；公共组件只接收数据和回调，不读取课程 ID（课程链接、下载组件除外）。
 新课程仅写自己的 `src/lessons/<ID>`、适用时的 `labs/lessons/<ID>`，用 `lesson.ts` 自动发现，无须修改清单或路由。
-共享能力新增或破坏性接口修改走独立基础设施 PR。每课独立分支与 PR，不捆绑三课提交。
+新建课程独立分支、一课一 PR，共享能力新增或破坏性接口修改通常走独立基础设施 PR。既有课程的授权批量修订可合并相关课程、共享改动与文档到同一个 PR；仍须明确兼容性与逐课验证，不因批量交付降低验收。
 
 先读 LESSON_SPEC、任务卡与 NOTATION，定义 `experiment.ts` 的输入、输出、参数限制和误差容限，再写 UI。
 输入回调只接收有效有限数；修改优化参数时归零显示索引，必要时用 Svelte `{#key}` 重建时钟组件。

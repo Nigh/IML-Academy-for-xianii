@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -28,19 +30,42 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    已有点积和向量长度的知识。本课把长度推广为范数，并用差向量衡量两点距离；不同尺度如何改变比较结果是新增内容。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="换单位为何改变近邻"
   ><p>
     近邻分类、聚类和误差评分都需要比较距离。如果把一个输入从米改记为毫米，模型却认为样本忽然远了很多，问题出在表示与度量。{metadata.title}先用同单位位移解释范数，再演示混合单位的错误。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="直达与沿轴移动"
-  ><p>
-    从原点到(3,4)m，直线最短长度是5m；若只能先横向再纵向行走，路程是7m。L2范数对应欧氏长度，L1范数相加绝对分量。两点的距离等于差向量的范数，而范数本身衡量向量到零的距离。
+<TheorySection id="intuition" title="直达与沿轴移动">
+  <p>
+    范数（norm）是对“大小”的一种约定，记号是把向量夹在双竖线中，下标区分不同规则。L2就是熟悉的勾股长度；L1把每个分量的绝对值相加。它们描述不同的任务限制，不是同一个长度的两种写法。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\|(3,4)^\mathsf T\|_2=5,\qquad\|(3,4)^\mathsf T\|_1=7,\qquad\mathbf b-\mathbf a=(3,4)^\mathsf T`}
+    description="例中a=(1,1)m，b=(4,5)m；差向量和两个范数都带m单位。L1可解释为只能沿坐标轴走的最短路程。"
+  />
+  <p>
+    距离要先相减再求范数：相减把“从哪里出发”消掉，只保留两点的相对位移。合法范数非负，只有零向量大小为0；放大向量会同比放大大小，绕道也不会比直接连接更短。这些条件分别叫正定性、绝对齐次性和三角不等式。
   </p>
   <p>
-    不同范数描述不同的几何与任务偏好，没有一种在所有问题上更正确。L1随坐标轴旋转通常改变，L2在正交旋转下不变；使用它们之前要确定坐标含义。
-  </p></TheorySection
->
+    尺度是比较前的单位尺。如果某特征除以它自己的正尺度，就变成无量纲数；尺度越大，该特征同样的变化在距离中越不显著。改米为毫米时，分量和尺度必须同时乘1000。只改分量会让数值变大，却没有新增物理差异。
+  </p>
+  <KnowledgeCheck prompt="把米改成毫米后，归一化距离应当变大1000倍吗？"
+    >{#snippet answer()}<p>
+        不应当。分量及同单位尺度都乘1000，比值不变。只改分量才会制造虚假的距离变化。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="从范数定义距离"
   ><FormulaBlock
     latex={String.raw`\|\mathbf z\|_1=\sum_i|z_i|,\quad\|\mathbf z\|_2=\sqrt{\sum_i z_i^2},\quad d_p(\mathbf a,\mathbf b)=\|\mathbf a-\mathbf b\|_p`}
@@ -54,7 +79,10 @@
   </p></TheorySection
 >
 <TheorySection id="experiment" title="同一位移，不同数值表示"
-  ><InteractivePanel
+  ><p>
+    先预测再操作：把米改成毫米后，归一化距离应当变大1000倍吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
+  <InteractivePanel
     title="物理长度与数值分数"
     instructions="默认差向量(3,4)m，尺度均1m。分量范围±5m，尺度0.1至10m。预设只改变第一特征的显示单位；非法输入保留有效结果。"
     meaning="几何始终按m绘制。实线Δ是直达位移，横向与竖向两段显示L1轴向路径；数值区同时报告合法物理范数、错误混合单位分数与归一化度量。"

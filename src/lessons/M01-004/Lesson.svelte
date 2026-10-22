@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -27,9 +29,20 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    前置课程已经教过向量逐分量相加，以及正、负、零倍数。本课问的是：选定的一批向量，经过这些操作后会不会离开这批向量？
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="模型允许哪些输出">
   <p>
-    一个线性模型只能把若干固定方向按实数系数相加。如果允许的输出集合在相加或缩放后会跑出去，它就不能作为这样的线性输出空间。{metadata.title}帮助我们区分“所有线性组合都合法”的集合与带偏移的集合。
+    直线上的两个位移相加，结果还在这条直线上吗？把其中一段反向或放大呢？本课从这些已经学过的操作出发，解释哪些向量集合能容纳任意这样的组合，再把结论用于模型允许的输出。
   </p>
   <p>
     例如两路无量纲特征受约束 y=2x，任何强度的叠加仍满足比例关系；加上固定偏置后变成
@@ -39,14 +52,35 @@
 </TheorySection>
 <TheorySection id="intuition" title="封闭意味着组合后仍合法">
   <p>
-    在一个集合中选两个向量，任意拉伸、翻转并相加，结果仍属于集合，这叫对线性组合封闭。非空集合还必须容纳零向量，因为把任何成员乘零就得到零。过原点的直线能满足；离开原点的平移直线不能满足。
+    先从高中直线开始：满足某条方程的所有点构成一个集合（set），其中某个点就是集合的成员。“属于”只是在问这个点是否满足条件。把点的坐标当作从原点指向它的向量，便能对成员做加法和数乘。
   </p>
   <p>
-    这里研究 R²
-    中采用通常加法与数乘的子空间。结合律、交换律、分配律等从环境空间继承；非空加上线性组合封闭即可验证子空间。一般抽象向量空间还包括函数、多项式等对象，不能仅用箭头定义。
+    向量空间（vector
+    space）是一组能按规则相加、数乘的对象；运算满足交换、结合和分配等规律。普通二维实向量已经满足这些规律。我们从这个大空间中挑一部分成员时，若它们仍构成向量空间，这一部分就叫子空间（subspace）。
   </p>
+  <FormulaBlock
+    latex={String.raw`V=\{(x,y)^\mathsf T:y=2x\},\quad \mathbf u=(1,2)^\mathsf T,\quad \mathbf v=(-1,-2)^\mathsf T`}
+    description="V读作“所有满足y等于2x的二维向量的集合”；u、v是其中两个成员。本课坐标和系数均无量纲。"
+  />
+  <p>
+    试着相加：两个成员相加得到原点，仍在线上；把其中一个成员乘−2，也仍在线上。这种“做完允许的运算，还留在集合里”的性质叫封闭（closure）。要证明子空间，不能只测这两个点：必须对任意成员、任意实数系数都成立，并且集合非空。
+  </p>
+  <p>
+    为什么一定要有零向量？任何成员乘0都会得到它。如果候选集合不含原点，就已经失败。把直线向上移1，虽然仍像一条普通直线，却不含原点，因而不是线性子空间。这不表示它没用，而是属于不同的数学结构。
+  </p>
+  <p>
+    线性模型在这里指把固定向量分别乘系数后相加的规则。所有允许的输出合起来叫输出集合；系数允许取任意实数且没有固定偏移时，这个集合就是线性输出空间。机器学习中常把加固定偏置的模型也叫线性模型，但严格数学上它对输入通常是仿射（affine）映射；读本课时要区分这两种用法。
+  </p>
+  <KnowledgeCheck prompt="一条直线包含原点，就足以说明任意集合都是子空间吗？"
+    >{#snippet answer()}<p>
+        不能。对这里的整条过原点直线成立；任意集合还要检查任意加法与数乘的封闭性，例如只有原点和一个非零点的集合就不封闭。
+      </p>{/snippet}</KnowledgeCheck
+  >
 </TheorySection>
 <TheorySection id="mathematics" title="子空间判据与反例">
+  <p>
+    读公式时，R表示实数，R²表示两个实数排成的向量；∈读作“属于”，∀读作“对于任意”，空集符号表示没有成员，花括号表示把满足条件的对象收集成集合。这里“任意”不能替换为“我试过的几个”。
+  </p>
   <FormulaBlock
     latex={String.raw`V\ne\varnothing,\quad \forall\mathbf u,\mathbf v\in V,\ \forall a,b\in\mathbb R:\ a\mathbf u+b\mathbf v\in V`}
     description="V 为 R² 的候选非空子集；u、v 为2×1实向量；a、b为任意实标量。本课所有坐标、系数均无量纲。使用通常的加法与数乘，不能另加系数限制。"
@@ -62,6 +96,9 @@
   </p>
 </TheorySection>
 <TheorySection id="experiment" title="直线能否容纳线性组合">
+  <p>
+    先预测再操作：一条直线包含原点，就足以说明任意集合都是子空间吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="组合后还在线上吗"
     instructions="偏移 d 默认0，系数 a、b 默认1；范围均 −2 至2，无量纲。u=(1,2+d)、v=(−1,−2+d)。输入非法时保留有效结果。"
@@ -97,6 +134,7 @@
       />
     </div>
     <Plot2D
+      equal
       series={result.series}
       xRange={[-5, 5]}
       yRange={[-12, 12]}

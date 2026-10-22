@@ -55,3 +55,12 @@ it('拒绝错误矩阵、非有限值、越界与溢出', () => {
     ),
   ).toThrow();
 });
+
+it('教学网格使用单位间隔，变换后仍保留真实间距', () => {
+  const r = experiment(presets[0].matrix);
+  expect(r.before).toHaveLength(6);
+  expect(
+    r.before.every((line) => line.every((p) => Number.isInteger(p.x) && Number.isInteger(p.y))),
+  ).toBe(true);
+  expect(r.after[0][0].x).toBe(-2);
+});

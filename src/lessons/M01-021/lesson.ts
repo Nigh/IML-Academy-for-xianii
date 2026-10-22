@@ -4,6 +4,7 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'learning-path', title: '接上已有知识' },
     { id: 'motivation', title: '给每个通道加偏置，不写三重循环' },
     { id: 'intuition', title: '从最后一轴开始对齐' },
     { id: 'mathematics', title: '兼容条件与索引映射' },
@@ -20,7 +21,7 @@ export default {
         {
           id: 'same',
           text: '(2,3,4)',
-          explanation: '尾轴4匹配，缺失前轴视为1，偏置跨批次与时间复用。',
+          explanation: '从末轴逐对检查兼容条件。尾轴4匹配，缺失前轴视为1，偏置跨批次与时间复用。',
         },
         { id: 'append', text: '(2,3,4,4)', explanation: '逐元素广播不会自动增加一个新尾轴。' },
       ],

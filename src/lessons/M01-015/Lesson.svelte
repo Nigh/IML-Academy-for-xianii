@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -30,20 +32,42 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    已有列空间、秩、零空间及解族的知识。本课把高中方程组的相交、平行与重合连接到这些概念，再解释何时能用逆矩阵恢复输入。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="标定能否唯一反推参数"
   ><p>
     标定模型把未知参数x映射为观测b，已知观测后能否反求参数？{metadata.title}研究这件事的存在性和唯一性。若两个测量只是同一约束的重复，更多读数并不一定带来更多信息；若读数彼此矛盾，则精确方程根本无解。本课用无量纲实数、三个固定二维矩阵解析展示，不把合成数据当实测结果。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="约束直线的三种关系"
-  ><p>
-    每一行方程给出输入平面里的一条直线。两线相交于一点时有唯一解，重合时有无穷多个解，平行且分离时无解。单位矩阵的两行分别固定x₁和x₂；倍数行矩阵只约束两分量之和，第二行若不给相同总和就产生矛盾。
+<TheorySection id="intuition" title="约束直线的三种关系">
+  <p>
+    矩阵方程把一组高中线性方程简写到一起：每行就是一条约束，未知数放在同一列。先按消元法判断约束有没有冲突，再问能不能唯一还原输入。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\begin{cases}x_1+x_2=2\\2x_1+2x_2=d\end{cases}\quad\Longrightarrow\quad 0=d-4`}
+    description="两式相减：第二式减第一式的2倍。d为目标第二读数，各量无量纲；d不为4时矛盾，为4时第二式没有新增约束。"
+  />
+  <p>
+    逆矩阵是撤销变换的规则，记号上标−1不是对每个元素取倒数。单位矩阵I沿每个方向保持输入，作用相当于“什么也不改”；逆矩阵与原矩阵先后作用必须得到I。仅对某个目标找到解，不代表对所有目标都能唯一反求。
   </p>
   <p>
-    逆矩阵（inverse
-    matrix）表示撤销一个可逆线性变换。它必须对所有输出都能恢复唯一输入；只为某个b找到一个解，并不证明矩阵可逆。
-  </p></TheorySection
->
+    满秩方阵表示输入方向全部保留，且输入输出维数相同。二维行列式是从四个元素算出的一个数，下面给出乘积之差公式；其绝对值是单位方形经变换后的面积，为0说明被压成线或点，因此不能逆转。增广矩阵是在系数矩阵右侧再附上目标列，用于同时记录约束及其目标。
+  </p>
+  <KnowledgeCheck prompt="第二个约束只是第一个的2倍，会自动产生唯一解吗？"
+    >{#snippet answer()}<p>
+        不会。若目标也成2倍，约束重复；否则矛盾。要唯一解，必须有足够独立约束。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="mathematics" title="逆矩阵需要什么条件">
   <FormulaBlock
     latex={String.raw`A\mathbf x=\mathbf b,\quad A\in\mathbb R^{n\times n},\quad \operatorname{rank}A=n\ \Longrightarrow\ \mathbf x=A^{-1}\mathbf b`}
@@ -61,6 +85,9 @@
   </p>
 </TheorySection>
 <TheorySection id="experiment" title="切换右端项与解的类型">
+  <p>
+    先预测再操作：第二个约束只是第一个的2倍，会自动产生唯一解吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="同一个矩阵，不同观测"
     instructions="选择矩阵场景。b₁默认2、b₂默认1，各范围−4至4；解族系数t默认0、范围−3至3，步长0.25，均无量纲。数值框支持键盘；非有限或越界输入不进入计算。"
@@ -104,6 +131,7 @@
     />
     <MatrixView values={result.matrix} columnLabels={['x₁系数', 'x₂系数']} />
     <Plot2D
+      equal
       series={result.series}
       xRange={[-result.extent, result.extent]}
       yRange={[-result.extent, result.extent]}

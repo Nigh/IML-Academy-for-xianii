@@ -1,4 +1,6 @@
 <script lang="ts">
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
+  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
@@ -48,18 +50,47 @@
   }
 </script>
 
+<TheorySection id="learning-path" title="接上已有知识">
+  <p>
+    前置课程已经教过向量分量、加法和数乘。本课新增一种把两个向量变成一个数的运算；高中夹角与余弦用于解释它。
+  </p>
+  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
+    <ul>
+      {#each metadata.prerequisites as id (id)}<li>
+          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
+        </li>{/each}
+    </ul>{/if}
+</TheorySection>
 <TheorySection id="motivation" title="两个特征朝向是否一致？"
   ><p>
     检索系统比较两个样本的特征，神经网络在线性层计算输入与权重的匹配。{metadata.title}让我们从两个数值列表走向方向与长度的几何关系。本课所有分量为无量纲的二维实数，不涉及真实训练。
   </p></TheorySection
 >
-<TheorySection id="intuition" title="把一个箭头投到另一个方向"
-  ><p>
-    把 b 当作参考方向。a 沿 b 的分量越大，点积通常越大；但 b
-    自身的长度也参与乘法。因此，只有去除长度的影响后，才适合比较方向相似性。锐角、直角与钝角分别对应正、零、负点积。
-  </p></TheorySection
->
+<TheorySection id="intuition" title="把一个箭头投到另一个方向">
+  <p>
+    内积或点积（dot
+    product）是一条明确的计算规则：对应分量相乘，把乘积相加，结果是一个标量。它不生成新箭头。先算最简单的例子，再讨论它为什么能描述方向。
+  </p>
+  <FormulaBlock
+    latex={String.raw`(3,2)^\mathsf T\cdot(1,0)^\mathsf T=3\times1+2\times0=3,\qquad \mathbf a\cdot\mathbf b=\|\mathbf a\|_2\|\mathbf b\|_2\cos\theta`}
+    description="向量为二维无量纲实向量，θ是两根非零箭头的夹角，双竖线表示欧氏长度。零向量没有方向，因而不定义它的夹角。"
+  />
+  <p>
+    如果参考向量沿横轴且长度为1，点积恰好读出另一个向量的横向分量。一般参考方向也是如此：先把箭头沿参考方向的贡献读出来，再乘参考向量自己的长度。下一课投影会系统解释如何从这个数恢复对应的箭头。
+  </p>
+  <p>
+    锐角的余弦为正，钝角为负，垂直时为0，故点积符号反映夹角。但把任一向量放大，点积也随之放大；方向没变，分数却变了。余弦相似度除掉两个长度的乘积，只比较方向，两向量都非零才有定义。
+  </p>
+  <KnowledgeCheck prompt="保持方向，把参考向量放大2倍，点积和余弦相似度怎样变化？"
+    >{#snippet answer()}<p>
+        点积放大2倍；非零向量的余弦相似度不变，因为分子分母同比放大。
+      </p>{/snippet}</KnowledgeCheck
+  >
+</TheorySection>
 <TheorySection id="experiment" title="先预测符号，再移动端点">
+  <p>
+    先预测再操作：保持方向，把参考向量放大2倍，点积和余弦相似度怎样变化？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
+  </p>
   <InteractivePanel
     title="方向与尺度的对照实验"
     instructions="选择预设，先预测点积正负。拖动 a、b 的圆形端点，或使用同步数值控件。每个分量范围 −5 至 5，超范围输入不传播。"
