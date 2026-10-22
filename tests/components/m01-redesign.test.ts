@@ -1,5 +1,5 @@
 import { render, fireEvent, cleanup } from '@testing-library/svelte';
-import { afterEach, expect, it } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import type { Component } from 'svelte';
 import type { LessonBodyProps } from '../../src/lib/lesson/contract.ts';
 import { lessonById } from '../../src/lib/curriculum/catalog.ts';
@@ -18,6 +18,14 @@ const explorations = import.meta.glob<{
   };
 }>('../../src/lessons/M01-*/exploration.ts', { eager: true });
 afterEach(cleanup);
+beforeEach(() =>
+  vi.stubGlobal('matchMedia', () => ({
+    matches: false,
+    addEventListener() {},
+    removeEventListener() {},
+  })),
+);
+afterEach(() => vi.unstubAllGlobals());
 
 for (const [path, module] of Object.entries(lessons)) {
   const id = path.split('/').at(-2)!;

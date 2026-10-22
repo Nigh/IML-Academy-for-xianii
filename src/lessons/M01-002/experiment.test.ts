@@ -1,5 +1,43 @@
 import { describe, it, expect } from 'vitest';
-import { add, scale, vector, magnitude } from './experiment.ts';
+import {
+  add,
+  scale,
+  vector,
+  magnitude,
+  routePosition,
+  assessRoute,
+  routeTasks,
+} from './experiment.ts';
+it('两段直线按解析位置推进，检查路径而不仅是终点', () => {
+  const a = vector(2, 1),
+    b = vector(1, 2);
+  expect(routePosition(a, b, 0)).toEqual(vector(0, 0));
+  expect(routePosition(a, b, 5)).toEqual(vector(1, 0.5));
+  expect(routePosition(a, b, 10)).toEqual(a);
+  expect(routePosition(a, b, 15)).toEqual(vector(2.5, 2));
+  expect(routePosition(a, b, 20)).toEqual(vector(3, 3));
+  expect(assessRoute(a, b, routeTasks[0])).toMatchObject({ viaReached: true, endReached: true });
+  expect(assessRoute(b, a, routeTasks[0])).toMatchObject({ viaReached: false, endReached: true });
+  expect(assessRoute(a, vector(-1, 2), routeTasks[0])).toMatchObject({
+    viaReached: true,
+    endReached: false,
+  });
+  expect(assessRoute(vector(2, -1), vector(-2, 1), routeTasks[1])).toMatchObject({
+    viaReached: true,
+    endReached: true,
+  });
+  expect(assessRoute(scale(a, -2), vector(-1, 2), routeTasks[2])).toMatchObject({
+    viaReached: true,
+    endReached: true,
+  });
+  expect(routePosition(vector(0, 0), vector(0, 0), 15)).toEqual(vector(0, 0));
+  expect(assessRoute(vector(2 + 1e-10, 1), b, routeTasks[0]).viaReached).toBe(true);
+  expect(assessRoute(vector(2 + 1e-6, 1), b, routeTasks[0]).viaReached).toBe(false);
+  for (const step of [-1, 21, 0.5, NaN, Infinity])
+    expect(() => routePosition(a, b, step)).toThrow(RangeError);
+  expect(() => routePosition(a, { x: NaN, y: 0 }, 0)).toThrow();
+  expect(() => assessRoute(a, b, { via: { x: Infinity, y: 0 }, end: a })).toThrow();
+});
 describe('二维向量数学', () => {
   it('逐分量相加并完全抵消', () => {
     expect(add(vector(2, 1), vector(-1, 2))).toEqual({ x: 1, y: 3 });
