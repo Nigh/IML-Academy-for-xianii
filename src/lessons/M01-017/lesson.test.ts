@@ -1,0 +1,23 @@
+import { render, fireEvent, cleanup } from '@testing-library/svelte';
+import { afterEach, it, expect } from 'vitest';
+import Lesson from './Lesson.svelte';
+import definition from './lesson.ts';
+import { lessonById } from '../../lib/curriculum/catalog.ts';
+import { lessonDefinitionSchema } from '../../lib/lesson/contract.ts';
+afterEach(cleanup);
+it('协议、全部特征场景、角参数与复位', async () => {
+  expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-017');
+  const v = render(Lesson, { metadata: lessonById.get('M01-017')! });
+  for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
+  expect(v.getByTestId('result').textContent).toContain('特征值λ=2');
+  await fireEvent.click(v.getByText('场景一对照：纵轴特征方向'));
+  expect(v.getByTestId('result').textContent).toContain('特征值λ=3');
+  await fireEvent.input(v.getByLabelText('输入角 θ (°)'), { target: { value: '45' } });
+  expect(v.getByTestId('result').textContent).toContain('当前不是实特征方向');
+  await fireEvent.click(v.getByText('场景二：旋转90°'));
+  expect(v.getByTestId('result').textContent).toContain('没有任何非零实特征向量');
+  await fireEvent.click(v.getByText('场景三：负特征值'));
+  expect(v.getByTestId('result').textContent).toContain('特征值λ=-1');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('result').textContent).toContain('特征值λ=2');
+});
