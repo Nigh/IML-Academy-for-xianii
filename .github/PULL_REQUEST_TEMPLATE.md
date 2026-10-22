@@ -15,4 +15,4 @@
 
 明确未验证的硬件、已知边界和需要独立处理的共享基础设施需求。文档更新标明既有课程或自动检查与新标准之间的差异。
 
-合并前确认全部 PR CI 通过并完成内容审阅；使用 Conventional Commits，通过 PR 合并 main，不直接推送或绕过失败检查。
+合并前确认全部 PR CI 通过并完成内容审阅；使用 Conventional Commits，通过 Create a merge commit（命令行 `gh pr merge --merge`）合并 main，保留分支提交与合并节点，不直接推送或绕过失败检查。
