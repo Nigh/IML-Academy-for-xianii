@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '删去一个特征，模型的表达能力一定下降吗？' },
+    { id: 'motivation', title: '平台接到非零指令，为什么还能停在起点？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '寻找非平凡零组合' },
+    { id: 'experiment', title: '试出一组能够抵消的驱动指令' },
     { id: 'intuition', title: '能抵消的贡献揭示冗余' },
     { id: 'mathematics', title: '相关、独立与基' },
     { id: 'pitfalls', title: '数量与维数的区别' },

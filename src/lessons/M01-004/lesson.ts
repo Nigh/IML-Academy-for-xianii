@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '一条直线上的两个合法输出相加，还会是合法输出吗？' },
+    { id: 'motivation', title: '两张合格的向量卡相加，输出卡还合格吗？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '直线能否容纳线性组合' },
+    { id: 'experiment', title: '用成员卡检查组合是否仍合法' },
     { id: 'intuition', title: '封闭意味着组合后仍合法' },
     { id: 'mathematics', title: '子空间判据与反例' },
     { id: 'pitfalls', title: '一次成功不是证明' },

@@ -33,8 +33,10 @@
   }
 </script>
 
-<TheorySection id="motivation" title="一条直线上的两个合法输出相加，还会是合法输出吗？">
-  <p>比较y=2x与y=2x+1，各取线上两点相加。两条直线都能始终容纳结果吗？</p>
+<TheorySection id="motivation" title="两张合格的向量卡相加，输出卡还合格吗？">
+  <p>
+    检验台用一条坐标规则筛选向量卡。输入的两张卡都满足规则；把它们相加、取反或乘零，输出卡是否仍能通过同一检验？比较过原点的规则与带固定偏移的规则。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -48,8 +50,10 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="直线能否容纳线性组合">
-  <p>比较过原点与平移直线；在平移场景尝试a+b=1和a=b=0，解释为什么有些组合成功仍不能证明子空间。</p>
+<TheorySection id="experiment" title="用成员卡检查组合是否仍合法">
+  <p>
+    先在两种规则下按“两张成员卡相加”和“成员乘以零”；再试“各取一半”。比较输出卡的通过状态，说明为什么某次成功不能证明所有组合都合法。
+  </p>
   <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
     <InteractivePanel
       title="组合后还在线上吗"
@@ -58,6 +62,57 @@
       limitations="只展示直线族和两名成员；有限交互不是任意集合封闭性的证明。点的成员判定用绝对容差1e−12，子空间结论由解析条件 d=0 给出。"
       onreset={() => select('linear')}
     >
+      <section
+        class="object-workbench"
+        data-testid="object-workbench"
+        aria-label="向量成员组合检验台"
+      >
+        <h3>把两张成员卡送进组合检验器</h3>
+        <p>候选规则是 y=2x+{d}。两张卡都满足它；选择一个运算，检验输出卡还能否通过同一规则。</p>
+        <div class="actions">
+          <span>卡 u：({result.u.x},{result.u.y})</span><span
+            >卡 v：({result.v.x},{result.v.y})</span
+          >
+        </div>
+        <div class="actions">
+          <button
+            class="btn btn-outline"
+            onclick={() => {
+              a = 1;
+              b = 1;
+            }}>两张成员卡相加</button
+          >
+          <button
+            class="btn btn-outline"
+            onclick={() => {
+              a = 0;
+              b = 0;
+            }}>成员乘以零</button
+          >
+          <button
+            class="btn btn-outline"
+            onclick={() => {
+              a = -1;
+              b = 0;
+            }}>把成员 u 取反</button
+          >
+          <button
+            class="btn btn-outline"
+            onclick={() => {
+              a = 0.5;
+              b = 0.5;
+            }}>两张卡各取一半</button
+          >
+        </div>
+        <output data-testid="object-result"
+          >输出卡 ({result.w.x.toFixed(2)},{result.w.y.toFixed(2)})：{result.member
+            ? '通过成员检验'
+            : '未通过成员检验'}；检验差值 {result.defect.toFixed(3)}</output
+        >
+        <p>
+          一次未通过就能推翻封闭性；几次通过不能代替对任意成员、任意实系数的证明。此处直接操作向量卡，避免把仿射位置误当成位移。
+        </p>
+      </section>
       <PresetSelector {presets} value={selected} defaultId="linear" onchange={select} />
       <div class="parameters">
         <ParameterSlider
@@ -193,6 +248,30 @@
 </TheorySection>
 
 <style>
+  .object-workbench {
+    padding: 1rem;
+    border: 1px solid var(--color-base-content);
+    border-radius: 0.75rem;
+    background: var(--color-base-200);
+    margin-block: 1rem;
+  }
+  .object-workbench .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-workbench button {
+    min-height: 44px;
+    height: auto;
+    white-space: normal;
+  }
+  .object-workbench output {
+    display: block;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+  }
+
   .parameters {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));

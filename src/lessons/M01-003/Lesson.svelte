@@ -35,9 +35,9 @@
   }
 </script>
 
-<TheorySection id="motivation" title="24个数足够说明一段数据属于谁、何时、哪个通道吗？">
+<TheorySection id="motivation" title="实验记录有24个数，怎样找到某一时刻的读数？">
   <p>
-    两段记录、三个时刻、四个通道，共24个数。若接收方分成三段、每段两个时刻，同一个数会被当成哪里的读数？用地址编码逐格核对。
+    记录台收到两段实验，每段三个时刻、每时刻四个通道。打开第二段、选择一个时刻，能否找到对应通道的槽位？如果接收方把同一串数分成三段、每段两个时刻，记录地址又会怎样变化？
   </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
@@ -52,9 +52,9 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="切开三阶张量">
+<TheorySection id="experiment" title="在记录台中选择批次、时刻与通道">
   <p>
-    比较两种24元素的分组，再比较单通道与三通道。找到最后批次的最后一个时刻，检查零起始索引的边界。
+    先打开不同记录并前后切换时刻，核对表格第一行；再增加一个通道，观察槽位与总元素数。比较两种24元素的分组，最后找到第八段记录的最后时刻。
   </p>
   <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
     <InteractivePanel
@@ -64,6 +64,42 @@
       limitations="这是固定行主序的教学数组，不代表任意框架内存布局；不分配训练模型，不测量运行时内存或速度。"
       onreset={() => select('original')}
     >
+      <section class="object-workbench" data-testid="object-workbench" aria-label="多次实验记录台">
+        <h3>打开一段实验记录</h3>
+        <p>每张卡代表一段独立记录。选择卡片和时刻，下面的表格随之切换；每个通道是一列记录槽。</p>
+        <div class="actions" aria-label="实验记录卡">
+          {#each Array.from({ length: B }, (_, i) => i) as i (i)}
+            <button class="btn btn-outline" aria-pressed={batch === i} onclick={() => (batch = i)}
+              >记录 {i + 1}</button
+            >
+          {/each}
+        </div>
+        <div class="actions">
+          <button class="btn btn-outline" disabled={start === 0} onclick={() => (start -= 1)}
+            >前一个时刻</button
+          >
+          <button class="btn btn-outline" disabled={start === T - 1} onclick={() => (start += 1)}
+            >后一个时刻</button
+          >
+          <button class="btn btn-outline" disabled={C === 8} onclick={() => (C += 1)}
+            >增加一个测量通道</button
+          >
+          <button class="btn btn-outline" disabled={C === 1} onclick={() => (C -= 1)}
+            >移除最后通道</button
+          >
+        </div>
+        <output data-testid="object-result"
+          >正在打开记录 {batch + 1} / {B}，时刻 {start + 1} / {T}；本时刻有 {C} 个通道槽。</output
+        >
+        <div class="actions" aria-label="当前时刻的通道记录">
+          {#each result.values[0] as value, c (c)}
+            <span class="badge badge-outline">通道 {c + 1}：地址码 {value}</span>
+          {/each}
+        </div>
+        <p>
+          这是确定性地址编码，不是真实传感器读数。增加通道会重新编码地址；原有读数不被模拟成实测数据。
+        </p>
+      </section>
       <PresetSelector {presets} value={selected} defaultId="original" onchange={select} />
       <div class="parameters">
         <NumericInput
@@ -218,6 +254,30 @@
 </TheorySection>
 
 <style>
+  .object-workbench {
+    padding: 1rem;
+    border: 1px solid var(--color-base-content);
+    border-radius: 0.75rem;
+    background: var(--color-base-200);
+    margin-block: 1rem;
+  }
+  .object-workbench .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-workbench button {
+    min-height: 44px;
+    height: auto;
+    white-space: normal;
+  }
+  .object-workbench output {
+    display: block;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+  }
+
   .parameters {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));

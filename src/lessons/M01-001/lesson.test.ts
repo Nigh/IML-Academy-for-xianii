@@ -10,6 +10,12 @@ it('协议、全部章节、三个场景、输入与复位', async () => {
   expect(definition.quiz).toHaveLength(3);
   const view = render(Lesson, { metadata: lessonById.get('M01-001')! });
   await fireEvent.click(view.getByRole('button', { name: '直接探索' }));
+  await fireEvent.click(view.getByRole('button', { name: '终点向西 1m' }));
+  expect(view.getByTestId('object-result').textContent).toContain('地图终点 (2,4)');
+  await fireEvent.click(view.getByRole('button', { name: '导航仪转向 / 回正' }));
+  expect(view.getByTestId('object-result').textContent).toContain('(4.000, -2.000)');
+  await fireEvent.click(view.getByRole('button', { name: '复位 ↺' }));
+
   for (const section of definition.sections)
     expect(view.container.querySelector(`#${section.id}`)).toBeTruthy();
   expect(view.getByTestId('components').textContent).toContain('(3.000, 4.000) m');

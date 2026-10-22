@@ -47,3 +47,26 @@ export function experiment(x: number, y: number, third: boolean) {
     range: 1.35 * Math.max(1, Math.abs(x), Math.abs(y)),
   };
 }
+
+/** A bounded command sequence, evaluated in the same order as the displayed route. */
+export function combineCommands(
+  vectors: readonly { x: number; y: number }[],
+  coefficients: readonly number[],
+) {
+  if (vectors.length < 1 || vectors.length > 3 || vectors.length !== coefficients.length)
+    throw new RangeError('指令数量必须与一至三路驱动一致。');
+  let endpoint = vector(0, 0);
+  const path = [endpoint];
+  for (let i = 0; i < vectors.length; i++) {
+    finite(vectors[i].x, vectors[i].y, coefficients[i]);
+    if (Math.abs(coefficients[i]) > 3) throw new RangeError('指令份数范围为−3至3。');
+    endpoint = add(endpoint, scale(vectors[i], coefficients[i]));
+    path.push(endpoint);
+  }
+  return {
+    endpoint,
+    path,
+    nontrivial: coefficients.some((c) => c !== 0),
+    returned: norm(endpoint) <= 1e-12,
+  };
+}

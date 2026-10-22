@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '权重可以随便调，就一定能命中任意目标吗？' },
+    { id: 'motivation', title: '两路驱动都能前进后退，平台就能到达任何目标吗？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '尝试命中目标' },
+    { id: 'experiment', title: '给定位平台下达驱动指令' },
     { id: 'intuition', title: '固定方向，改变系数' },
     { id: 'mathematics', title: '从一次组合到整个张成空间' },
     { id: 'pitfalls', title: '更多向量不一定增加方向' },

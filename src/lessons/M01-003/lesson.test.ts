@@ -9,6 +9,15 @@ it('全部预设、切片、非法值与复位符合协议', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-003');
   const v = render(Lesson, { metadata: lessonById.get('M01-003')! });
   await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  await fireEvent.click(v.getByRole('button', { name: '记录 2' }));
+  await fireEvent.click(v.getByRole('button', { name: '后一个时刻' }));
+  expect(v.getByTestId('object-result').textContent).toContain('记录 2 / 2，时刻 2 / 3');
+  expect(v.getByText('通道 1：地址码 16')).toBeTruthy();
+  await fireEvent.click(v.getByRole('button', { name: '增加一个测量通道' }));
+  expect(v.getByTestId('shape').textContent).toContain('(2,3,5)');
+  expect(v.getByText('通道 1：地址码 20')).toBeTruthy();
+  await fireEvent.click(v.getByText('复位 ↺'));
+
   for (const section of definition.sections)
     expect(v.container.querySelector(`#${section.id}`)).toBeTruthy();
   for (const [name, count] of [

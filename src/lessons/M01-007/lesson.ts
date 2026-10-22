@@ -4,9 +4,9 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '检索分数变大，是方向更接近，还是特征变长了？' },
+    { id: 'motivation', title: '把候选卡的特征增强，检索分数就更可靠吗？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '先预测符号，再移动端点' },
+    { id: 'experiment', title: '先操作特征卡，再用几何图解释分数' },
     { id: 'intuition', title: '把一个箭头投到另一个方向' },
     { id: 'mathematics', title: '把投影写成公式' },
     { id: 'pitfalls', title: '点积不是纯粹的方向分数' },

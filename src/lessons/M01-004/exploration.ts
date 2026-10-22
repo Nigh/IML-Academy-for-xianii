@@ -1,13 +1,13 @@
 export const exploration = {
-  prompt: '比较y=2x与y=2x+1，各取线上两点相加。两条直线都能始终容纳结果吗？',
+  prompt: '输入卡都通过y=2x+1的检验。两张卡相加或乘零，输出卡一定也能通过吗？',
   options: [
     {
-      text: '都是直线，所以都可以',
+      text: '一定通过，因为输入卡都合格',
       correct: false,
       observation: '将偏移设为1，再把两个系数都设为0，检查原点。',
     },
     {
-      text: '只有过原点的整条直线可以',
+      text: '不一定，相加或乘零会产生不合格输出',
       correct: true,
       observation: '比较相加后的点是否仍满足各自的方程。',
     },

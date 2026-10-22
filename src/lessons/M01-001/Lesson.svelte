@@ -33,8 +33,10 @@
   }
 </script>
 
-<TheorySection id="motivation" title="两台导航仪报告不同的坐标，可能记录了同一段位移吗？">
-  <p>地图上向东3m、向北4m的位移保持不动。只把坐标轴逆时针转90°，会发生什么？</p>
+<TheorySection id="motivation" title="配送车没有移动，导航仪读数为什么变了？">
+  <p>
+    配送车要从站点到达东面3m、北面4m的地址。先在地图上移动终点，再只转动导航仪的参考方向：车的位置、距离和两个方向的读数，哪些会变？
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -48,8 +50,10 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="移动坐标轴，保持位移">
-  <p>固定原分量，只转动轴，再把位移设为零。比较“分量改变”和“方向未定义”各自发生在什么条件下。</p>
+<TheorySection id="experiment" title="先设置配送终点，再转动导航仪">
+  <p>
+    用方向按钮改变配送终点，观察位移与距离；随后只转动导航仪，对照地图与本地读数。最后让车回到起点，检查没有位移时还能否定义方向。
+  </p>
   <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
     <InteractivePanel
       title="同一位移，两套分量"
@@ -58,6 +62,56 @@
       limitations="只讨论同原点、正交归一基的二维旋转；不涉及平移、曲线坐标或混合单位的特征距离。图中单位为 m，方向基按 1m 刻度显示。"
       onreset={() => select('displacement')}
     >
+      <section
+        class="object-workbench"
+        data-testid="object-workbench"
+        aria-label="送货地图与导航仪"
+      >
+        <h3>给配送车设置终点，再转动导航仪</h3>
+        <p>终点按地图的东西、南北方向移动。导航仪只改变读数的参考方向，不会把配送车搬走。</p>
+        <svg
+          viewBox="0 0 360 320"
+          role="img"
+          aria-label={`配送车位于东向${x}米、北向${y}米；导航仪转过${degrees}度`}
+        >
+          <rect class="floor" x="20" y="20" width="320" height="280" rx="12" />
+
+          <path class="reference" d="M 180 70 V 290 M 30 180 H 330" />
+          <path class="route" d={`M 180 180 H ${180 + x * 24} V ${180 - y * 24}`} />
+          <circle class="object" cx={180 + x * 24} cy={180 - y * 24} r="12" />
+
+          <circle cx="180" cy="180" r="4" fill="currentColor" />
+          <g transform={`translate(180 180) rotate(${-degrees})`}>
+            <path class="route" d="M 0 0 H 40 L 32 -5 M 40 0 L 32 5" />
+          </g>
+        </svg>
+        <p>
+          地图固定，北向上、东向右。圆形为配送终点，中心圆点为起点；短箭头指导航仪的横轴正方向。
+        </p>
+        <div class="actions">
+          <button class="btn btn-outline" disabled={x > 4} onclick={() => (x += 1)}
+            >终点向东 1m</button
+          >
+          <button class="btn btn-outline" disabled={x < -4} onclick={() => (x -= 1)}
+            >终点向西 1m</button
+          >
+          <button class="btn btn-outline" disabled={y > 4} onclick={() => (y += 1)}
+            >终点向北 1m</button
+          >
+          <button class="btn btn-outline" disabled={y < -4} onclick={() => (y -= 1)}
+            >终点向南 1m</button
+          >
+          <button class="btn btn-outline" onclick={() => (degrees = degrees === 90 ? 0 : 90)}
+            >导航仪转向 / 回正</button
+          >
+        </div>
+        <output data-testid="object-result"
+          >地图终点 ({x},{y}) m；导航仪读数 {formatVector(result.components)}；直线距离 {result.length.toFixed(
+            3,
+          )} m</output
+        >
+        <p>圆形车标是终点位置，不表示车身朝向。下方数学图中的箭头就是从起点到这辆车的位移。</p>
+      </section>
       <PresetSelector {presets} value={selected} defaultId="displacement" onchange={select} />
       <div class="parameters">
         <ParameterSlider
@@ -200,6 +254,56 @@
 </TheorySection>
 
 <style>
+  .object-workbench {
+    padding: 1rem;
+    border: 1px solid var(--color-base-content);
+    border-radius: 0.75rem;
+    background: var(--color-base-200);
+    margin-block: 1rem;
+  }
+  .object-workbench svg {
+    display: block;
+    width: 100%;
+    max-width: 32rem;
+    margin: auto;
+  }
+  .object-workbench .floor {
+    fill: var(--color-base-100);
+    stroke: var(--color-base-content);
+  }
+  .object-workbench .route {
+    stroke: var(--color-primary);
+    stroke-width: 3;
+    fill: none;
+  }
+  .object-workbench .reference {
+    stroke: var(--color-base-content);
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 5 4;
+  }
+  .object-workbench .object {
+    fill: var(--color-accent);
+    stroke: var(--color-base-content);
+    stroke-width: 2;
+  }
+  .object-workbench .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-workbench button {
+    min-height: 44px;
+    height: auto;
+    white-space: normal;
+  }
+  .object-workbench output {
+    display: block;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+  }
+
   .parameters {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));

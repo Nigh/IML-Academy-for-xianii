@@ -33,8 +33,10 @@
   }
 </script>
 
-<TheorySection id="motivation" title="权重可以随便调，就一定能命中任意目标吗？">
-  <p>只用方向(1,1)和(2,2)，系数可取任意实数，能组合出(1,0)吗？</p>
+<TheorySection id="motivation" title="两路驱动都能前进后退，平台就能到达任何目标吗？">
+  <p>
+    定位平台有两路驱动，每一路都能前进、后退。先用横向、纵向驱动把平台送到目标；再把两路驱动都装到同一条斜线上，观察再多指令能否补出缺少的移动方向。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -48,9 +50,9 @@
     </ul>{/if}
 </TheorySection>
 
-<TheorySection id="experiment" title="尝试命中目标">
+<TheorySection id="experiment" title="给定位平台下达驱动指令">
   <p>
-    在独立方向场景先打乱权重再找回目标；换到共线场景，再尝试同样的操作。比较两种场景的可达位置，并说明你的判断依据。
+    在独立驱动场景先按后退，再找回目标；换到共线驱动，尝试前进和后退。平台终点、两段移动轨迹和数学图同步更新：哪些误差能靠指令消除，哪些需要增加新方向？
   </p>
   <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
     <InteractivePanel
@@ -60,6 +62,60 @@
       limitations="有限网格不等于连续span。图域按场景和当前参数调整，比较距离请读取数值；最近点仅对本课标准平面或直线解析计算。"
       onreset={() => select('plane')}
     >
+      <section
+        class="object-workbench"
+        data-testid="object-workbench"
+        aria-label="两路驱动定位平台"
+      >
+        <h3>用两路驱动把平台送到目标</h3>
+        <p>
+          每次点按给相应驱动增加或减少一份指令。标准驱动分别改变横、纵位置；共线驱动只能沿同一方向往返。坐标是无量纲教学指令单位。
+        </p>
+        <svg
+          viewBox="0 0 360 320"
+          role="img"
+          aria-label={`平台终点${result.w.x},${result.w.y}，目标${result.target.x},${result.target.y}`}
+        >
+          <rect class="floor" x="20" y="20" width="320" height="280" rx="12" />
+          <path class="reference" d="M 180 40 V 290 M 30 160 H 330" />
+          <path
+            class="route"
+            d={`M 180 160 L ${180 + (result.first.x / result.extent) * 120} ${160 - (result.first.y / result.extent) * 120} L ${180 + (result.w.x / result.extent) * 120} ${160 - (result.w.y / result.extent) * 120}`}
+          />
+          <circle
+            class="object"
+            cx={180 + (result.w.x / result.extent) * 120}
+            cy={160 - (result.w.y / result.extent) * 120}
+            r="10"
+          />
+          <path
+            class="reference"
+            d={`M ${180 + (result.target.x / result.extent) * 120 - 9} ${160 - (result.target.y / result.extent) * 120 - 9} l 18 18 m -18 0 l 18 -18`}
+          />
+        </svg>
+        <p>
+          图例：圆形为平台，交叉为目标，中心为起点。横向向右、纵向向上，实线路线依次显示两路贡献。
+        </p>
+        <div class="actions">
+          <button class="btn btn-outline" disabled={a > 2} onclick={() => (a += 1)}
+            >驱动一前进一份</button
+          >
+          <button class="btn btn-outline" disabled={a < -2} onclick={() => (a -= 1)}
+            >驱动一后退一份</button
+          >
+          <button class="btn btn-outline" disabled={b > 2} onclick={() => (b += 1)}
+            >驱动二前进一份</button
+          >
+          <button class="btn btn-outline" disabled={b < -2} onclick={() => (b -= 1)}
+            >驱动二后退一份</button
+          >
+        </div>
+        <output data-testid="object-result"
+          >平台 ({result.w.x.toFixed(2)},{result.w.y.toFixed(2)})；距目标 {result.error.toFixed(
+            4,
+          )}；{result.error < 1e-12 ? '已命中目标' : '继续调整指令，或判断目标是否可达'}</output
+        >
+      </section>
       <PresetSelector {presets} value={selected} defaultId="plane" onchange={select} />
       <div class="parameters">
         <ParameterSlider
@@ -207,6 +263,56 @@
 </TheorySection>
 
 <style>
+  .object-workbench {
+    padding: 1rem;
+    border: 1px solid var(--color-base-content);
+    border-radius: 0.75rem;
+    background: var(--color-base-200);
+    margin-block: 1rem;
+  }
+  .object-workbench svg {
+    display: block;
+    width: 100%;
+    max-width: 32rem;
+    margin: auto;
+  }
+  .object-workbench .floor {
+    fill: var(--color-base-100);
+    stroke: var(--color-base-content);
+  }
+  .object-workbench .route {
+    stroke: var(--color-primary);
+    stroke-width: 3;
+    fill: none;
+  }
+  .object-workbench .reference {
+    stroke: var(--color-base-content);
+    stroke-width: 2;
+    fill: none;
+    stroke-dasharray: 5 4;
+  }
+  .object-workbench .object {
+    fill: var(--color-accent);
+    stroke: var(--color-base-content);
+    stroke-width: 2;
+  }
+  .object-workbench .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-workbench button {
+    min-height: 44px;
+    height: auto;
+    white-space: normal;
+  }
+  .object-workbench output {
+    display: block;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+  }
+
   .parameters {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
