@@ -1,0 +1,26 @@
+import { render, fireEvent, cleanup } from '@testing-library/svelte';
+import { afterEach, it, expect } from 'vitest';
+import Lesson from './Lesson.svelte';
+import definition from './lesson.ts';
+import { lessonById } from '../../lib/curriculum/catalog.ts';
+import { lessonDefinitionSchema } from '../../lib/lesson/contract.ts';
+afterEach(cleanup);
+it('协议、预设、参数改变与复位', async () => {
+  expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-014');
+  const v = render(Lesson, { metadata: lessonById.get('M01-014')! });
+  for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
+  expect(v.getByTestId('result').textContent).toContain('零空间维度=1');
+  await fireEvent.click(v.getByText('场景二：满列秩'));
+  expect(v.getByTestId('result').textContent).toContain('零空间维度=0');
+  await fireEvent.click(v.getByText('场景二对照：降秩'));
+  expect(v.getByTestId('result').textContent).toContain('Ax=(0,0)');
+  await fireEvent.click(v.getByText('场景三：同一输出的一族输入'));
+  expect(v.getByTestId('result').textContent).toContain('当前输入=(2,0)');
+  await fireEvent.input(v.getByLabelText('核方向系数 t'), { target: { value: '-1' } });
+  expect(v.getByTestId('result').textContent).toContain('当前输入=(0,2)');
+  expect(v.getByTestId('result').textContent).toContain('Ax=(2)');
+  await fireEvent.input(v.getByLabelText('目标参数 d'), { target: { value: 'NaN' } });
+  expect(v.getByTestId('result').textContent).toContain('Ax=(2)');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('result').textContent).toContain('当前输入=(1,-1)');
+});
