@@ -1,0 +1,24 @@
+import { render, fireEvent, cleanup } from '@testing-library/svelte';
+import { afterEach, it, expect } from 'vitest';
+import Lesson from './Lesson.svelte';
+import definition from './lesson.ts';
+import { lessonById } from '../../lib/curriculum/catalog.ts';
+import { lessonDefinitionSchema } from '../../lib/lesson/contract.ts';
+afterEach(cleanup);
+it('协议、两层目标、候选变化和复位', async () => {
+  expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-016');
+  const v = render(Lesson, { metadata: lessonById.get('M01-016')! });
+  for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
+  expect(v.getByTestId('result').textContent).toContain('伪逆解=(1,1)');
+  expect(v.getByTestId('result').textContent).toContain('候选解=(2,0)');
+  await fireEvent.input(v.getByLabelText('候选偏移 t'), { target: { value: '0' } });
+  expect(v.getByTestId('result').textContent).toContain('候选解=(1,1)');
+  await fireEvent.click(v.getByText('场景二：超定不一致'));
+  expect(v.getByTestId('result').textContent).toContain('最小残差=1.4142');
+  await fireEvent.click(v.getByText('场景二对照：可精确拟合'));
+  expect(v.getByTestId('result').textContent).toContain('最小残差=0');
+  await fireEvent.input(v.getByLabelText('目标 b₂'), { target: { value: 'NaN' } });
+  expect(v.getByTestId('result').textContent).toContain('最小残差=0');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('result').textContent).toContain('候选解=(2,0)');
+});
