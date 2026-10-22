@@ -1,5 +1,5 @@
 export const exploration = {
-  prompt: '约束x₁+x₂=2与2x₁+2x₂=3能同时满足吗？',
+  prompt: '重复测量模式下，表一目标2、表二目标3。只调两路控制器，能让两只表同时达标吗？',
   options: [
     {
       text: '不能，消元后矛盾',
@@ -9,7 +9,7 @@ export const exploration = {
     {
       text: '能，两个方程总能解两个未知数',
       correct: false,
-      observation: '切换重复约束的相容与矛盾预设，观察交点。',
+      observation: '切换矛盾预设，操作控制器；检查表一读数为2时，表二实际读数是多少。',
     },
   ],
   hints: ['第二式减第一式的2倍，左侧还剩什么？', '将第二读数从3改为4，独立约束数量是否增加？'],

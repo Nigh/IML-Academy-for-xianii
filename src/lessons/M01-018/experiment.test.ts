@@ -42,3 +42,17 @@ it('拒绝负奇异值、无序、非有限和越界', () => {
   ] as const)
     expect(() => experiment(args[0], args[1], args[2], args[3], args[4])).toThrow();
 });
+
+it('带缺口印章与SVD矩阵同源，压平保持真实退化', () => {
+  for (const reflect of [false, true]) {
+    const r = experiment(3, 1, 30, 45, reflect);
+    for (let i = 0; i < r.stamp[0].length; i++) {
+      const p = r.stamp[0][i],
+        q = r.stamp[3][i];
+      expect(q.x).toBeCloseTo(r.matrix[0][0] * p.x + r.matrix[0][1] * p.y, 12);
+      expect(q.y).toBeCloseTo(r.matrix[1][0] * p.x + r.matrix[1][1] * p.y, 12);
+    }
+  }
+  expect(experiment(3, 0, 0, 0, false).stamp[3].every((p) => p.y === 0)).toBe(true);
+  expect(experiment(0, 0, 0, 0, false).stamp[3].every((p) => p.x === 0 && p.y === 0)).toBe(true);
+});

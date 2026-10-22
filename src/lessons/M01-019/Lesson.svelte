@@ -36,7 +36,9 @@
 </script>
 
 <TheorySection id="motivation" title="只保留一个方向时，删掉的信息能否从其他方向补回来？">
-  <p>diag(3,1)只保留第一奇异项，剩余矩阵的Frobenius误差是多少？</p>
+  <p>
+    传输一张小图块时，如果只能保留一个主要模式，会丢掉哪些格子的亮度？先在重构台选择传输层数，再用矩阵和误差解释看到的变化。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -84,6 +86,44 @@
           selected = 'custom';
         }}
       />
+      <section class="object-workbench" data-testid="object-workbench" aria-label="合成图块重构台">
+        <h3>选择传输几层，再比较重构图块</h3>
+        <p>
+          四格图块的每格就是一个矩阵元素；固定标度为0至3，填充越深表示值越大，数字给出精确值。模型是合成亮度，不是图片压缩性能测试。
+        </p>
+        <div class="object-actions">
+          {#each [0, 1, 2] as count (count)}<button
+              class="btn"
+              aria-pressed={k === count}
+              onclick={() => {
+                k = count;
+                selected = 'custom';
+              }}>传输 {count} 层</button
+            >{/each}
+        </div>
+        <div class="object-cards">
+          {#each [{ name: '原图', values: r.matrix }, { name: '重构', values: r.approximation }, { name: '丢失', values: r.residual }] as image (image.name)}
+            <div class="object-card">
+              <h4>{image.name}</h4>
+              <div class="tiles">
+                {#each image.values as row, i (i)}{#each row as value, j (j)}<div class="tile">
+                      <span class="tile-shade" style:opacity={Math.abs(value) / 3}></span><span
+                        >{fmt(value)}</span
+                      >
+                    </div>{/each}{/each}
+              </div>
+            </div>
+          {/each}
+        </div>
+        <output data-testid="tile-reading" aria-live="polite"
+          >传输 {k} 层；重构值 {r.approximation.flat().map(fmt).join('，')}；丢失量 {fmt(
+            r.error,
+          )}</output
+        >
+        <p>
+          试着把第二层强度降至0：此时只传第一层会丢失信息吗？小图块用于看清误差，2×2因子存储并不节省空间。
+        </p>
+      </section>
       <Plot2D
         series={r.series}
         xRange={[-0.1, 2.1]}
@@ -197,6 +237,62 @@
 >
 
 <style>
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tile {
+    position: relative;
+    min-height: 4rem;
+    border: 1px solid var(--color-base-300);
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+  }
+  .tile-shade {
+    position: absolute;
+    inset: 0;
+    background: var(--color-base-content);
+    z-index: -1;
+  }
+  .tile span:last-child {
+    background: var(--color-base-100);
+    padding: 0.2rem;
+  }
+
+  .object-workbench {
+    border: 1px solid var(--color-base-300);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-block: 1rem;
+    background: var(--color-base-100);
+  }
+  .object-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-actions button {
+    min-height: 44px;
+    white-space: normal;
+  }
+  .object-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    gap: 0.75rem;
+  }
+  .object-card {
+    border: 1px solid var(--color-base-300);
+    padding: 0.75rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .object-workbench output {
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+
   p {
     overflow-wrap: anywhere;
   }

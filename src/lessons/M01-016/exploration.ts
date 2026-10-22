@@ -1,10 +1,10 @@
 export const exploration = {
-  prompt: 'x₁+x₂=2的解很多。只在精确拟合的解中，哪个长度最小？',
+  prompt: '两路驱动总指令必须为2，只在达标的分配中，哪组归一化指令的平方和最小？',
   options: [
     {
       text: '(0,0)',
       correct: false,
-      observation: '在欠定模式把t从1移到0，比较候选残差和范数。',
+      observation: '操作第一路增减按钮，检查总读数是否达标，再比较指令平方和。',
     },
     {
       text: '(1,1)',

@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { experiment } from './experiment.ts';
+import { commandOutput, experiment } from './experiment.ts';
 it('单位/剪切逆与奇异相容性解析答案', () => {
   const i = experiment('identity', 2, -1, 0);
   expect(i.solution).toEqual([2, -1]);
@@ -38,4 +38,13 @@ it('边界、消元与非法参数', () => {
   }
   for (const n of [NaN, Infinity, 3.1, -3.1])
     expect(() => experiment('identity', 0, 0, n)).toThrow();
+});
+
+it('控制器读数服从相同矩阵，重复表不会独立变化', () => {
+  expect(commandOutput('identity', 2, 1)).toEqual([2, 1]);
+  expect(commandOutput('shear', 2, 1)).toEqual([3, 1]);
+  expect(commandOutput('dependent', 2, -1)).toEqual([1, 2]);
+  expect(() => commandOutput('identity', Infinity, 0)).toThrow(RangeError);
+  expect(() => commandOutput('identity', 9, 0)).toThrow(RangeError);
+  expect(() => commandOutput('unknown', 0, 0)).toThrow(RangeError);
 });

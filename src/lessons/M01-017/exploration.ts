@@ -1,5 +1,5 @@
 export const exploration = {
-  prompt: 'diag(2,3)作用于(1,1)得到(2,3)。原输入是特征向量吗？',
+  prompt: '模板横向放大2倍、纵向放大3倍。斜放45°的方向标记，变形后还会沿原直线吗？',
   options: [
     {
       text: '不是，输出和输入不共线',
@@ -9,7 +9,7 @@ export const exploration = {
     {
       text: '是，因为可以算出一个平均倍率',
       correct: false,
-      observation: '从横轴方向转到45°，观察共线残差。',
+      observation: '转动模板，对照圆点、方框和偏离原直线的读数。',
     },
   ],
   hints: [

@@ -22,3 +22,16 @@ it('协议、全部特征场景、角参数与复位', async () => {
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByTestId('result').textContent).toContain('特征值λ=2');
 });
+
+it('对象操作与数学结果同源', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-017')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  expect(v.getByTestId('object-workbench')).toBeTruthy();
+  await fireEvent.click(v.getByRole('button', { name: '模板竖直放置' }));
+  expect(v.getByTestId('template-reading').textContent).toContain('输出 (0,3)');
+  expect(v.getByTestId('result').textContent).toContain('特征值λ=3');
+  await fireEvent.click(v.getByRole('button', { name: '模板顺时针转15°' }));
+  expect(v.getByTestId('template-reading').textContent).toContain('模板角度 75°');
+  expect(v.getByTestId('result').textContent).toContain('当前不是实特征方向');
+  await fireEvent.click(v.getByText('复位 ↺'));
+});

@@ -23,3 +23,15 @@ it('协议、两层目标、候选变化和复位', async () => {
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByTestId('result').textContent).toContain('候选解=(2,0)');
 });
+
+it('对象操作与数学结果同源', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-016')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  expect(v.getByTestId('object-workbench')).toBeTruthy();
+  await fireEvent.click(v.getByRole('button', { name: '第一路减少半单位' }));
+  expect(v.getByTestId('drive-readings').textContent).toContain('驱动 1 指令：1.5');
+  expect(v.getByTestId('drive-readings').textContent).toContain('表 1：2；目标 2；差值 0');
+  await fireEvent.click(v.getByRole('button', { name: '采用伪逆分配' }));
+  expect(v.getByTestId('drive-readings').textContent).toContain('驱动 2 指令：1');
+  await fireEvent.click(v.getByText('复位 ↺'));
+});

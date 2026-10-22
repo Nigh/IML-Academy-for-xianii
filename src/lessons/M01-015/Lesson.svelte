@@ -13,7 +13,7 @@
   import Plot2D from '../../components/charts/Plot2D.svelte';
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
-  import { experiment, presets } from './experiment.ts';
+  import { experiment, presets, commandOutput } from './experiment.ts';
   let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let mode = $state('identity'),
@@ -21,12 +21,20 @@
     b2 = $state(1),
     t = $state(0),
     selected = $state('identity');
+  let drive1 = $state(0),
+    drive2 = $state(0);
+  const measured = $derived(commandOutput(mode, drive1, drive2));
   const result = $derived(experiment(mode, b1, b2, t));
+  const viewExtent = $derived(
+    Math.max(result.extent, 1.3 * Math.abs(drive1), 1.3 * Math.abs(drive2)),
+  );
   const fmt = (n: number) => Number(n.toFixed(3));
   function select(id: string) {
     if (id === 'identity') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
+      drive1 = 0;
+      drive2 = 0;
       mode = p.mode;
       b1 = p.b1;
       b2 = p.b2;
@@ -37,7 +45,9 @@
 </script>
 
 <TheorySection id="motivation" title="相同测量规则，为什么能出现唯一解、无穷解和无解？">
-  <p>约束x₁+x₂=2与2x₁+2x₂=3能同时满足吗？</p>
+  <p>
+    两路控制指令经过一个已标定的混合器，驱动两个读数表。给定目标读数，怎样反求指令？如果两个表其实测的是同一组合，还能独立设定目标吗？这里使用无量纲的理想线性模型。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -53,15 +63,53 @@
 
 <TheorySection id="experiment" title="切换右端项与解的类型">
   <p>先比较相交、重合与平行，再只改右端项；检查系数矩阵奇异时，目标变化会怎样改变解的存在性。</p>
-  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+  <PredictionLab {...exploration} context={JSON.stringify([result, drive1, drive2])} {resetVersion}>
     <InteractivePanel
       title="同一个矩阵，不同观测"
-      instructions="选择矩阵场景。b₁默认2、b₂默认1，各范围−4至4；解族系数t默认0、范围−3至3，步长0.25，均无量纲。数值框支持键盘；非有限或越界输入不进入计算。"
+      instructions="先操作双通道控制器，比较表读数与目标，再查看约束线与解。选择矩阵场景。b₁默认2、b₂默认1，各范围−4至4；解族系数t默认0、范围−3至3，步长0.25，均无量纲。数值框支持键盘；非有限或越界输入不进入计算。"
       meaning="实线与虚线分别表示两行约束，圆点是唯一解或解族当前成员。无解时不伪造交点；两线重合时虚线覆盖实线，文字明确说明。图范围自适应，像素长度不可跨预设比较。"
       limitations="仅三个结构已知的小矩阵；相容性按当前双精度数值严格比较b₂−2b₁是否为0，预设与0.25步长均能精确表示。任意近似输入或含噪数据需容差/最小二乘分析。t只在无穷解时影响当前成员。"
       onreset={() => select('identity')}
     >
       <PresetSelector {presets} value={selected} defaultId="identity" onchange={select} />
+      <section class="object-workbench" data-testid="object-workbench" aria-label="双通道标定台">
+        <h3>先操作控制器，让两只表同时到达目标</h3>
+        <p>
+          指令 x₁、x₂ 可正可负。混合规则由下方 A
+          给出；切换预设会清零指令。先试自己的指令，再对照解析解。
+        </p>
+        <div class="object-cards">
+          <div class="object-card">
+            <ParameterSlider
+              label="控制器一指令 x₁"
+              value={drive1}
+              min={-8}
+              max={8}
+              step={0.25}
+              onchange={(n) => (drive1 = n)}
+            />
+          </div>
+          <div class="object-card">
+            <ParameterSlider
+              label="控制器二指令 x₂"
+              value={drive2}
+              min={-8}
+              max={8}
+              step={0.25}
+              onchange={(n) => (drive2 = n)}
+            />
+          </div>
+        </div>
+        <div class="object-cards" aria-live="polite" data-testid="instrument-readings">
+          <output class="object-card"
+            >表一：{fmt(measured[0])}；目标 {b1}；差值 {fmt(measured[0] - b1)}</output
+          >
+          <output class="object-card"
+            >表二：{fmt(measured[1])}；目标 {b2}；差值 {fmt(measured[1] - b2)}</output
+          >
+        </div>
+        <p>现在调整下方目标，再试控制器：重复测量模式下，两只表能否任意独立设置？</p>
+      </section>
       <ParameterSlider
         label="右端项 b₁"
         value={b1}
@@ -98,14 +146,23 @@
       <MatrixView values={result.matrix} columnLabels={['x₁系数', 'x₂系数']} />
       <Plot2D
         equal
-        series={result.series}
-        xRange={[-result.extent, result.extent]}
-        yRange={[-result.extent, result.extent]}
+        series={[
+          ...result.series,
+          {
+            id: 'command',
+            label: '我的控制指令',
+            kind: 'scatter',
+            points: [{ x: drive1, y: drive2 }],
+            role: 'secondary',
+          },
+        ]}
+        xRange={[-viewExtent, viewExtent]}
+        yRange={[-viewExtent, viewExtent]}
         xLabel="x₁"
         yLabel="x₂"
         xUnit="无量纲"
         yUnit="无量纲"
-        description="输入平面中的两行约束：实线第一式，虚线第二式；重合表示约束重复，圆点标识当前解。线段在视域边界截取，解族不限于图中范围。"
+        description="输入平面中的两行约束：实线第一式，虚线第二式；重合表示约束重复，圆点标识解析解，另一个散点标识我的控制指令。线段在视域边界截取，解族不限于图中范围。"
       />
       <div aria-live="polite" data-testid="result">
         <p>
@@ -207,6 +264,29 @@
 >
 
 <style>
+  .object-workbench {
+    border: 1px solid var(--color-base-300);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-block: 1rem;
+    background: var(--color-base-100);
+  }
+  .object-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    gap: 0.75rem;
+  }
+  .object-card {
+    border: 1px solid var(--color-base-300);
+    padding: 0.75rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .object-workbench output {
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+
   p {
     overflow-wrap: anywhere;
   }

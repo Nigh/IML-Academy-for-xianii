@@ -24,3 +24,19 @@ it('协议、四预设、阶段、零矩阵与复位', async () => {
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByTestId('result').textContent).toContain('奇异值=(3,1)');
 });
+
+it('对象操作与数学结果同源', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-018')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  expect(v.getByTestId('object-workbench')).toBeTruthy();
+  await fireEvent.click(v.getByRole('button', { name: '取回原始印章' }));
+  const original = v.getByTestId('stamp-shape').getAttribute('points');
+  await fireEvent.click(v.getByRole('button', { name: '送入下一道工序' }));
+  await fireEvent.click(v.getByRole('button', { name: '送入下一道工序' }));
+  expect(v.getByTestId('stamp-shape').getAttribute('points')).not.toBe(original);
+  expect(v.getByTestId('stamp-reading').textContent).toContain('工序 2');
+  await fireEvent.click(v.getByRole('button', { name: '压平第二方向' }));
+  expect(v.getByTestId('stamp-reading').textContent).toContain('保留方向数 1');
+  expect(v.getByTestId('result').textContent).toContain('精确秩=1');
+  await fireEvent.click(v.getByText('复位 ↺'));
+});

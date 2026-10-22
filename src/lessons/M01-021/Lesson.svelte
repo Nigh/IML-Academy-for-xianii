@@ -46,7 +46,9 @@
 </script>
 
 <TheorySection id="motivation" title="给每个通道加偏置，程序怎么知道哪个轴是通道？">
-  <p>(3,)和(4,)相加，会自动得到3×4表吗？</p>
+  <p>
+    一批传感器在多个时刻记录四个通道。要给每个通道加上同一份校正偏置，怎样让每条读数取到正确的偏置？数组长度相同，也可能把时间轴认成通道轴。
+  </p>
 </TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
@@ -67,7 +69,7 @@
   <PredictionLab {...exploration} context={JSON.stringify([a, b, offset, flat])} {resetVersion}>
     <InteractivePanel
       title="尾轴对齐与真实加法"
-      instructions="形状用逗号分隔1–3个整数，每轴1–4，默认2,3,4和4；不输入括号。偏置起点默认10，范围±10，步长1，可键盘编辑。输出位置从0起；形状非法或不兼容时显示原因并停止计算。"
+      instructions="先点击读数格，操作偏置板并追踪来源；再编辑形状验证广播边界。形状用逗号分隔1–3个整数，每轴1–4，默认2,3,4和4；不输入括号。偏置起点默认10，范围±10，步长1，可键盘编辑。输出位置从0起；形状非法或不兼容时显示原因并停止计算。"
       meaning="第一个输入A按行优先扁平索引i赋值A[i]=i；第二个输入D[j]=偏置起点+j。这是确定性地址编码，便于查来源，不代表实测特征。选择任意输出，查看完整坐标、两个来源和实际求和。"
       limitations="仅演示正长度小张量加法，不含标量、空轴、其他运算或实际框架内存分配。表格只列前12项，全部最多64项都可用输出位置检查器访问。形状合法不能证明批次/时间/通道语义正确。"
       onreset={() => select('channels')}
@@ -123,6 +125,51 @@
           values={[r.left, r.right, r.shape]}
           rowLabels={['A补前轴', 'D补前轴', '输出']}
         />
+        <section
+          class="object-workbench"
+          data-testid="object-workbench"
+          aria-label="传感器数组偏置台"
+        >
+          <h3>选择读数格，追踪偏置从哪一格复用</h3>
+          <p>
+            默认数组按批次、时间、通道排列；值是合成地址编码。每个按钮是一条输出读数，坐标完整列出；选择它会同步定位下方来源。切换为一般形状时，坐标不自动获得业务含义。
+          </p>
+          <div class="object-actions">
+            <button
+              class="btn"
+              disabled={offset <= -10}
+              onclick={() => {
+                offset = Math.max(-10, offset - 1);
+                selected = 'custom';
+              }}>偏置板整体减1</button
+            >
+            <button
+              class="btn"
+              disabled={offset >= 10}
+              onclick={() => {
+                offset = Math.min(10, offset + 1);
+                selected = 'custom';
+              }}>偏置板整体加1</button
+            >
+          </div>
+          <div class="object-actions">
+            {#each r.rows as row (row.flat)}<button
+                class="btn"
+                aria-pressed={flat === row.flat}
+                onclick={() => (flat = row.flat)}
+                aria-label={`读取坐标 ${row.index.join(',')}`}
+                >{row.index.join(',')}：{row.value}</button
+              >{/each}
+          </div>
+          <output data-testid="sensor-reading" aria-live="polite"
+            >选中 {current.index.join(',')}：原读数 {current.av} + 偏置板格 {current.right.index.join(
+              ',',
+            )} 的 {current.bv} = {current.value}</output
+          >
+          <p>
+            选同一通道、不同时刻的两格，比较偏置来源；再选“形状对但语义待定”检查长度相同是否就能识别时间轴。
+          </p>
+        </section>
         <NumericInput
           integer
           label="输出扁平位置"
@@ -224,6 +271,28 @@
 >
 
 <style>
+  .object-workbench {
+    border: 1px solid var(--color-base-300);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-block: 1rem;
+    background: var(--color-base-100);
+  }
+  .object-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block: 0.75rem;
+  }
+  .object-actions button {
+    min-height: 44px;
+    white-space: normal;
+  }
+  .object-workbench output {
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+
   p {
     overflow-wrap: anywhere;
   }

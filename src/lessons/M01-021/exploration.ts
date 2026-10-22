@@ -1,10 +1,10 @@
 export const exploration = {
-  prompt: '(3,)和(4,)相加，会自动得到3×4表吗？',
+  prompt: '三次采样的列表(3,)与四通道偏置板(4,)直接相加，会自动组成3×4读数表吗？',
   options: [
     {
       text: '不会，尾轴3与4冲突',
       correct: true,
-      observation: '比较两个一维形状与显式行列形状的来源索引。',
+      observation: '选择不兼容预设，再切换行列扩展，点击读数格追踪偏置来源。',
     },
     {
       text: '会，两个向量自动沿不同轴扩展',

@@ -25,3 +25,19 @@ it('协议、全部形状预设、来源检查器、错误恢复与复位', asyn
   await fireEvent.click(v.getByText('复位 ↺'));
   expect(v.getByTestId('result').textContent).toContain('输出形状=(2,3,4)');
 });
+
+it('对象操作与数学结果同源', async () => {
+  const v = render(Lesson, { metadata: lessonById.get('M01-021')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
+  expect(v.getByTestId('object-workbench')).toBeTruthy();
+  await fireEvent.click(v.getByRole('button', { name: '读取坐标 1,2,3' }));
+  expect(v.getByTestId('sensor-reading').textContent).toContain(
+    '原读数 23 + 偏置板格 3 的 13 = 36',
+  );
+  await fireEvent.click(v.getByRole('button', { name: '偏置板整体减1' }));
+  expect(v.getByTestId('sensor-reading').textContent).toContain(
+    '原读数 23 + 偏置板格 3 的 12 = 35',
+  );
+  expect(v.getByTestId('trace').textContent).toContain('相加=35');
+  await fireEvent.click(v.getByText('复位 ↺'));
+});

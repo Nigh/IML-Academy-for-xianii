@@ -128,3 +128,10 @@ export function experiment(mode: string, b1: number, b2: number, t: number) {
     determinant: inverse ? 1 : 0,
   };
 }
+
+export function commandOutput(mode: string, first: number, second: number) {
+  if (![first, second].every((n) => Number.isFinite(n) && Math.abs(n) <= 8))
+    throw new RangeError('控制指令须有限且在±8内。');
+  const { matrix } = experiment(mode, 0, 0, 0);
+  return matrix.map((row) => row[0] * first + row[1] * second);
+}
