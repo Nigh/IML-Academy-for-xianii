@@ -1,0 +1,21 @@
+import { render, fireEvent, cleanup } from '@testing-library/svelte';
+import { afterEach, it, expect } from 'vitest';
+import Lesson from './Lesson.svelte';
+import definition from './lesson.ts';
+import { lessonById } from '../../lib/curriculum/catalog.ts';
+import { lessonDefinitionSchema } from '../../lib/lesson/contract.ts';
+afterEach(cleanup);
+it('协议、三点拟合、离群参数与复位', async () => {
+  expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-020');
+  const v = render(Lesson, { metadata: lessonById.get('M01-020')! });
+  for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
+  expect(v.getByTestId('result').textContent).toContain('斜率a=1.5');
+  await fireEvent.click(v.getByText('场景二对照：加入普通点'));
+  expect(v.getByTestId('result').textContent).toContain('斜率a=1.1');
+  await fireEvent.click(v.getByText('场景二：加入离群点'));
+  expect(v.getByTestId('result').textContent).toContain('斜率a=2.9');
+  await fireEvent.input(v.getByLabelText('第四观测偏移 δ'), { target: { value: '0' } });
+  expect(v.getByTestId('result').textContent).toContain('斜率a=1.1');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('result').textContent).toContain('观测数=3');
+});
