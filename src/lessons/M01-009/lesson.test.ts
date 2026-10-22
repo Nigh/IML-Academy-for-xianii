@@ -1,0 +1,22 @@
+import { render, fireEvent, cleanup } from '@testing-library/svelte';
+import { afterEach, it, expect } from 'vitest';
+import Lesson from './Lesson.svelte';
+import definition from './lesson.ts';
+import { lessonById } from '../../lib/curriculum/catalog.ts';
+import { lessonDefinitionSchema } from '../../lib/lesson/contract.ts';
+afterEach(cleanup);
+it('协议、四个预设、候选与复位', async () => {
+  expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-009');
+  const v = render(Lesson, { metadata: lessonById.get('M01-009')! });
+  for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
+  await fireEvent.click(v.getByText('场景二：方向放大两倍'));
+  expect(v.getByTestId('result').textContent).toContain('(3.000,0.000)');
+  await fireEvent.input(v.getByLabelText('候选系数 t'), { target: { value: '1.5' } });
+  expect(v.getByText(/候选距离：2.000/)).toBeTruthy();
+  await fireEvent.click(v.getByText('场景三：正交零投影'));
+  expect(v.getByTestId('result').textContent).toContain('(0.000,0.000)');
+  await fireEvent.click(v.getByText('场景四：零方向'));
+  expect(v.getByTestId('result').textContent).toContain('未定义');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('result').textContent).toContain('(3.000,0.000)');
+});
