@@ -9,6 +9,10 @@
 
 LESSON_SPEC owns teaching acceptance; task cards add lesson-specific requirements without lowering it. Runtime types/checks are structural gates, not proof of teaching quality.
 
+## Teaching design Skills
+
+For lesson creation or optimization, read `docs/TEACHING_DESIGN.md` and follow `docs/LESSON_OPTIMIZATION.md` within the authorized scope. Use `skills/math-storytelling/SKILL.md` for core questions, concept motivation and derivation paths; use `skills/interactive-pedagogy/SKILL.md` for active exploration, feedback and transfer challenges. Load only the relevant skill for a narrower review. These are versioned project skills; read their paths explicitly if the session has not discovered their names. Collaboration, portability and required external skills are documented in `docs/TEACHING_SKILLS.md`. Before writing or revising learner-facing course content (including prose, quizzes, teaching interactions and lab instructions), verify that math-storytelling, interactive-pedagogy, humanizer-zh and ui-ux-pro-max have readable SKILL.md entrypoints and the resources needed for this task. Use humanizer-zh for Chinese prose and ui-ux-pro-max for course UX review. If any required skill is missing, unreadable or incomplete, stop course-content authoring, identify the missing skill and ask the user to install or repair it before continuing; recheck after installation. Do not substitute another skill or silently fall back. This gate does not apply to non-content changes, including documentation, tooling, infrastructure or read-only review. Do not automatically install external skills.
+
 ## Ownership
 
 A new-lesson creation task may modify only `src/lessons/<LESSON_ID>/**` and `labs/lessons/<LESSON_ID>/**`.
