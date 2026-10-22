@@ -37,4 +37,4 @@
   ]);
 </script>
 
-<Plot2D {series} {xRange} {yRange} xLabel="参数 x" yLabel="参数 y" {description} />
+<Plot2D equal {series} {xRange} {yRange} xLabel="参数 x" yLabel="参数 y" {description} />
