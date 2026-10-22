@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '模型解释了一部分观测，剩余部分还藏着同方向的贡献吗？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '观测中哪些部分能被模型解释' },
+    { id: 'experiment', title: '旋转参考方向再分解' },
     { id: 'intuition', title: '沿线分量与垂直剩余' },
     { id: 'mathematics', title: '正交性消去交叉项' },
-    { id: 'experiment', title: '旋转参考方向再分解' },
     { id: 'pitfalls', title: '残差不是任意剩余' },
     { id: 'summary', title: '解释部分加正交残差' },
   ],

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -11,6 +13,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let a = $state([
       [1, 2, 3],
@@ -26,6 +29,7 @@
     selected = $state('rectangular');
   const result = $derived(experiment(a, b, i, j));
   function select(id: string) {
+    if (id === 'rectangular') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       a = p.a.map((r) => [...r]);
@@ -44,6 +48,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="一个输出格子为什么要读取整行和整列？">
+  <p>A有2行3列，B有3行2列。AB第一个格子应如何计算？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     只需前置课程的分量、数乘与相加。这里从头介绍矩阵的行列和乘法，不默认你已经读过编号更早的张量或内积课程。
@@ -55,10 +62,63 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="一层模型如何同时计算多个输出"
-  ><p>
-    线性层需要把多个输入特征按不同权重组合成多个输出。{metadata.title}把这些内积组织成一个规则，便于同时描述形状和计算。本课矩阵元素全部无量纲，最多3行3列，结果为真实解析计算，不进行训练。
-  </p></TheorySection
+
+<TheorySection id="experiment" title="编辑矩阵并逐格检查">
+  <p>逐格查看乘积来源，再编辑一个权重；比较剪切与缩放的AB、BA，找出顺序改变后哪项贡献不同。</p>
+  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+    <InteractivePanel
+      title="每一个乘积从哪里来"
+      instructions="默认2×3乘3×2。矩阵单元格可键盘编辑，有限值范围±1e6；非法输入不传播。结果行/列索引从0开始，数学公式从1开始。预设切换和复位同时重置索引。"
+      meaning="A中高亮当前行，B中高亮当前列，AB高亮当前结果。下方列出实际逐项乘积及相加结果；另显示BA，比较形状与顺序。"
+      limitations="最多3×3的有界解析模型，无性能基准或训练。小数使用双精度浮点；形状兼容也不保证特征顺序或单位语义兼容。"
+      onreset={() => select('rectangular')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="rectangular" onchange={select} />
+      <h3>A · {a.length}×{a[0].length}</h3>
+      <MatrixView
+        values={a}
+        readonly={false}
+        highlight={a[0].map((_, k) => [i, k] as const)}
+        oncellchange={(r, c, v) => edit('a', r, c, v)}
+      />
+      <h3>B · {b.length}×{b[0].length}</h3>
+      <MatrixView
+        values={b}
+        readonly={false}
+        highlight={b.map((_, k) => [k, j] as const)}
+        oncellchange={(r, c, v) => edit('b', r, c, v)}
+      />
+      <div class="parameters">
+        <NumericInput
+          label="结果行索引 i"
+          value={i}
+          min={0}
+          max={a.length - 1}
+          integer
+          onchange={(v) => (i = v)}
+        /><NumericInput
+          label="结果列索引 j"
+          value={j}
+          min={0}
+          max={b[0].length - 1}
+          integer
+          onchange={(v) => (j = v)}
+        />
+      </div>
+      <h3>AB · {result.product.length}×{result.product[0].length}</h3>
+      <MatrixView values={result.product} highlight={[[i, j]]} />
+      <FormulaBlock
+        latex={`(AB)_{${i + 1},${j + 1}}=\\sum_{k=1}^{${a[0].length}}A_{${i + 1},k}B_{k,${j + 1}}`}
+        description="高亮行和列的逐项乘积沿共同轴求和。"
+      />
+      <div aria-live="polite">
+        <p>行值：{result.row.join('，')}；列值：{result.column.join('，')}</p>
+        <p data-testid="result">逐项乘积：{result.terms.join('，')}；和：{result.product[i][j]}</p>
+      </div>
+      {#if result.reverse}<h3>BA · {result.reverse.length}×{result.reverse[0].length}</h3>
+        <MatrixView values={result.reverse} />{:else}<p>BA不满足内维度兼容，未定义。</p>{/if}
+    </InteractivePanel>
+  </PredictionLab></TheorySection
 >
 <TheorySection id="intuition" title="一格是一次行列匹配">
   <p>
@@ -77,11 +137,13 @@
   <p>
     内维度是左列数与右行数，它们必须相同才能配对；外维度是左行数与右列数，保留为结果形状。求和符号Σ表示把下标遍历到的各项加起来。转置T表示交换行和列；复合映射表示把一次输出继续送进下一次计算，矩阵写法按从右到左的顺序作用。
   </p>
-  <KnowledgeCheck prompt="一个2×3矩阵能乘一个2×1输入吗？"
-    >{#snippet answer()}<p>
-        不能。每行3个系数需要3个输入配对；合法输入应有3行。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：批次样本按行放置，X形状为B×n，列向量约定的权重W为m×n。如何得到B×m输出？"
   >
+    {#snippet answer()}<p>
+        计算XWᵀ，内维度n配对，每行样本与每行权重求和。不能直接照抄Wx的列向量式而忽略样本轴。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="内维度收缩，外维度保留"
   ><FormulaBlock
@@ -92,66 +154,7 @@
     把右矩阵每一列看作一个输入列向量，乘法表示对所有列应用同一线性映射。复合映射对列向量从右向左作用；结合律允许改变分组，但交换顺序通常改变含义，甚至使运算没有定义。
   </p></TheorySection
 >
-<TheorySection id="experiment" title="编辑矩阵并逐格检查"
-  ><p>
-    先预测再操作：一个2×3矩阵能乘一个2×1输入吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="每一个乘积从哪里来"
-    instructions="默认2×3乘3×2。矩阵单元格可键盘编辑，有限值范围±1e6；非法输入不传播。结果行/列索引从0开始，数学公式从1开始。预设切换和复位同时重置索引。"
-    meaning="A中高亮当前行，B中高亮当前列，AB高亮当前结果。下方列出实际逐项乘积及相加结果；另显示BA，比较形状与顺序。"
-    limitations="最多3×3的有界解析模型，无性能基准或训练。小数使用双精度浮点；形状兼容也不保证特征顺序或单位语义兼容。"
-    onreset={() => select('rectangular')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="rectangular" onchange={select} />
-    <h3>A · {a.length}×{a[0].length}</h3>
-    <MatrixView
-      values={a}
-      readonly={false}
-      highlight={a[0].map((_, k) => [i, k] as const)}
-      oncellchange={(r, c, v) => edit('a', r, c, v)}
-    />
-    <h3>B · {b.length}×{b[0].length}</h3>
-    <MatrixView
-      values={b}
-      readonly={false}
-      highlight={b.map((_, k) => [k, j] as const)}
-      oncellchange={(r, c, v) => edit('b', r, c, v)}
-    />
-    <div class="parameters">
-      <NumericInput
-        label="结果行索引 i"
-        value={i}
-        min={0}
-        max={a.length - 1}
-        integer
-        onchange={(v) => (i = v)}
-      /><NumericInput
-        label="结果列索引 j"
-        value={j}
-        min={0}
-        max={b[0].length - 1}
-        integer
-        onchange={(v) => (j = v)}
-      />
-    </div>
-    <h3>AB · {result.product.length}×{result.product[0].length}</h3>
-    <MatrixView values={result.product} highlight={[[i, j]]} />
-    <FormulaBlock
-      latex={`(AB)_{${i + 1},${j + 1}}=\\sum_{k=1}^{${a[0].length}}A_{${i + 1},k}B_{k,${j + 1}}`}
-      description="高亮行和列的逐项乘积沿共同轴求和。"
-    />
-    <div aria-live="polite">
-      <p>行值：{result.row.join('，')}；列值：{result.column.join('，')}</p>
-      <p data-testid="result">逐项乘积：{result.terms.join('，')}；和：{result.product[i][j]}</p>
-    </div>
-    {#if result.reverse}<h3>BA · {result.reverse.length}×{result.reverse[0].length}</h3>
-      <MatrixView values={result.reverse} />{:else}<p>BA不满足内维度兼容，未定义。</p>{/if}
-  </InteractivePanel>
-  <p>
-    场景一检查首格的三个乘积7、18、33，和为58，再逐格切换。场景二比较AB首行(2,1)与BA首行(2,2)，说明先剪切再缩放和相反顺序不同。编辑任意权重，观察所有受影响格子一起更新；最后复位。
-  </p></TheorySection
->
+
 <TheorySection id="pitfalls" title="顺序和形状不能省略"
   ><CommonMistakes
     items={[

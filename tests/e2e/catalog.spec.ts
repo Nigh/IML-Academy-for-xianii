@@ -75,6 +75,7 @@ test('搜索、模块、主题、响应式和无障碍', async ({ page }) => {
 });
 test('已缓存应用和示范课可以离线刷新，字体与 chunk 无错误 @smoke', async ({ page, context }) => {
   await page.goto('./#/lesson/math/linear-algebra/vector-addition');
+  await page.getByRole('button', { name: '直接探索', exact: true }).click();
   await expect(page.getByText('(1, 3) m')).toBeVisible();
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
@@ -87,6 +88,7 @@ test('已缓存应用和示范课可以离线刷新，字体与 chunk 无错误 
   });
   await context.setOffline(true);
   await page.reload();
+  await page.getByRole('button', { name: '直接探索', exact: true }).click();
   await expect(page.getByText('(1, 3) m')).toBeVisible();
   await page.getByRole('button', { name: '场景二：完全抵消' }).click();
   await expect(page.getByText('(0, 0) m')).toBeVisible();
@@ -98,7 +100,10 @@ test('已缓存应用和示范课可以离线刷新，字体与 chunk 无错误 
 test('首页、示范课与进度页在亮暗主题下可访问', async ({ page }) => {
   for (const route of ['#/', '#/lesson/math/linear-algebra/vector-addition', '#/progress']) {
     await page.goto(`./${route}`);
-    if (route.includes('vector-addition')) await expect(page.getByText('(1, 3) m')).toBeVisible();
+    if (route.includes('vector-addition')) {
+      await page.getByRole('button', { name: '直接探索', exact: true }).click();
+      await expect(page.getByText('(1, 3) m')).toBeVisible();
+    }
     for (const theme of ['light', 'dark']) {
       await page.getByLabel('主题', { exact: true }).selectOption(theme);
       await expect(page.locator('html')).toHaveAttribute(
@@ -131,6 +136,7 @@ test('存储损坏或不可用时不覆盖旧数据且可以学习', async ({ br
     const page = await context.newPage();
     await page.goto('./#/lesson/math/linear-algebra/vector-addition');
     await expect(page.getByText(/当前使用内存模式|浏览器存储不可用/)).toBeVisible();
+    await page.getByRole('button', { name: '直接探索', exact: true }).click();
     await expect(page.getByText('(1, 3) m')).toBeVisible();
     await page.getByRole('button', { name: '标记为已完成' }).click();
     await expect(page.getByRole('button', { name: '已完成 ✓' })).toBeDisabled();

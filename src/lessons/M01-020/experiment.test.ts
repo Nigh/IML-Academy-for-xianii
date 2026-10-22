@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { fit, experiment } from './experiment.ts';
+import { fit, experiment, candidate } from './experiment.ts';
 it('三点解析解与正交条件、离群影响', () => {
   const r = experiment(false, 0);
   expect(r.slope).toBe(1.5);
@@ -48,4 +48,23 @@ it('形状、非有限、退化与边界校验', () => {
   ])
     expect(() => fit(p)).toThrow();
   for (const d of [NaN, Infinity, -8.1, 8.1]) expect(() => experiment(true, d)).toThrow();
+});
+
+it('候选直线的独立解析损失、最优下界和非法输入', () => {
+  // 三点上 y=1+t 的残差为0,0,−1，SSE=1。
+  expect(candidate(false, 0, 1, 1).sse).toBe(1);
+  const optimal = experiment(false, 0);
+  expect(candidate(false, 0, 4 / 3, 1.5).sse).toBeCloseTo(1 / 6, 12);
+  for (const c of [-8, 0, 8])
+    for (const a of [-8, 0, 8]) {
+      const r = candidate(false, 0, c, a);
+      expect(r.sse).toBeGreaterThanOrEqual(optimal.sse);
+      expect(r.sse).toBeCloseTo((c - a) ** 2 + (c - 1) ** 2 + (c + a - 3) ** 2, 10);
+      expect(r.yRange[0]).toBeLessThan(Math.min(...r.series.points.map((p) => p.y)));
+      expect(r.yRange[1]).toBeGreaterThan(Math.max(...r.series.points.map((p) => p.y)));
+    }
+  for (const bad of [NaN, Infinity, -8.1, 8.1]) {
+    expect(() => candidate(false, 0, bad, 1)).toThrow();
+    expect(() => candidate(false, 0, 1, bad)).toThrow();
+  }
 });

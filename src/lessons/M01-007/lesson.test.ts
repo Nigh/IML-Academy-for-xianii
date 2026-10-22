@@ -14,6 +14,7 @@ it('协议、章节、主要参数更新和复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-007');
   expect(definition.quiz.length).toBeGreaterThanOrEqual(2);
   const v = render(Lesson, { metadata: lessonById.get('M01-007')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const section of definition.sections)
     expect(v.container.querySelector(`#${section.id}`)).toBeTruthy();
   expect(v.container.querySelector('[role="alert"]')).toBeNull();

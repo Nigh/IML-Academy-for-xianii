@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('协议、单位对照、尺度与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-008');
   const v = render(Lesson, { metadata: lessonById.get('M01-008')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('L1=7.000 m；L2=5.000 m');
   await fireEvent.click(v.getByText('场景二：第一特征改用毫米'));

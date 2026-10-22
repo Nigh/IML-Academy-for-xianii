@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('协议、四预设、阶段、零矩阵与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-018');
   const v = render(Lesson, { metadata: lessonById.get('M01-018')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('奇异值=(3,1)');
   await fireEvent.click(v.getByText('场景二：秩1'));

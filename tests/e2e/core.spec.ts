@@ -3,13 +3,15 @@ import lessons from '../../curriculum/lessons.json' with { type: 'json' };
 import { test, expect } from '@playwright/test';
 test('示范课交互、复位、测验、完成、进度导出和深链接刷新 @smoke', async ({ page }) => {
   await page.goto('./#/lesson/math/linear-algebra/vector-addition');
+  await page.getByRole('button', { name: '直接探索', exact: true }).click();
   await expect(page.getByText('(1, 3) m')).toBeVisible();
   await page.getByRole('button', { name: '场景二：完全抵消' }).click();
   await expect(page.getByText('(0, 0) m')).toBeVisible();
   await page.getByRole('button', { name: '复位 ↺' }).click();
+  await page.getByRole('button', { name: '直接探索', exact: true }).click();
   await expect(page.getByText('(1, 3) m')).toBeVisible();
   await page.getByLabel('合位移为 (0,0)m，路径长度为 2√5m', { exact: true }).check();
-  await page.getByRole('button', { name: '检查理解', exact: true }).click();
+  await page.getByRole('button', { name: '检查理解', exact: true }).first().click();
   await expect(page.getByText('回答正确', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: '标记为已完成' }).click();
   await page.reload();

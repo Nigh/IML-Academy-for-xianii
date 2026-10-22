@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -12,6 +14,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let mode = $state('diagonal'),
     angle = $state(0),
@@ -20,6 +23,7 @@
   const fmt = (n: number) =>
     n !== 0 && Math.abs(n) < 1e-4 ? n.toExponential(3) : Number(n.toFixed(4));
   function select(id: string) {
+    if (id === 'x') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       mode = p.mode;
@@ -29,6 +33,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="反复应用同一个变换，哪些输入方向最容易追踪？">
+  <p>diag(2,3)作用于(1,1)得到(2,3)。原输入是特征向量吗？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     前课已经能解释矩阵如何改变平面。这里新增特征值与特征向量；它们不要求先学逆矩阵课，本课会解释用到的二维行列式。
@@ -40,11 +47,54 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="哪些方向在反复变换中最简单"
-  ><p>
-    一个线性状态更新反复作用时，普通向量可能同时转向和伸缩，但某些方向只按一个比例变化。这让动力学模态、协方差主方向和迭代算法更容易分析。{metadata.title}寻找这些特殊方向。本课用无量纲二维实矩阵解析计算，不以小模型证明真实系统稳定性。
-  </p></TheorySection
->
+
+<TheorySection id="experiment" title="旋转输入寻找特征方向">
+  <p>
+    寻找坐标轴特征方向，再尝试45°与90°旋转矩阵。对照正负倍率和残差，区分“没有找到”与“解析上不存在”。
+  </p>
+  <PredictionLab {...exploration} context={JSON.stringify(r)} {resetVersion}>
+    <InteractivePanel
+      title="同一输入与它的像"
+      instructions="选择固定矩阵。单位输入角θ默认0°，范围−180°至180°，步长1°，可用键盘数值框；非法值保留有效角度。横轴正向为0°，逆时针为正。"
+      meaning="实线是单位输入v，虚线是Av。数值给出最佳比例ρ和共线残差e；标签移至文字区防止重叠。仅在该矩阵解析条件满足时报告特征值。切换矩阵时等比例视域自适应，不能跨图按像素比较长度。"
+      limitations="三个固定2×2矩阵，非通用特征分解。显示残差为浮点近似，接近零不替代精确证明；坐标轴角度采用精确零分量，避免三角函数舍入制造假箭头。"
+      onreset={() => select('x')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="x" onchange={select} />
+      <ParameterSlider
+        label="输入角 θ"
+        unit="°"
+        value={angle}
+        min={-180}
+        max={180}
+        step={1}
+        onchange={(n) => {
+          angle = n;
+          selected = 'custom';
+        }}
+      />
+      <MatrixView values={r.matrix} />
+      <VectorDiagram
+        range={r.range}
+        vectors={[
+          { ...r.v, label: '', role: 'primary' },
+          { ...r.av, label: '', role: 'secondary' },
+        ]}
+        description="无量纲等比例x/y坐标；实线单位输入v、虚线输出Av，重合或反向保持真实几何关系。"
+      />
+      <div aria-live="polite" data-testid="result">
+        <p>实线v=({fmt(r.v.x)},{fmt(r.v.y)})；虚线Av=({fmt(r.av.x)},{fmt(r.av.y)})。</p>
+        <p>最佳比例ρ={fmt(r.rho)}；共线残差e={r.residual.toExponential(3)}。</p>
+        <p>
+          {r.eigen ? `当前是特征方向，特征值λ=${r.eigenvalue}。` : '当前不是实特征方向。'}{mode ===
+          'rotation'
+            ? '解析结论：此90°旋转没有任何非零实特征向量。'
+            : '解析结论：此矩阵的实特征方向仅为两个坐标轴。'}
+        </p>
+      </div>
+    </InteractivePanel>
+  </PredictionLab>
+</TheorySection>
 <TheorySection id="intuition" title="共线可以同向也可以反向">
   <p>
     特征向量是一根非零输入向量，变换后仍在原来的直线上；特征值是长度和正反方向的有符号倍率。它与机器学习中的“特征列”不是同一层含义。
@@ -59,11 +109,13 @@
   <p>
     下面的单位矩阵I保持每个分量；A减去λI表示在每个对角元素上减λ。二维行列式是主对角乘积减另一条对角乘积，等于0表示两列不能独立覆盖平面。因此这里的核（kernel）就是所有零输出输入的集合。寻找非零的零输出输入时，要检查该乘积差是否为0。复数特征值和实对角化只作补充，不要求在此掌握。
   </p>
-  <KnowledgeCheck prompt="矩阵把一根非零箭头反向放大2倍，它还是特征向量吗？"
-    >{#snippet answer()}<p>
-        是，对应特征值−2。特征方向要求共线，不要求同向。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：矩阵把非零向量送到原点，这个输入能是特征向量吗？与零向量本身有何区别？"
   >
+    {#snippet answer()}<p>
+        能，对应λ=0。输入仍非零，方向可识别；零输入不能作为特征向量，否则任意λ都形式上满足等式。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="非零向量与实数条件">
   <FormulaBlock
@@ -86,54 +138,7 @@
     有n个线性无关实特征向量时才可组成实特征向量基并作实对角化。实对称矩阵保证存在正交实特征向量基；一般实矩阵不保证，甚至有实特征值也可能缺少足够独立特征向量。
   </p>
 </TheorySection>
-<TheorySection id="experiment" title="旋转输入寻找特征方向">
-  <p>
-    先预测再操作：矩阵把一根非零箭头反向放大2倍，它还是特征向量吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="同一输入与它的像"
-    instructions="选择固定矩阵。单位输入角θ默认0°，范围−180°至180°，步长1°，可用键盘数值框；非法值保留有效角度。横轴正向为0°，逆时针为正。"
-    meaning="实线是单位输入v，虚线是Av。数值给出最佳比例ρ和共线残差e；标签移至文字区防止重叠。仅在该矩阵解析条件满足时报告特征值。切换矩阵时等比例视域自适应，不能跨图按像素比较长度。"
-    limitations="三个固定2×2矩阵，非通用特征分解。显示残差为浮点近似，接近零不替代精确证明；坐标轴角度采用精确零分量，避免三角函数舍入制造假箭头。"
-    onreset={() => select('x')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="x" onchange={select} />
-    <ParameterSlider
-      label="输入角 θ"
-      unit="°"
-      value={angle}
-      min={-180}
-      max={180}
-      step={1}
-      onchange={(n) => {
-        angle = n;
-        selected = 'custom';
-      }}
-    />
-    <MatrixView values={r.matrix} />
-    <VectorDiagram
-      range={r.range}
-      vectors={[
-        { ...r.v, label: '', role: 'primary' },
-        { ...r.av, label: '', role: 'secondary' },
-      ]}
-      description="无量纲等比例x/y坐标；实线单位输入v、虚线输出Av，重合或反向保持真实几何关系。"
-    />
-    <div aria-live="polite" data-testid="result">
-      <p>实线v=({fmt(r.v.x)},{fmt(r.v.y)})；虚线Av=({fmt(r.av.x)},{fmt(r.av.y)})。</p>
-      <p>最佳比例ρ={fmt(r.rho)}；共线残差e={r.residual.toExponential(3)}。</p>
-      <p>
-        {r.eigen ? `当前是特征方向，特征值λ=${r.eigenvalue}。` : '当前不是实特征方向。'}{mode ===
-        'rotation'
-          ? '解析结论：此90°旋转没有任何非零实特征向量。'
-          : '解析结论：此矩阵的实特征方向仅为两个坐标轴。'}
-      </p>
-    </div>
-  </InteractivePanel>
-  <p>
-    场景一比较横轴λ=2和纵轴λ=3，再将θ改为45°观察转向与非零残差。场景二连续改变θ，残差始终约1；结合λ²+1无实根理解为何不是“还没找到角度”。场景三观察负特征值导致反向，复位恢复横轴放大。
-  </p>
-</TheorySection>
+
 <TheorySection id="pitfalls" title="实矩阵不保证实特征向量基"
   ><CommonMistakes
     items={[

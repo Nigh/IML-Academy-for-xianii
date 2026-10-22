@@ -18,6 +18,8 @@ for (const [title, slug] of routes) {
     await page.reload();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(title);
     await page.locator('#experiment').scrollIntoViewIfNeeded();
+    if (slug.endsWith('dot-product'))
+      await page.getByRole('button', { name: '直接探索', exact: true }).click();
     for (const theme of ['light', 'dark']) {
       await page.getByLabel('主题', { exact: true }).selectOption(theme);
       await expect(page.locator('html')).toHaveAttribute(
@@ -50,6 +52,7 @@ for (const [title, slug] of routes) {
 }
 test('向量拖动与键盘输入同步更新点积', async ({ page }) => {
   await page.goto('./#/lesson/math/linear-algebra/dot-product');
+  await page.getByRole('button', { name: '直接探索', exact: true }).click();
   await expect(page.getByTestId('dot-result')).toHaveText('点积 = 6');
   const end = page.getByTestId('vector-end-0');
   await end.scrollIntoViewIfNeeded();

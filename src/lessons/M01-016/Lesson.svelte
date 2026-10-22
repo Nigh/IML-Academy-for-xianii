@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -12,6 +14,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let mode = $state('under'),
     b1 = $state(2),
@@ -22,6 +25,7 @@
   const fmt = (n: number) =>
     n !== 0 && Math.abs(n) < 1e-4 ? n.toExponential(3) : Number(n.toFixed(4));
   function select(id: string) {
+    if (id === 'under') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       mode = p.mode;
@@ -33,6 +37,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="同样拟合得好的多个解，应该怎样选一个？">
+  <p>x₁+x₂=2的解很多。只在精确拟合的解中，哪个长度最小？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     前置课程已解释普通逆矩阵和正交投影。本课处理没有普通逆的情形，并明确区分“输出误差最小”和“输入长度最小”两次选择。
@@ -44,11 +51,86 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="观测太少或互相矛盾时"
-  ><p>
-    标定可能只有一个总和读数却想恢复两个参数，也可能两个观测要求同一参数取不同值。普通逆矩阵无法处理这些非方阵问题。{metadata.title}给出统一的线性代数答案：最小范数最小二乘解。本课用无量纲合成小模型解析计算，不运行训练或通用数值分解。
-  </p></TheorySection
->
+
+<TheorySection id="experiment" title="比较伪逆与候选解">
+  <p>欠定模式只改核偏移，比较同输出的输入长度；超定模式改变候选偏移，比较无法消掉的观测矛盾。</p>
+  <PredictionLab {...exploration} context={JSON.stringify(r)} {resetVersion}>
+    <InteractivePanel
+      title="哪一种误差还可以降低"
+      instructions="选择欠定或超定预设。b₁默认2、b₂默认0，范围±4；t默认1，范围±3，步长0.25，均无量纲。欠定模式只用b₁，b₂仅超定模式显示。非法数值保留有效结果；键盘可编辑。"
+      meaning="欠定模式画输入空间：实线最小范数解，虚线当前精确解，点线核位移。超定模式画输出空间：实线目标b，虚线最优拟合Ax⋆，点线连接残差。重合和零向量保持真实位置，数值在下方。"
+      limitations="两个固定非方阵的解析模型，不是通用伪逆计算器。t在欠定模式增加核分量，在超定模式把标量解偏离均值；对照两种不同后果。自适应等比例视域不可跨图比较像素长度。"
+      onreset={() => select('under')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="under" onchange={select} />
+      <ParameterSlider
+        label="目标 b₁"
+        value={b1}
+        min={-4}
+        max={4}
+        step={0.25}
+        onchange={(n) => {
+          b1 = n;
+          selected = 'custom';
+        }}
+      />
+      {#if mode === 'over'}<ParameterSlider
+          label="目标 b₂"
+          value={b2}
+          min={-4}
+          max={4}
+          step={0.25}
+          onchange={(n) => {
+            b2 = n;
+            selected = 'custom';
+          }}
+        />{/if}
+      <ParameterSlider
+        label="候选偏移 t"
+        value={t}
+        min={-3}
+        max={3}
+        step={0.25}
+        onchange={(n) => {
+          t = n;
+          selected = 'custom';
+        }}
+      />
+      <p>A：</p>
+      <MatrixView values={r.matrix} />
+      <p>A⁺：</p>
+      <MatrixView values={r.pinverse} />
+      <VectorDiagram
+        range={r.extent}
+        vectors={[
+          { ...r.target, label: '', role: 'primary' },
+          { ...r.displayed, label: '', role: 'secondary' },
+        ]}
+        projection={{ from: r.target, to: r.displayed }}
+        description={mode === 'under'
+          ? '输入平面x₁/x₂，无量纲；实线最小范数解、虚线当前解、点线核位移。'
+          : '输出平面第一/第二观测，无量纲；实线目标b、虚线最优拟合、点线残差。'}
+      />
+      <div aria-live="polite" data-testid="result">
+        <p>
+          {mode === 'under' ? '图中：实线x⋆，虚线候选x。' : '图中：实线b，虚线Ax⋆。'} b=({r.rhs
+            .map(fmt)
+            .join(',')})。
+        </p>
+        <p>
+          伪逆解=({r.star.map(fmt).join(',')})；拟合=({r.fitted.map(fmt).join(',')})；最小残差={fmt(
+            r.residual,
+          )}；解范数={fmt(r.starNorm)}。
+        </p>
+        <p>
+          候选解=({r.candidate.map(fmt).join(',')})；候选输出=({r.current
+            .map(fmt)
+            .join(',')})；候选残差={fmt(r.candidateResidual)}；候选范数={fmt(r.candidateNorm)}。
+        </p>
+      </div>
+    </InteractivePanel>
+  </PredictionLab>
+</TheorySection>
 <TheorySection id="intuition" title="先最小残差，再最小范数">
   <p>
     欠定（underdetermined）表示未知分量比独立约束多，可能有很多解；超定（overdetermined）表示方程比未知分量多，含噪或矛盾观测可能没有精确解。伪逆用统一规则选择一个输入，但不会凭空消除观测矛盾。
@@ -67,11 +149,13 @@
     Moore–Penrose伪逆记为A⁺，是把目标送到上述唯一选中解的矩阵；可逆时它等于普通逆。公式中的min表示最小数值，arg
     min表示取得这个最小值的输入或输入集合；星号只是最优解的标记。理解这两个配方例子后，再读下面的嵌套公式；一般构造方法留到SVD课。
   </p>
-  <KnowledgeCheck prompt="两个目标要求同一参数为1和3，伪逆能同时精确满足吗？"
-    >{#snippet answer()}<p>
-        不能。最优参数为2，残差平方和为2；伪逆给最佳折中，不消除矛盾。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：若两个参数使用不同单位，仍能直接把数值平方相加决定“最短”吗？说明需要什么约定。"
   >
+    {#snippet answer()}<p>
+        需要先约定参数单位、尺度或加权范数。欧氏最小范数依赖表示，换单位可能改变选中的解，伪逆没有自动决定物理重要性。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="Moore–Penrose伪逆">
   <FormulaBlock
@@ -90,88 +174,7 @@
     一般伪逆满足AA⁺A=A、A⁺AA⁺=A⁺，且AA⁺与A⁺A均对称。这四个条件唯一确定Moore–Penrose伪逆；AA⁺是列空间的正交投影。可逆方阵的伪逆等于普通逆；一般矩阵可借助后续SVD构造，不能无条件使用含(AᵀA)⁻¹的公式。
   </p>
 </TheorySection>
-<TheorySection id="experiment" title="比较伪逆与候选解">
-  <p>
-    先预测再操作：两个目标要求同一参数为1和3，伪逆能同时精确满足吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="哪一种误差还可以降低"
-    instructions="选择欠定或超定预设。b₁默认2、b₂默认0，范围±4；t默认1，范围±3，步长0.25，均无量纲。欠定模式只用b₁，b₂仅超定模式显示。非法数值保留有效结果；键盘可编辑。"
-    meaning="欠定模式画输入空间：实线最小范数解，虚线当前精确解，点线核位移。超定模式画输出空间：实线目标b，虚线最优拟合Ax⋆，点线连接残差。重合和零向量保持真实位置，数值在下方。"
-    limitations="两个固定非方阵的解析模型，不是通用伪逆计算器。t在欠定模式增加核分量，在超定模式把标量解偏离均值；对照两种不同后果。自适应等比例视域不可跨图比较像素长度。"
-    onreset={() => select('under')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="under" onchange={select} />
-    <ParameterSlider
-      label="目标 b₁"
-      value={b1}
-      min={-4}
-      max={4}
-      step={0.25}
-      onchange={(n) => {
-        b1 = n;
-        selected = 'custom';
-      }}
-    />
-    {#if mode === 'over'}<ParameterSlider
-        label="目标 b₂"
-        value={b2}
-        min={-4}
-        max={4}
-        step={0.25}
-        onchange={(n) => {
-          b2 = n;
-          selected = 'custom';
-        }}
-      />{/if}
-    <ParameterSlider
-      label="候选偏移 t"
-      value={t}
-      min={-3}
-      max={3}
-      step={0.25}
-      onchange={(n) => {
-        t = n;
-        selected = 'custom';
-      }}
-    />
-    <p>A：</p>
-    <MatrixView values={r.matrix} />
-    <p>A⁺：</p>
-    <MatrixView values={r.pinverse} />
-    <VectorDiagram
-      range={r.extent}
-      vectors={[
-        { ...r.target, label: '', role: 'primary' },
-        { ...r.displayed, label: '', role: 'secondary' },
-      ]}
-      projection={{ from: r.target, to: r.displayed }}
-      description={mode === 'under'
-        ? '输入平面x₁/x₂，无量纲；实线最小范数解、虚线当前解、点线核位移。'
-        : '输出平面第一/第二观测，无量纲；实线目标b、虚线最优拟合、点线残差。'}
-    />
-    <div aria-live="polite" data-testid="result">
-      <p>
-        {mode === 'under' ? '图中：实线x⋆，虚线候选x。' : '图中：实线b，虚线Ax⋆。'} b=({r.rhs
-          .map(fmt)
-          .join(',')})。
-      </p>
-      <p>
-        伪逆解=({r.star.map(fmt).join(',')})；拟合=({r.fitted.map(fmt).join(',')})；最小残差={fmt(
-          r.residual,
-        )}；解范数={fmt(r.starNorm)}。
-      </p>
-      <p>
-        候选解=({r.candidate.map(fmt).join(',')})；候选输出=({r.current
-          .map(fmt)
-          .join(',')})；候选残差={fmt(r.candidateResidual)}；候选范数={fmt(r.candidateNorm)}。
-      </p>
-    </div>
-  </InteractivePanel>
-  <p>
-    场景一保持b=2改变t，两个解都精确拟合，但t=0才最小范数。场景二保持b=(1,3)，将t调到0，候选残差降到√2却不能降到0。再令两个目标相等，观察最优输出与目标重合。复位恢复欠定对照。
-  </p>
-</TheorySection>
+
 <TheorySection id="pitfalls" title="伪逆不会制造不存在的精确解"
   ><CommonMistakes
     items={[

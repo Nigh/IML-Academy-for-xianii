@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '一个输出格子为什么要读取整行和整列？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '一层模型如何同时计算多个输出' },
+    { id: 'experiment', title: '编辑矩阵并逐格检查' },
     { id: 'intuition', title: '一格是一次行列匹配' },
     { id: 'mathematics', title: '内维度收缩，外维度保留' },
-    { id: 'experiment', title: '编辑矩阵并逐格检查' },
     { id: 'pitfalls', title: '顺序和形状不能省略' },
     { id: 'summary', title: '用形状读懂矩阵乘法' },
   ],

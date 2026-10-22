@@ -7,8 +7,9 @@ import { lessonDefinitionSchema } from '../../lib/lesson/contract.ts';
 afterEach(cleanup);
 it('课程协议有效且交互结果与输入一致、可复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-002');
-  expect(definition.quiz).toHaveLength(1);
+  expect(definition.quiz).toHaveLength(3);
   const view = render(Lesson, { metadata: lessonById.get('M01-002')! });
+  await fireEvent.click(view.getByRole('button', { name: '直接探索' }));
   expect(view.getByText('(1, 3) m')).toBeTruthy();
   await fireEvent.click(view.getByText('场景二：完全抵消'));
   expect(view.getByText('(0, 0) m')).toBeTruthy();
@@ -22,7 +23,7 @@ it('课程协议有效且交互结果与输入一致、可复位', async () => {
   expect(view.container.querySelectorAll('.vector-diagram line')).toHaveLength(5);
   await fireEvent.click(view.getByText('复位 ↺'));
   expect(view.getByText('(1, 3) m')).toBeTruthy();
-  expect(view.container.querySelectorAll('details')).toHaveLength(3);
+  expect(view.getByText(/^迁移：/)).toBeTruthy();
   for (const section of definition.sections)
     expect(view.container.querySelector(`#${section.id}`)).toBeTruthy();
 });

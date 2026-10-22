@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -9,6 +11,7 @@
   import ParameterSlider from '../../components/interactive/ParameterSlider.svelte';
   import VectorDiagram from '../../components/charts/VectorDiagram.svelte';
   import { add, magnitude, scale, vector } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let k = $state(1);
   let ax = $state(2);
@@ -35,6 +38,7 @@
     ),
   );
   function reset() {
+    resetVersion += 1;
     k = 1;
     ax = 2;
     ay = 1;
@@ -44,6 +48,11 @@
   }
 </script>
 
+<TheorySection id="motivation" title="两段路都走了，为什么还能回到原点？">
+  <p>
+    机器人完成位移(2,1)m，再走(−2,−1)m。记录最终位置和走过的路，能得到同一个数吗？下面把箭头首尾相接，再改变第一段的倍率。
+  </p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     上一课已经区分了物理位移、坐标分量和长度。本课固定同一个坐标系，学习怎样合并位移和改变位移的大小；不再重复标量与向量的完整定义。
@@ -55,14 +64,126 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="从两段位移开始">
+
+<TheorySection id="experiment" title="亲手合成两个向量">
   <p>
-    机器人先移动到位置 a，再沿方向 b
-    移动一段。它最终在哪里？只把两段距离加起来还不够，我们需要同时保留方向。
+    比较转向和抵消；改变k的正负，观察第一段的方向与长度。再切换两种作图方式，检查合向量是否相同。
   </p>
-  <p>
-    本课用平面位移建立 {metadata.title} 的直觉。坐标以米（m）为单位，向右为 x 正方向，向上为 y 正方向。
-  </p>
+  <PredictionLab
+    {...exploration}
+    context={JSON.stringify([k, ax, ay, bx, by, mode])}
+    {resetVersion}
+  >
+    <InteractivePanel
+      title="方向会改变答案"
+      instructions="调节四个坐标分量。也可以切换作图方式，或直接尝试下面的对照场景。"
+      meaning="箭头 ka、虚线箭头 b 与合向量 ka+b 都由当前坐标解析计算；不是预录动画。"
+      limitations="二维欧氏空间、同一坐标系、同一单位；不描述旋转姿态的复合。"
+      onreset={reset}
+    >
+      <ParameterSlider
+        label="数乘系数 k"
+        value={k}
+        min={-3}
+        max={3}
+        step={0.1}
+        unit="无量纲"
+        onchange={(n) => (k = n)}
+      />
+      <p>
+        默认 k=1。计算 k a + b；k 为负时 a 反向。分量均为 m，范围 −5 至
+        5；非法输入保留上次有效结果。视域随端点变化，比较长度时请读取数值。
+      </p>
+      <div class="vector-lab">
+        <div class="vector-controls">
+          <span class="vector-key primary-key">向量 a · m</span>
+          <ParameterSlider
+            label="a 的 x 分量"
+            value={ax}
+            min={-5}
+            max={5}
+            step={0.1}
+            onchange={(n) => (ax = n)}
+          />
+          <ParameterSlider
+            label="a 的 y 分量"
+            value={ay}
+            min={-5}
+            max={5}
+            step={0.1}
+            onchange={(n) => (ay = n)}
+          />
+          <span class="vector-key secondary-key">向量 b · m</span>
+          <ParameterSlider
+            label="b 的 x 分量"
+            value={bx}
+            min={-5}
+            max={5}
+            step={0.1}
+            onchange={(n) => (bx = n)}
+          />
+          <ParameterSlider
+            label="b 的 y 分量"
+            value={by}
+            min={-5}
+            max={5}
+            step={0.1}
+            onchange={(n) => (by = n)}
+          />
+        </div>
+        <div>
+          <VectorDiagram
+            {range}
+            vectors={[
+              { ...a, label: 'ka', role: 'primary' },
+              {
+                ...b,
+                label: mode === 'head-tail' ? '' : 'b',
+                role: 'secondary',
+                origin: mode === 'head-tail' ? a : undefined,
+              },
+              { ...sum, label: magnitude(sum) === 0 ? '' : '和', role: 'accent' },
+              ...(mode === 'parallelogram'
+                ? [
+                    { ...b, origin: a, label: '', role: 'secondary' as const },
+                    { ...a, origin: b, label: '', role: 'primary' as const },
+                  ]
+                : []),
+            ]}
+            description={`数乘后的向量 ka=(${fmt(a.x)},${fmt(a.y)}) 米，b=(${bx},${by}) 米，合向量=(${fmt(sum.x)},${fmt(sum.y)}) 米。`}
+          />
+          <label class="field"
+            >作图方式<select class="select select-bordered" bind:value={mode}
+              ><option value="head-tail">首尾相接</option><option value="parallelogram"
+                >平行四边形</option
+              ></select
+            ></label
+          >
+        </div>
+      </div>
+      <p>图例：ka 为实线，b 为虚线，和为标有“和”的实线；抵消时合向量落在原点，不画虚假箭头。</p>
+      <div class="experiment-result" aria-live="polite">
+        k a + b = <strong>({fmt(sum.x)}, {fmt(sum.y)}) m</strong><span
+          >合位移长度 {magnitude(sum).toFixed(2)} m · 路程 {(magnitude(a) + magnitude(b)).toFixed(
+            2,
+          )} m</span
+        >
+      </div>
+      <div class="scenario-buttons">
+        <button class="btn btn-sm btn-outline" onclick={reset}>场景一：转向后合成</button><button
+          class="btn btn-sm btn-outline"
+          onclick={() => {
+            k = 1;
+            mode = 'head-tail';
+            ax = 2;
+            ay = -1;
+            bx = -2;
+            by = 1;
+          }}>场景二：完全抵消</button
+        >
+      </div>
+    </InteractivePanel>
+  </PredictionLab>
 </TheorySection>
 <TheorySection id="intuition" title="把箭头首尾相接">
   <p>
@@ -81,124 +202,13 @@
   <p>
     长度的相加是另一件事。向右2m再向上1m，实际路程为3m，但起点到终点的直线距离为平方根5m。只有两段非零位移同向共线时，合位移长度才等于两段长度之和。
   </p>
-  <KnowledgeCheck prompt="先向右2m，再向上1m，合位移长度会是3m吗？"
-    >{#snippet answer()}<p>
-        不会。3m是两段路程之和，起终点的直线距离是平方根5m。
-      </p>{/snippet}</KnowledgeCheck
-  >
+  <KnowledgeCheck prompt="迁移：一段记录用m，另一段用mm。可以直接逐分量相加吗？说明必须先做什么。">
+    {#snippet answer()}<p>
+        先统一单位并确认两段使用同一坐标系。数值能相加不代表含义匹配；位置记录还需先转成相对于同一起点的位移。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
-<TheorySection id="experiment" title="亲手合成两个向量">
-  <p>
-    先预测再操作：先向右2m，再向上1m，合位移长度会是3m吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="方向会改变答案"
-    instructions="调节四个坐标分量。也可以切换作图方式，或直接尝试下面的对照场景。"
-    meaning="箭头 ka、虚线箭头 b 与合向量 ka+b 都由当前坐标解析计算；不是预录动画。"
-    limitations="二维欧氏空间、同一坐标系、同一单位；不描述旋转姿态的复合。"
-    onreset={reset}
-  >
-    <ParameterSlider
-      label="数乘系数 k"
-      value={k}
-      min={-3}
-      max={3}
-      step={0.1}
-      unit="无量纲"
-      onchange={(n) => (k = n)}
-    />
-    <p>
-      默认 k=1。计算 k a + b；k 为负时 a 反向。分量均为 m，范围 −5 至
-      5；非法输入保留上次有效结果。视域随端点变化，比较长度时请读取数值。
-    </p>
-    <div class="vector-lab">
-      <div class="vector-controls">
-        <span class="vector-key primary-key">向量 a · m</span>
-        <ParameterSlider
-          label="a 的 x 分量"
-          value={ax}
-          min={-5}
-          max={5}
-          step={0.1}
-          onchange={(n) => (ax = n)}
-        />
-        <ParameterSlider
-          label="a 的 y 分量"
-          value={ay}
-          min={-5}
-          max={5}
-          step={0.1}
-          onchange={(n) => (ay = n)}
-        />
-        <span class="vector-key secondary-key">向量 b · m</span>
-        <ParameterSlider
-          label="b 的 x 分量"
-          value={bx}
-          min={-5}
-          max={5}
-          step={0.1}
-          onchange={(n) => (bx = n)}
-        />
-        <ParameterSlider
-          label="b 的 y 分量"
-          value={by}
-          min={-5}
-          max={5}
-          step={0.1}
-          onchange={(n) => (by = n)}
-        />
-      </div>
-      <div>
-        <VectorDiagram
-          {range}
-          vectors={[
-            { ...a, label: 'ka', role: 'primary' },
-            {
-              ...b,
-              label: mode === 'head-tail' ? '' : 'b',
-              role: 'secondary',
-              origin: mode === 'head-tail' ? a : undefined,
-            },
-            { ...sum, label: magnitude(sum) === 0 ? '' : '和', role: 'accent' },
-            ...(mode === 'parallelogram'
-              ? [
-                  { ...b, origin: a, label: '', role: 'secondary' as const },
-                  { ...a, origin: b, label: '', role: 'primary' as const },
-                ]
-              : []),
-          ]}
-          description={`数乘后的向量 ka=(${fmt(a.x)},${fmt(a.y)}) 米，b=(${bx},${by}) 米，合向量=(${fmt(sum.x)},${fmt(sum.y)}) 米。`}
-        />
-        <label class="field"
-          >作图方式<select class="select select-bordered" bind:value={mode}
-            ><option value="head-tail">首尾相接</option><option value="parallelogram"
-              >平行四边形</option
-            ></select
-          ></label
-        >
-      </div>
-    </div>
-    <p>图例：ka 为实线，b 为虚线，和为标有“和”的实线；抵消时合向量落在原点，不画虚假箭头。</p>
-    <div class="experiment-result" aria-live="polite">
-      k a + b = <strong>({fmt(sum.x)}, {fmt(sum.y)}) m</strong><span
-        >合位移长度 {magnitude(sum).toFixed(2)} m · 路程 {(magnitude(a) + magnitude(b)).toFixed(2)} m</span
-      >
-    </div>
-    <div class="scenario-buttons">
-      <button class="btn btn-sm btn-outline" onclick={reset}>场景一：转向后合成</button><button
-        class="btn btn-sm btn-outline"
-        onclick={() => {
-          k = 1;
-          mode = 'head-tail';
-          ax = 2;
-          ay = -1;
-          bx = -2;
-          by = 1;
-        }}>场景二：完全抵消</button
-      >
-    </div>
-  </InteractivePanel>
-</TheorySection>
+
 <TheorySection id="mathematics" title="回到数学定义">
   <FormulaBlock
     latex={String.raw`\mathbf a+\mathbf b=\begin{bmatrix}a_x+b_x\\a_y+b_y\end{bmatrix}`}
@@ -244,7 +254,7 @@
       两者同向时成立。垂直时合长度由勾股定理计算，严格小于两个非零长度之和；反向时会抵消。只有长度相等不足以判断方向。
     </p>{/snippet}
 </KnowledgeCheck>
-<TheorySection id="summary" title="带走三个结论">
+<TheorySection id="summary" title="带走四个结论">
   <LessonSummary
     points={[
       '同坐标同单位的向量逐分量相加，几何上首尾相接。',

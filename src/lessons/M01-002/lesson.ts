@@ -4,14 +4,14 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '两段路都走了，为什么还能回到原点？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '从两段位移开始' },
-    { id: 'intuition', title: '首尾相接的直觉' },
     { id: 'experiment', title: '亲手合成两个向量' },
+    { id: 'intuition', title: '把箭头首尾相接' },
     { id: 'mathematics', title: '回到数学定义' },
-    { id: 'pitfalls', title: '长度与方向的误区' },
-    { id: 'engineering', title: '工程中的向量' },
-    { id: 'summary', title: '带走三个结论' },
+    { id: 'pitfalls', title: '长度不能代替方向' },
+    { id: 'engineering', title: '工程中的同一条规则' },
+    { id: 'summary', title: '带走四个结论' },
   ],
   quiz: [
     {
@@ -37,6 +37,34 @@ export default {
         },
       ],
       answerId: 'zero',
+    },
+    {
+      id: 'negative-scale',
+      version: 1,
+      prompt: 'a=(2,1)m，k=−2。k a 是什么？',
+      options: [
+        { id: 'both', text: '(−4,−2)m', explanation: '每个分量都乘−2，长度变成2倍并反向。' },
+        { id: 'one', text: '(−4,1)m', explanation: '数乘同时作用于全部分量，不能只改变横分量。' },
+      ],
+      answerId: 'both',
+    },
+    {
+      id: 'units',
+      version: 1,
+      prompt: '两段位移分别用m和mm记录，相加前必须怎样处理？',
+      options: [
+        {
+          id: 'convert',
+          text: '统一单位并确认坐标系相同',
+          explanation: '逐分量相加要求同一基和同一单位，需先换算和变换。',
+        },
+        {
+          id: 'direct',
+          text: '按原数字直接相加',
+          explanation: '相同数字在m和mm中对应不同位移，直接加会改变实际含义。',
+        },
+      ],
+      answerId: 'convert',
     },
   ],
 } satisfies LessonDefinition;

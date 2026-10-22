@@ -9,6 +9,7 @@ it('协议、全部章节、三个场景、输入与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-001');
   expect(definition.quiz).toHaveLength(3);
   const view = render(Lesson, { metadata: lessonById.get('M01-001')! });
+  await fireEvent.click(view.getByRole('button', { name: '直接探索' }));
   for (const section of definition.sections)
     expect(view.container.querySelector(`#${section.id}`)).toBeTruthy();
   expect(view.getByTestId('components').textContent).toContain('(3.000, 4.000) m');

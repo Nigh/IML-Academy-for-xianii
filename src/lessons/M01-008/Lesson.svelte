@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -11,6 +13,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let x = $state(3),
     y = $state(4),
@@ -19,6 +22,7 @@
     sy = $state(1);
   const result = $derived(experiment(x, y, factor, sx, sy));
   function select(id: string) {
+    if (id === 'metres') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       x = 3;
@@ -30,6 +34,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="只改记录单位，最近邻的判断为什么会变？">
+  <p>把第一分量从m改成mm，同时把该维尺度也换成mm，归一化距离会改变吗？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     已有点积和向量长度的知识。本课把长度推广为范数，并用差向量衡量两点距离；不同尺度如何改变比较结果是新增内容。
@@ -41,10 +48,87 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="换单位为何改变近邻"
-  ><p>
-    近邻分类、聚类和误差评分都需要比较距离。如果把一个输入从米改记为毫米，模型却认为样本忽然远了很多，问题出在表示与度量。{metadata.title}先用同单位位移解释范数，再演示混合单位的错误。
-  </p></TheorySection
+
+<TheorySection id="experiment" title="同一位移，不同数值表示">
+  <p>比较m与mm显示；再只增大第一尺度。判断两次操作中，哪次改变表示，哪次改变度量。</p>
+  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+    <InteractivePanel
+      title="物理长度与数值分数"
+      instructions="默认差向量(3,4)m，尺度均1m。分量范围±5m，尺度0.1至10m。预设只改变第一特征的显示单位；非法输入保留有效结果。"
+      meaning="几何始终按m绘制。实线Δ是直达位移，横向与竖向两段显示L1轴向路径；数值区同时报告合法物理范数、错误混合单位分数与归一化度量。"
+      limitations="两维欧氏教学模型，无随机/训练。混合m/mm数值平方和只是错误示范，不具有物理长度单位；更一般的特征尺度需要任务知识。"
+      onreset={() => select('metres')}
+    >
+      <PresetSelector
+        {presets}
+        value={x === 3 && y === 4 && sx === 1 && sy === 1
+          ? factor === 1
+            ? 'metres'
+            : 'millimetres'
+          : 'custom'}
+        defaultId="metres"
+        onchange={select}
+      />
+      <div class="parameters">
+        <ParameterSlider
+          label="第一物理分量"
+          value={x}
+          min={-5}
+          max={5}
+          step={0.1}
+          unit="m"
+          onchange={(v) => (x = v)}
+        /><ParameterSlider
+          label="第二物理分量"
+          value={y}
+          min={-5}
+          max={5}
+          step={0.1}
+          unit="m"
+          onchange={(v) => (y = v)}
+        /><ParameterSlider
+          label="第一特征尺度"
+          value={sx}
+          min={0.1}
+          max={10}
+          step={0.1}
+          unit="m"
+          onchange={(v) => (sx = v)}
+        /><ParameterSlider
+          label="第二特征尺度"
+          value={sy}
+          min={0.1}
+          max={10}
+          step={0.1}
+          unit="m"
+          onchange={(v) => (sy = v)}
+        />
+      </div>
+      <VectorDiagram
+        range={result.range}
+        vectors={[
+          { x, y, label: x || y ? 'Δ' : '', role: 'primary' },
+          { x, y: 0, label: x ? '横段' : '', role: 'secondary' },
+          { x: 0, y, origin: { x, y: 0 }, label: '', role: 'accent' },
+        ]}
+        description="等比例坐标x/y均为m，Δ为差向量，横段与竖段首尾相接。零分量不画假箭头；重合端点通过独立数值解释。"
+      />
+      <div aria-live="polite">
+        <p data-testid="result">L1={result.l1.toFixed(3)} m；L2={result.l2.toFixed(3)} m</p>
+        <p>
+          显示分量：{result.shownX}
+          {factor === 1 ? 'm' : 'mm'}，{y} m；直接数值平方和开根={result.rawL2.toFixed(
+            3,
+          )}（{factor === 1 ? '同单位，数值对应m' : '错误混合单位示范，无合法物理长度单位'}）
+        </p>
+        <p>
+          按尺度归一化：L1={result.normalizedL1.toFixed(3)}；L2={result.normalizedL2.toFixed(
+            3,
+          )}（无量纲）
+        </p>
+      </div>
+    </InteractivePanel>
+  </PredictionLab></TheorySection
 >
 <TheorySection id="intuition" title="直达与沿轴移动">
   <p>
@@ -60,11 +144,13 @@
   <p>
     尺度是比较前的单位尺。如果某特征除以它自己的正尺度，就变成无量纲数；尺度越大，该特征同样的变化在距离中越不显著。改米为毫米时，分量和尺度必须同时乘1000。只改分量会让数值变大，却没有新增物理差异。
   </p>
-  <KnowledgeCheck prompt="把米改成毫米后，归一化距离应当变大1000倍吗？"
-    >{#snippet answer()}<p>
-        不应当。分量及同单位尺度都乘1000，比值不变。只改分量才会制造虚假的距离变化。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：有人用L2的平方替代范数，声称仍满足三角不等式。用数轴上的0、1、2检查这个说法。"
   >
+    {#snippet answer()}<p>
+        平方距离d(0,2)=4，大于d(0,1)+d(1,2)=2，三角不等式失败。平方距离常用于优化，但不能称为同一个范数。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="从范数定义距离"
   ><FormulaBlock
@@ -78,90 +164,7 @@
     正尺度使这成为缩放坐标中的合法距离。标准化尺度若由数据估计，应只用训练数据拟合，避免验证信息泄露；本课尺度由学习者明确指定，没有估计过程。
   </p></TheorySection
 >
-<TheorySection id="experiment" title="同一位移，不同数值表示"
-  ><p>
-    先预测再操作：把米改成毫米后，归一化距离应当变大1000倍吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="物理长度与数值分数"
-    instructions="默认差向量(3,4)m，尺度均1m。分量范围±5m，尺度0.1至10m。预设只改变第一特征的显示单位；非法输入保留有效结果。"
-    meaning="几何始终按m绘制。实线Δ是直达位移，横向与竖向两段显示L1轴向路径；数值区同时报告合法物理范数、错误混合单位分数与归一化度量。"
-    limitations="两维欧氏教学模型，无随机/训练。混合m/mm数值平方和只是错误示范，不具有物理长度单位；更一般的特征尺度需要任务知识。"
-    onreset={() => select('metres')}
-  >
-    <PresetSelector
-      {presets}
-      value={x === 3 && y === 4 && sx === 1 && sy === 1
-        ? factor === 1
-          ? 'metres'
-          : 'millimetres'
-        : 'custom'}
-      defaultId="metres"
-      onchange={select}
-    />
-    <div class="parameters">
-      <ParameterSlider
-        label="第一物理分量"
-        value={x}
-        min={-5}
-        max={5}
-        step={0.1}
-        unit="m"
-        onchange={(v) => (x = v)}
-      /><ParameterSlider
-        label="第二物理分量"
-        value={y}
-        min={-5}
-        max={5}
-        step={0.1}
-        unit="m"
-        onchange={(v) => (y = v)}
-      /><ParameterSlider
-        label="第一特征尺度"
-        value={sx}
-        min={0.1}
-        max={10}
-        step={0.1}
-        unit="m"
-        onchange={(v) => (sx = v)}
-      /><ParameterSlider
-        label="第二特征尺度"
-        value={sy}
-        min={0.1}
-        max={10}
-        step={0.1}
-        unit="m"
-        onchange={(v) => (sy = v)}
-      />
-    </div>
-    <VectorDiagram
-      range={result.range}
-      vectors={[
-        { x, y, label: x || y ? 'Δ' : '', role: 'primary' },
-        { x, y: 0, label: x ? '横段' : '', role: 'secondary' },
-        { x: 0, y, origin: { x, y: 0 }, label: '', role: 'accent' },
-      ]}
-      description="等比例坐标x/y均为m，Δ为差向量，横段与竖段首尾相接。零分量不画假箭头；重合端点通过独立数值解释。"
-    />
-    <div aria-live="polite">
-      <p data-testid="result">L1={result.l1.toFixed(3)} m；L2={result.l2.toFixed(3)} m</p>
-      <p>
-        显示分量：{result.shownX}
-        {factor === 1 ? 'm' : 'mm'}，{y} m；直接数值平方和开根={result.rawL2.toFixed(
-          3,
-        )}（{factor === 1 ? '同单位，数值对应m' : '错误混合单位示范，无合法物理长度单位'}）
-      </p>
-      <p>
-        按尺度归一化：L1={result.normalizedL1.toFixed(3)}；L2={result.normalizedL2.toFixed(
-          3,
-        )}（无量纲）
-      </p>
-    </div>
-  </InteractivePanel>
-  <p>
-    场景一确认L1=7m、L2=5m；场景二只有x显示变为3000mm，物理图形与归一化距离均不变，混合单位分数却约为3000。再增大第一尺度，观察该维对无量纲距离的贡献下降；把两分量置零验证距离为零，最后复位。
-  </p></TheorySection
->
+
 <TheorySection id="pitfalls" title="度量包含尺度选择"
   ><CommonMistakes
     items={[

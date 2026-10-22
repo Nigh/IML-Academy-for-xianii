@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '只能沿一条直线解释观测，哪个点离观测最近？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '只能沿一个方向解释观测' },
+    { id: 'experiment', title: '方向尺度与投影位置' },
     { id: 'intuition', title: '垂足是最近点' },
     { id: 'mathematics', title: '最小距离导出投影' },
-    { id: 'experiment', title: '方向尺度与投影位置' },
     { id: 'pitfalls', title: '系数不是投影向量' },
     { id: 'summary', title: '最近分量与条件' },
   ],

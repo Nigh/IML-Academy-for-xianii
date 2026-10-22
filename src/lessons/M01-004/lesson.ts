@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '一条直线上的两个合法输出相加，还会是合法输出吗？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '模型允许哪些输出' },
+    { id: 'experiment', title: '直线能否容纳线性组合' },
     { id: 'intuition', title: '封闭意味着组合后仍合法' },
     { id: 'mathematics', title: '子空间判据与反例' },
-    { id: 'experiment', title: '直线能否容纳线性组合' },
     { id: 'pitfalls', title: '一次成功不是证明' },
     { id: 'summary', title: '从集合到子空间' },
   ],

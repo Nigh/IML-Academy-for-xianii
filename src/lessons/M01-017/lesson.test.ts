@@ -8,6 +8,7 @@ afterEach(cleanup);
 it('协议、全部特征场景、角参数与复位', async () => {
   expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-017');
   const v = render(Lesson, { metadata: lessonById.get('M01-017')! });
+  await fireEvent.click(v.getByRole('button', { name: '直接探索' }));
   for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
   expect(v.getByTestId('result').textContent).toContain('特征值λ=2');
   await fireEvent.click(v.getByText('场景一对照：纵轴特征方向'));

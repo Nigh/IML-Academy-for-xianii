@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -12,6 +14,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let mode = $state('dependent'),
     epsilon = $state(1),
@@ -19,6 +22,7 @@
     selected = $state('dependent');
   const result = $derived(experiment(mode, epsilon, tolerance));
   function select(id: string) {
+    if (id === 'dependent') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       mode = p.mode;
@@ -29,6 +33,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="矩阵有两列，就一定保留两份独立信息吗？">
+  <p>矩阵两列为(1,2)和(2,4)。所有输出能铺满平面吗？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     前置课程已建立基、维数与矩阵变换。本课把“独立方向有几个”应用到矩阵的全部可能输出，并首次命名列空间和秩。
@@ -40,10 +47,72 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="输出还能保留几个方向"
-  ><p>
-    两个特征列看似提供两份输入，但若始终成比例，就只提供一个独立变化方向。{metadata.title}从线性映射的输出空间判断信息是否被压缩。本课用两个已知解析奇异值的矩阵族，不运行通用SVD或真实训练，全部量无量纲。
-  </p></TheorySection
+
+<TheorySection id="experiment" title="逐步缩小一个方向">
+  <p>比较倍数列与单位矩阵，再固定微小ε只调τ。说明精确秩和数值秩各依赖什么。</p>
+  <PredictionLab {...exploration} context={JSON.stringify(result)} {resetVersion}>
+    <InteractivePanel
+      title="相同矩阵，不同判定尺度"
+      instructions="默认倍数列矩阵。选择对角矩阵预设后可调ε（0–1，默认1）；相对阈值τ默认1e−6，范围1e−12至0.5。数值框支持科学记数法，非法值保留有效结果。"
+      meaning="矩阵与列方向图显示实际变换，数值区分别报告精确秩、阈值和数值秩。ε低于1e−6时不画难以分辨的第二列箭头，矩阵与科学记数法保留真实非零值。"
+      limitations="只对这两个结构化矩阵族给出解析秩，非通用秩求解器。数值秩依赖阈值；省略不可分辨箭头不代表其为零，精确数据以矩阵和数值区为准。"
+      onreset={() => select('dependent')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="dependent" onchange={select} />
+      <div class="parameters">
+        <NumericInput
+          label="第二奇异值 ε（仅对角族）"
+          value={epsilon}
+          min={0}
+          max={1}
+          step={1e-8}
+          onchange={(n) => {
+            epsilon = n;
+            mode = 'diagonal';
+            selected = 'custom';
+          }}
+        /><NumericInput
+          label="相对阈值 τ"
+          value={tolerance}
+          min={1e-12}
+          max={0.5}
+          step={1e-6}
+          onchange={(n) => {
+            tolerance = n;
+            selected = 'custom';
+          }}
+        />
+      </div>
+      <MatrixView values={result.matrix} columnLabels={['第一列', '第二列']} /><VectorDiagram
+        range={result.range}
+        vectors={result.columns.flatMap((v, i) =>
+          i === 1 && result.hiddenSecond
+            ? []
+            : [
+                {
+                  ...v,
+                  label: `列${i + 1}`,
+                  role: i === 0 ? ('primary' as const) : ('secondary' as const),
+                },
+              ],
+        )}
+        description="等比例无量纲坐标，第一列实线、第二列虚线；微小第二列的真实值保留在矩阵和数值区，不能据屏幕判断精确秩。"
+      />
+      <div aria-live="polite">
+        <p>
+          奇异值：{result.singular
+            .map((n) => n.toExponential(2))
+            .join('，')}；绝对判定阈值：{result.threshold.toExponential(2)}
+        </p>
+        <p data-testid="result">精确秩={result.exactRank}；数值秩={result.numericalRank}</p>
+        {#if result.hiddenSecond}<p>
+            第二方向小于图中可读尺度，未画箭头；其奇异值为{epsilon.toExponential(2)}，{epsilon === 0
+              ? '恰好为零'
+              : '非零，精确秩仍为2'}。
+          </p>{/if}
+      </div>
+    </InteractivePanel>
+  </PredictionLab></TheorySection
 >
 <TheorySection id="intuition" title="列空间决定可达输出">
   <p>
@@ -61,13 +130,13 @@
     数值秩是在有限精度下回答“多小的方向可以忽略”。对沿横轴保留1倍、沿纵轴缩放ε倍的矩阵，只要ε非零，数学上仍是二维；设相对阈值为百万分之一时，亿分之一的纵向伸缩就会被忽略。矩阵没变，改变的是可分辨标准。
   </p>
   <p>
-    下方“奇异值”可先理解为选定主方向的长度伸缩倍数；本课矩阵结构已知，直接使用这些已知倍数计数。一般矩阵如何找主方向留到SVD课，下面的补充公式不作为理解精确秩的前提。
+    实验中的“奇异值”可先理解为选定主方向的长度伸缩倍数；本课矩阵结构已知，直接使用这些已知倍数计数。一般矩阵如何找主方向留到SVD课，下面的补充公式不作为理解精确秩的前提。
   </p>
-  <KnowledgeCheck prompt="纵向缩放很小但非零，数学上就只有一个方向了吗？"
-    >{#snippet answer()}<p>
-        不是。精确秩仍为2；在指定阈值下，数值秩可以忽略该小方向。
-      </p>{/snippet}</KnowledgeCheck
-  >
+  <KnowledgeCheck prompt="迁移：把diag(1,10⁻⁸)整体放大100倍，相对阈值不变，数值秩会变吗？为什么？">
+    {#snippet answer()}<p>
+        在同一相对规则下不变：每个奇异值和最大奇异值都放大100倍，与τ倍最大值的比较不变。固定绝对阈值可能给出不同判断。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="精确秩与阈值下的数值秩">
   <FormulaBlock
@@ -87,75 +156,7 @@
     </p>
   </details>
 </TheorySection>
-<TheorySection id="experiment" title="逐步缩小一个方向"
-  ><p>
-    先预测再操作：纵向缩放很小但非零，数学上就只有一个方向了吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="相同矩阵，不同判定尺度"
-    instructions="默认倍数列矩阵。选择对角矩阵预设后可调ε（0–1，默认1）；相对阈值τ默认1e−6，范围1e−12至0.5。数值框支持科学记数法，非法值保留有效结果。"
-    meaning="矩阵与列方向图显示实际变换，数值区分别报告精确秩、阈值和数值秩。ε低于1e−6时不画难以分辨的第二列箭头，矩阵与科学记数法保留真实非零值。"
-    limitations="只对这两个结构化矩阵族给出解析秩，非通用秩求解器。数值秩依赖阈值；省略不可分辨箭头不代表其为零，精确数据以矩阵和数值区为准。"
-    onreset={() => select('dependent')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="dependent" onchange={select} />
-    <div class="parameters">
-      <NumericInput
-        label="第二奇异值 ε（仅对角族）"
-        value={epsilon}
-        min={0}
-        max={1}
-        step={1e-8}
-        onchange={(n) => {
-          epsilon = n;
-          mode = 'diagonal';
-          selected = 'custom';
-        }}
-      /><NumericInput
-        label="相对阈值 τ"
-        value={tolerance}
-        min={1e-12}
-        max={0.5}
-        step={1e-6}
-        onchange={(n) => {
-          tolerance = n;
-          selected = 'custom';
-        }}
-      />
-    </div>
-    <MatrixView values={result.matrix} columnLabels={['第一列', '第二列']} /><VectorDiagram
-      range={result.range}
-      vectors={result.columns.flatMap((v, i) =>
-        i === 1 && result.hiddenSecond
-          ? []
-          : [
-              {
-                ...v,
-                label: `列${i + 1}`,
-                role: i === 0 ? ('primary' as const) : ('secondary' as const),
-              },
-            ],
-      )}
-      description="等比例无量纲坐标，第一列实线、第二列虚线；微小第二列的真实值保留在矩阵和数值区，不能据屏幕判断精确秩。"
-    />
-    <div aria-live="polite">
-      <p>
-        奇异值：{result.singular
-          .map((n) => n.toExponential(2))
-          .join('，')}；绝对判定阈值：{result.threshold.toExponential(2)}
-      </p>
-      <p data-testid="result">精确秩={result.exactRank}；数值秩={result.numericalRank}</p>
-      {#if result.hiddenSecond}<p>
-          第二方向小于图中可读尺度，未画箭头；其奇异值为{epsilon.toExponential(2)}，{epsilon === 0
-            ? '恰好为零'
-            : '非零，精确秩仍为2'}。
-        </p>{/if}
-    </div>
-  </InteractivePanel>
-  <p>
-    先确认倍数列矩阵的秩为1。切到单位矩阵，再把ε设为1e−8，保持阈值1e−6，比较精确秩2与数值秩1。将阈值降为1e−10，数值秩恢复2；最后把ε设为0，精确秩也变为1。复位恢复首场景。
-  </p></TheorySection
->
+
 <TheorySection id="pitfalls" title="图形和容差的边界"
   ><CommonMistakes
     items={[

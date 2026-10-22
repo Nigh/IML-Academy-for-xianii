@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '只读到两路信号之和，哪些输入变化永远看不见？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '相同读数背后的不同输入' },
+    { id: 'experiment', title: '改变输入但保持输出' },
     { id: 'intuition', title: '沿看不见的方向移动' },
     { id: 'mathematics', title: '零空间与全部解' },
-    { id: 'experiment', title: '改变输入但保持输出' },
     { id: 'pitfalls', title: '有零空间不等于无解' },
     { id: 'summary', title: '被消去的自由度' },
   ],

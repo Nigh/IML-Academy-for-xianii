@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -11,16 +13,23 @@
   import Plot2D from '../../components/charts/Plot2D.svelte';
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
-  import { experiment, presets } from './experiment.ts';
+  import { experiment, candidate, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let extra = $state(false),
     delta = $state(0),
     selected = $state('three');
+  let candidateIntercept = $state(1);
+  let candidateSlope = $state(1);
+  const trial = $derived(candidate(extra, delta, candidateIntercept, candidateSlope));
   const r = $derived(experiment(extra, delta));
   const fmt = (n: number) => Number(n.toPrecision(5));
   function select(id: string) {
+    if (id === 'three') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
+      candidateIntercept = 1;
+      candidateSlope = 1;
       extra = p.extra;
       delta = p.delta;
       selected = id;
@@ -28,6 +37,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="三点不共线，怎样判断一条拟合线已经无法整体改善？">
+  <p>最小二乘拟合的残差与模型每列都正交，是否代表每个点都拟合准确？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     已有伪逆、列空间和正交残差。本课将它们用于一组具体观测，建立逐点误差、平方和与最优预测之间的联系。
@@ -39,11 +51,109 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="无法同时穿过每个观测"
-  ><p>
-    用直线校准传感器或拟合特征与响应，观测常不共线，无法让每个点误差同时为0。{metadata.title}选择让残差平方和最小的参数，并解释这种折中为什么是投影。本课只有3或4个无量纲合成观测，解析拟合，不声称这些点来自真实设备或能代表泛化能力。
-  </p></TheorySection
->
+
+<TheorySection id="experiment" title="三点残差与离群点影响">
+  <p>比较三点、普通第四点和离群点。尝试调整自己的直线让平方和更低，再用列内积检查是否还可改进。</p>
+  <PredictionLab
+    {...exploration}
+    context={JSON.stringify([r, candidateIntercept, candidateSlope])}
+    {resetVersion}
+  >
+    <InteractivePanel
+      title="投影条件不要求每点零残差"
+      instructions="默认三点。勾选增加第四观测(t=2,b=3+δ)，δ默认0，范围−8至8，步长0.5，无量纲；非法数值保留有效值，可键盘编辑。预设离群点δ=6。复位恢复三点。"
+      meaning="圆点为观测，实线为我的候选，虚线为解析最优。表格显示候选的逐点残差和平方贡献；展开对照查看最优参数及Aᵀr。"
+      limitations="确定性小样本解析计算，无随机性。仅最小化训练样本未加权平方和，不保证鲁棒、因果或泛化。视域随数据自适应，跨场景比较应看轴刻度与系数。"
+      onreset={() => select('three')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="three" onchange={select} />
+      <label
+        ><input
+          type="checkbox"
+          checked={extra}
+          onchange={(e) => {
+            extra = e.currentTarget.checked;
+            selected = 'custom';
+          }}
+        /> 增加第四观测</label
+      >
+      {#if extra}<ParameterSlider
+          label="第四观测偏移 δ"
+          value={delta}
+          min={-8}
+          max={8}
+          step={0.5}
+          onchange={(n) => {
+            delta = n;
+            selected = 'custom';
+          }}
+        />{/if}
+      <p>
+        先调整自己的直线，尝试降低总平方误差。观察改进一个点时，其他点怎样变化；需要对照时再查看解析最优值。
+      </p>
+      <ParameterSlider
+        label="我的截距 c"
+        value={candidateIntercept}
+        min={-8}
+        max={8}
+        step={0.05}
+        onchange={(n) => (candidateIntercept = n)}
+      />
+      <ParameterSlider
+        label="我的斜率 a"
+        value={candidateSlope}
+        min={-8}
+        max={8}
+        step={0.05}
+        onchange={(n) => (candidateSlope = n)}
+      />
+      <p data-testid="candidate-loss" aria-live="polite">
+        我的平方和SSE={fmt(trial.sse)}；两列内积=({trial.normal.map(fmt).join(',')})
+      </p>
+      <Plot2D
+        series={[trial.series, r.series[1], r.series[0]]}
+        xRange={[-1.5, 2.5]}
+        yRange={trial.yRange}
+        xLabel="观测输入 t"
+        yLabel="响应 b"
+        xUnit="无量纲"
+        yUnit="无量纲"
+        description="观测散点与两条拟合线；圆点是数据，解析最优为虚线，我的候选为实线。此图不等同于Rⁿ观测空间。"
+      />
+      <details>
+        <summary>对照解析最优直线</summary>
+        <div aria-live="polite" data-testid="result">
+          <p>
+            观测数={r.points.length}；斜率a={fmt(r.slope)}；截距c={fmt(
+              r.intercept,
+            )}；平方和SSE={fmt(r.sse)}。
+          </p>
+          <p>
+            Aᵀr=({r.normal.map((n) => n.toExponential(3)).join(',')})；原三点系数a={fmt(
+              r.baseline.slope,
+            )}、c={fmt(r.baseline.intercept)}。
+          </p>
+        </div>
+      </details>
+      <MatrixView
+        values={r.points.map((p, i) => [
+          p[0],
+          p[1],
+          fmt(trial.predicted[i]),
+          fmt(trial.residual[i]),
+          fmt(trial.residual[i] ** 2),
+        ])}
+        columnLabels={['t', 'b', '我的预测', 'r=预测−b', 'r²']}
+      />
+      <details>
+        <summary>查看设计矩阵A</summary><MatrixView
+          values={r.matrix}
+          columnLabels={['常数列', '输入列']}
+        />
+      </details>
+    </InteractivePanel>
+  </PredictionLab>
+</TheorySection>
 <TheorySection id="intuition" title="观测空间中的正交投影">
   <p>
     每个输入位置t对应一个观测响应。候选直线给出预测，预测减观测就是该点残差。本课用这个符号约定；它与前面“观测减投影”的写法相差负号，但平方和与正交条件不变。
@@ -56,16 +166,19 @@
     description="t_i为输入、b_i为观测、带帽的b为预测，a为斜率、c为截距，i编号观测，n为观测数。本课全部无量纲。"
   />
   <p>
-    设计矩阵把每个观测的常数1和输入t排成一行，参数列按截距、斜率排列。每一列分别描述调一个参数时，全体预测会怎样一起变化。因此列空间位于观测空间：3个观测需要3个坐标，不能把下面二维数据散点图当成这个空间。
+    设计矩阵把每个观测的常数1和输入t排成一行，参数列按截距、斜率排列。每一列分别描述调一个参数时，全体预测会怎样一起变化。因此列空间位于观测空间：3个观测需要3个坐标，不能把实验中的二维数据散点图当成这个空间。
   </p>
   <p>
-    最优预测是观测在列空间上的投影，正交残差无法再沿任一模型列缩短。下面Aᵀr给出每列与残差的点积。梯度是各参数单独变化时的变化率组成的向量，凸表示平方目标不会藏着更低的局部谷底；两者用于补充说明，核心结论可直接由已有的投影和展开平方验证。
+    最优预测是观测在列空间上的投影，正交残差无法再沿任一模型列缩短。实验中的Aᵀr给出每列与残差的点积。梯度是各参数单独变化时的变化率组成的向量，凸表示平方目标不会藏着更低的局部谷底；两者用于补充说明，核心结论可直接由已有的投影和展开平方验证。
   </p>
-  <KnowledgeCheck prompt="一个点误差变小，能保证平方和也变小吗？"
-    >{#snippet answer()}<p>
-        不能。其他点可能变差；要计算全部残差平方的总和。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：如果所有输入t相同，仍能唯一拟合截距和斜率吗？解释列空间与参数之间的区别。"
   >
+    {#snippet answer()}<p>
+        不能唯一识别两参数：常数列与输入列相关，只有c+a
+        t这个组合可被确定。最优预测可唯一，参数却可不唯一；原斜率公式分母为0。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="最优性条件与线性拟合">
   <FormulaBlock
@@ -85,82 +198,7 @@
     description="满列秩时参数解唯一。若不满列秩，最优预测仍唯一，但参数可不唯一；伪逆给最小范数解。大型或病态问题通常采用QR/SVD等更稳定的分解，不必显式形成法方程的逆。"
   />
 </TheorySection>
-<TheorySection id="experiment" title="三点残差与离群点影响">
-  <p>
-    先预测再操作：一个点误差变小，能保证平方和也变小吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="投影条件不要求每点零残差"
-    instructions="默认三点。勾选增加第四观测(t=2,b=3+δ)，δ默认0，范围−8至8，步长0.5，无量纲；非法数值保留有效值，可键盘编辑。预设离群点δ=6。复位恢复三点。"
-    meaning="圆点为观测，虚线为当前最小二乘，实线为原三点拟合；默认二线重合。表格显示每个残差及平方贡献，数值区检查Aᵀr。图中拟合线不是逐点插值。"
-    limitations="确定性小样本解析计算，无随机性。仅最小化训练样本未加权平方和，不保证鲁棒、因果或泛化。视域随数据自适应，跨场景比较应看轴刻度与系数。"
-    onreset={() => select('three')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="three" onchange={select} />
-    <label
-      ><input
-        type="checkbox"
-        checked={extra}
-        onchange={(e) => {
-          extra = e.currentTarget.checked;
-          selected = 'custom';
-        }}
-      /> 增加第四观测</label
-    >
-    {#if extra}<ParameterSlider
-        label="第四观测偏移 δ"
-        value={delta}
-        min={-8}
-        max={8}
-        step={0.5}
-        onchange={(n) => {
-          delta = n;
-          selected = 'custom';
-        }}
-      />{/if}
-    <Plot2D
-      series={r.series}
-      xRange={[-1.5, 2.5]}
-      yRange={r.yRange}
-      xLabel="观测输入 t"
-      yLabel="响应 b"
-      xUnit="无量纲"
-      yUnit="无量纲"
-      description="观测散点与两条拟合线；圆点是数据，当前拟合为虚线，原三点拟合为实线。此图不等同于Rⁿ观测空间。"
-    />
-    <div aria-live="polite" data-testid="result">
-      <p>
-        观测数={r.points.length}；斜率a={fmt(r.slope)}；截距c={fmt(r.intercept)}；平方和SSE={fmt(
-          r.sse,
-        )}。
-      </p>
-      <p>
-        Aᵀr=({r.normal.map((n) => n.toExponential(3)).join(',')})；原三点系数a={fmt(
-          r.baseline.slope,
-        )}、c={fmt(r.baseline.intercept)}。
-      </p>
-    </div>
-    <MatrixView
-      values={r.points.map((p, i) => [
-        p[0],
-        p[1],
-        fmt(r.predicted[i]),
-        fmt(r.residual[i]),
-        fmt(r.residual[i] ** 2),
-      ])}
-      columnLabels={['t', 'b', '拟合', 'r=拟合−b', 'r²']}
-    />
-    <details>
-      <summary>查看设计矩阵A</summary><MatrixView
-        values={r.matrix}
-        columnLabels={['常数列', '输入列']}
-      />
-    </details>
-  </InteractivePanel>
-  <p>
-    场景一确认残差非零而Aᵀr接近0。先加入普通第四点，再切换离群点δ=6，比较斜率、原点附近的拟合和各点平方贡献；调回δ=0并复位。增加离群点会牵动整体参数，并非只影响该点自己的误差。
-  </p>
-</TheorySection>
+
 <TheorySection id="pitfalls" title="整体最优不等于逐点最优"
   ><CommonMistakes
     items={[

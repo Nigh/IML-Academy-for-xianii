@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
+  import { exploration } from './exploration.ts';
   import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
@@ -13,6 +15,7 @@
   import CommonMistakes from '../../components/lesson/CommonMistakes.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
   import { experiment, presets } from './experiment.ts';
+  let resetVersion = $state(0);
   let { metadata }: LessonBodyProps = $props();
   let mode = $state('diagonal'),
     tail = $state(1),
@@ -21,6 +24,7 @@
   const r = $derived(experiment(mode, tail, k));
   const fmt = (n: number) => Number(n.toPrecision(5));
   function select(id: string) {
+    if (id === 'one') resetVersion += 1;
     const p = presets.find((p) => p.id === id);
     if (p) {
       mode = p.mode;
@@ -31,6 +35,9 @@
   }
 </script>
 
+<TheorySection id="motivation" title="只保留一个方向时，删掉的信息能否从其他方向补回来？">
+  <p>diag(3,1)只保留第一奇异项，剩余矩阵的Frobenius误差是多少？</p>
+</TheorySection>
 <TheorySection id="learning-path" title="接上已有知识">
   <p>
     前课已经知道SVD的三个因子和奇异方向。本课只新增“保留部分方向”的近似方法，以及如何汇总全部元素的重构误差。
@@ -42,11 +49,73 @@
         </li>{/each}
     </ul>{/if}
 </TheorySection>
-<TheorySection id="motivation" title="只保存主要结构会丢什么"
-  ><p>
-    大型特征矩阵、图像和模型权重常含冗余结构。若只保存几个主要方向，存储和计算可能减少，但遗漏信息如何衡量？{metadata.title}用截断SVD给出明确答案。本课只用无量纲2×2合成矩阵演示误差，不宣称已经压缩真实模型或提升性能。
-  </p></TheorySection
->
+
+<TheorySection id="experiment" title="逐项恢复矩阵">
+  <p>先逐项恢复，再改变尾项大小；换到混合坐标时，检查误差是否仍由同样的尾部奇异值决定。</p>
+  <PredictionLab {...exploration} context={JSON.stringify(r)} {resetVersion}>
+    <InteractivePanel
+      title="误差来自哪一项"
+      instructions="第一奇异值固定3；第二奇异值默认1、范围0–3，步长0.25；保留项数k默认1，仅取0、1、2，可用键盘数值框。非法值保留有效结果。选择对角或固定45°混合坐标场景。"
+      meaning="图画解析最优误差随k的变化，圆点标当前选择；连线仅辅助阅读，k只取整数。下方逐项列出A、A_k、遗漏矩阵和两个秩1项，数值为直接解析计算，显示5有效位。"
+      limitations="二维固定奇异向量模型，非通用矩阵压缩程序。小模型不节省实际存储；Frobenius最优不保证语义、感知质量或下游准确率最优。"
+      onreset={() => select('one')}
+    >
+      <PresetSelector {presets} value={selected} defaultId="one" onchange={select} />
+      <ParameterSlider
+        label="第二奇异值 σ₂"
+        value={tail}
+        min={0}
+        max={3}
+        step={0.25}
+        onchange={(n) => {
+          tail = n;
+          selected = 'custom';
+        }}
+      />
+      <NumericInput
+        integer
+        label="保留项数 k"
+        value={k}
+        min={0}
+        max={2}
+        step={1}
+        onchange={(n) => {
+          k = n;
+          selected = 'custom';
+        }}
+      />
+      <Plot2D
+        series={r.series}
+        xRange={[-0.1, 2.1]}
+        yRange={[-0.2, 4.6]}
+        xLabel="保留项数 k（整数）"
+        yLabel="Frobenius误差"
+        yUnit="无量纲"
+        description="误差随保留项数增加而不增，当前圆点来自实际重构矩阵；k=2时完整恢复。"
+      />
+      <div aria-live="polite" data-testid="result">
+        <p>
+          原矩阵秩={r.rank}；当前近似秩={r.retainedRank}；Frobenius误差={fmt(
+            r.error,
+          )}；解析尾项误差={fmt(r.expected)}；保留能量={fmt(100 * r.energy)}%。
+        </p>
+        <p>原矩阵A：</p>
+        <MatrixView values={r.matrix.map((row) => row.map(fmt))} />
+        <p>重构A_k：</p>
+        <MatrixView values={r.approximation.map((row) => row.map(fmt))} />
+        <p>遗漏A−A_k：</p>
+        <MatrixView values={r.residual.map((row) => row.map(fmt))} />
+      </div>
+      <details>
+        <summary>查看两个秩1项</summary>
+        <p>第一项σ₁u₁v₁ᵀ：</p>
+        <MatrixView values={r.first.map((row) => row.map(fmt))} />
+        <p>第二项σ₂u₂v₂ᵀ：</p>
+        <MatrixView values={r.second.map((row) => row.map(fmt))} />
+      </details>
+    </InteractivePanel>
+  </PredictionLab>
+</TheorySection>
 <TheorySection id="intuition" title="保留强方向，舍弃弱方向">
   <p>
     一个奇异方向对应一份简单变换：只读取输入在该方向的分量，乘伸缩倍数，再沿对应输出方向输出。把全部这些变换相加就还原原矩阵；每份只有一个输出方向，称为秩1项。
@@ -64,11 +133,13 @@
   <p>
     奇异值平方和常被称为“能量”；本课是数学量，不宣称实际物理能量。截断法在这个未加权误差下最优，不保证保留任务所需的小方向。下面2×2例子的因子反而可能比原矩阵占更多数值，只演示近似原理，不冒充压缩收益。
   </p>
-  <KnowledgeCheck prompt="保留全部奇异项后，截断误差还有吗？"
-    >{#snippet answer()}<p>
-        数学上为0，实际计算可能有浮点容差；这也意味着没有通过删项减少秩。
-      </p>{/snippet}</KnowledgeCheck
+  <KnowledgeCheck
+    prompt="迁移：保留90%能量能保证分类准确率至少90%吗？给出一个小方向仍重要的可能情形。"
   >
+    {#snippet answer()}<p>
+        不能。若类别差异恰在被删的小方向，即使其能量很小，删除也会丢掉判别信息。Frobenius最优没有给出下游任务保证。
+      </p>{/snippet}
+  </KnowledgeCheck>
 </TheorySection>
 <TheorySection id="mathematics" title="截断SVD与最优误差">
   <FormulaBlock
@@ -90,75 +161,7 @@
     本课2×2秩1因子需5个标量，反而多于原矩阵4个，故只演示原理。实际大矩阵在k远小于维度时才可能节省；把A_k重新存成完整稠密矩阵也不会自动省存储。
   </p>
 </TheorySection>
-<TheorySection id="experiment" title="逐项恢复矩阵">
-  <p>
-    先预测再操作：保留全部奇异项后，截断误差还有吗？先说明你的理由，再用下面的预设和参数验证；比较图形与数值，最后复位重做一次。
-  </p>
-  <InteractivePanel
-    title="误差来自哪一项"
-    instructions="第一奇异值固定3；第二奇异值默认1、范围0–3，步长0.25；保留项数k默认1，仅取0、1、2，可用键盘数值框。非法值保留有效结果。选择对角或固定45°混合坐标场景。"
-    meaning="图画解析最优误差随k的变化，圆点标当前选择；连线仅辅助阅读，k只取整数。下方逐项列出A、A_k、遗漏矩阵和两个秩1项，数值为直接解析计算，显示5有效位。"
-    limitations="二维固定奇异向量模型，非通用矩阵压缩程序。小模型不节省实际存储；Frobenius最优不保证语义、感知质量或下游准确率最优。"
-    onreset={() => select('one')}
-  >
-    <PresetSelector {presets} value={selected} defaultId="one" onchange={select} />
-    <ParameterSlider
-      label="第二奇异值 σ₂"
-      value={tail}
-      min={0}
-      max={3}
-      step={0.25}
-      onchange={(n) => {
-        tail = n;
-        selected = 'custom';
-      }}
-    />
-    <NumericInput
-      integer
-      label="保留项数 k"
-      value={k}
-      min={0}
-      max={2}
-      step={1}
-      onchange={(n) => {
-        k = n;
-        selected = 'custom';
-      }}
-    />
-    <Plot2D
-      series={r.series}
-      xRange={[-0.1, 2.1]}
-      yRange={[-0.2, 4.6]}
-      xLabel="保留项数 k（整数）"
-      yLabel="Frobenius误差"
-      yUnit="无量纲"
-      description="误差随保留项数增加而不增，当前圆点来自实际重构矩阵；k=2时完整恢复。"
-    />
-    <div aria-live="polite" data-testid="result">
-      <p>
-        原矩阵秩={r.rank}；当前近似秩={r.retainedRank}；Frobenius误差={fmt(
-          r.error,
-        )}；解析尾项误差={fmt(r.expected)}；保留能量={fmt(100 * r.energy)}%。
-      </p>
-      <p>原矩阵A：</p>
-      <MatrixView values={r.matrix.map((row) => row.map(fmt))} />
-      <p>重构A_k：</p>
-      <MatrixView values={r.approximation.map((row) => row.map(fmt))} />
-      <p>遗漏A−A_k：</p>
-      <MatrixView values={r.residual.map((row) => row.map(fmt))} />
-    </div>
-    <details>
-      <summary>查看两个秩1项</summary>
-      <p>第一项σ₁u₁v₁ᵀ：</p>
-      <MatrixView values={r.first.map((row) => row.map(fmt))} />
-      <p>第二项σ₂u₂v₂ᵀ：</p>
-      <MatrixView values={r.second.map((row) => row.map(fmt))} />
-    </details>
-  </InteractivePanel>
-  <p>
-    场景一验证k=1误差1、保留能量90%。场景二增加到k=2，检查误差0；把k改为0，观察两方向全部删除。场景三检查混合坐标下四个遗漏元素共同贡献同样误差。场景四第二奇异值本来为0，一项即可无损，复位恢复一般情形。
-  </p>
-</TheorySection>
+
 <TheorySection id="pitfalls" title="能量保留不等于细节无损"
   ><CommonMistakes
     items={[

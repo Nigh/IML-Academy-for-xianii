@@ -4,11 +4,11 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
+    { id: 'motivation', title: '同样拟合得好的多个解，应该怎样选一个？' },
     { id: 'learning-path', title: '接上已有知识' },
-    { id: 'motivation', title: '观测太少或互相矛盾时' },
+    { id: 'experiment', title: '比较伪逆与候选解' },
     { id: 'intuition', title: '先最小残差，再最小范数' },
     { id: 'mathematics', title: 'Moore–Penrose伪逆' },
-    { id: 'experiment', title: '比较伪逆与候选解' },
     { id: 'pitfalls', title: '伪逆不会制造不存在的精确解' },
     { id: 'summary', title: '一个有条件解释的统一解' },
   ],
