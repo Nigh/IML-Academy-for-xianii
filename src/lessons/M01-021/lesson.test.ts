@@ -1,0 +1,26 @@
+import { render, fireEvent, cleanup } from '@testing-library/svelte';
+import { afterEach, it, expect } from 'vitest';
+import Lesson from './Lesson.svelte';
+import definition from './lesson.ts';
+import { lessonById } from '../../lib/curriculum/catalog.ts';
+import { lessonDefinitionSchema } from '../../lib/lesson/contract.ts';
+afterEach(cleanup);
+it('协议、全部形状预设、来源检查器、错误恢复与复位', async () => {
+  expect(lessonDefinitionSchema.parse(definition).id).toBe('M01-021');
+  const v = render(Lesson, { metadata: lessonById.get('M01-021')! });
+  for (const s of definition.sections) expect(v.container.querySelector(`#${s.id}`)).toBeTruthy();
+  expect(v.getByTestId('result').textContent).toContain('输出形状=(2,3,4)');
+  await fireEvent.input(v.getByLabelText('输出扁平位置'), { target: { value: '23' } });
+  expect(v.getByTestId('trace').textContent).toContain('相加=36');
+  await fireEvent.click(v.getByText('场景二：行列扩展'));
+  expect(v.getByTestId('result').textContent).toContain('输出形状=(3,4)');
+  await fireEvent.click(v.getByText('场景二对照：尾轴不兼容'));
+  expect(v.getByRole('status').textContent).toContain('不兼容');
+  expect(v.queryByTestId('result')).toBeNull();
+  await fireEvent.input(v.getByLabelText('输入A形状'), { target: { value: '3,1' } });
+  expect(v.getByTestId('result').textContent).toContain('输出形状=(3,4)');
+  await fireEvent.click(v.getByText('场景三：形状对但语义待定'));
+  expect(v.getByTestId('result').textContent).toContain('输出形状=(2,3,3)');
+  await fireEvent.click(v.getByText('复位 ↺'));
+  expect(v.getByTestId('result').textContent).toContain('输出形状=(2,3,4)');
+});
