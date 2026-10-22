@@ -66,5 +66,26 @@ export default {
       ],
       answerId: 'convert',
     },
+    {
+      id: 'route-order',
+      version: 1,
+      prompt:
+        '绘图平台必须先到 P 再到 Q。交换两段非平行位移后，虽然仍到 Q，是否完成原任务？说明判断依据。',
+      options: [
+        {
+          id: 'path',
+          text: '没有：第一段末端改变，原目标路线没有完成',
+          explanation:
+            '向量加法交换律只保证终点相同。先到 P 是路径约束，必须另外检查第一段末端；可在任务台交换指令验证。',
+        },
+        {
+          id: 'end',
+          text: '完成：合向量相同就代表路线相同',
+          explanation:
+            '合向量只记录起点到终点的变化，丢失中间路径。两段非平行位移交换后，中间点不同。',
+        },
+      ],
+      answerId: 'path',
+    },
   ],
 } satisfies LessonDefinition;
