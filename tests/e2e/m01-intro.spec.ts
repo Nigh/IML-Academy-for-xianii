@@ -156,3 +156,38 @@ test('M01-001：键盘加减覆盖边界，零向量与桌面缩放可操作', a
   await cdp.send('Emulation.clearDeviceMetricsOverride');
   await expect(page.getByRole('button', { name: '标记为已完成', exact: true })).toHaveCount(0);
 });
+
+test('M01-001：坐标轴匀速转动，机器人固定，跨半圈仍逆时针且复位取消动画', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(route);
+  await page.getByRole('button', { name: '执行移动（1 秒）', exact: true }).click();
+  await page.getByRole('button', { name: '换坐标轴', exact: true }).click();
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const turn = page.getByRole('button', { name: '坐标轴逆时针转 90°', exact: true });
+  const axes = page.getByTestId('intro-axes');
+  const angle = () =>
+    axes.evaluate((e) => Number(e.getAttribute('transform')!.match(/rotate\(([-\d.]+)\)/)![1]));
+  for (const start of [0, -90, -180, 90]) {
+    await turn.click();
+    await expect(turn).toBeDisabled();
+    await expect.poll(angle, { intervals: [20] }).toBeLessThan(start - 15);
+    const middle = await angle();
+    expect(middle).toBeGreaterThan(start - 90);
+    await expect(page.getByTestId('intro-robot')).toHaveAttribute('aria-label', /位置 \(3, 4\)/);
+    await expect(page.getByTestId('intro-length')).toHaveText('5 m');
+    await expect(page.getByTestId('axis-feedback')).toHaveCount(0);
+    await expect(turn).toBeEnabled();
+    await expect(axes).toHaveAttribute(
+      'transform',
+      `translate(240 200) rotate(${start === -180 ? 90 : start - 90})`,
+    );
+  }
+  await expect(page.getByTestId('intro-components')).toContainText('(3, 4)');
+  await turn.click();
+  await expect.poll(angle, { intervals: [20] }).toBeLessThan(-15);
+  await page.getByRole('button', { name: '坐标轴回正', exact: true }).click();
+  await page.waitForTimeout(1100);
+  await expect(axes).toHaveAttribute('transform', 'translate(240 200) rotate(0)');
+  await expect(page.getByTestId('intro-components')).toContainText('(3, 4)');
+  await expect(page.getByTestId('axis-feedback')).toHaveCount(0);
+});

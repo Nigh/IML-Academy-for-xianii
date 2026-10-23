@@ -15,24 +15,37 @@
   let prediction = $state<'same' | 'changed' | null>(null);
   let observed = $state(false);
   let frame = 0;
+  let axisFrame = 0;
+  let angle = $state(0);
+  let rotating = $state(false);
+  const normalizedAngle = $derived(angle > 180 ? angle - 360 : angle);
   const uid = $props.id();
-  const result = $derived(experiment(x, y, degrees));
+  const result = $derived(experiment(x, y, normalizedAngle));
   const extent = $derived(Math.max(6, Math.ceil(result.length) + 1));
   const scale = $derived(180 / extent);
   const ticks = $derived(Array.from({ length: 2 * extent + 1 }, (_, i) => i - extent));
   const axes = $derived(
-    degrees === 0
-      ? 'x 轴向东，y 轴向北'
-      : degrees === 90
-        ? 'x′ 轴向北，y′ 轴向西'
-        : degrees === 180
-          ? 'x′ 轴向西，y′ 轴向南'
-          : 'x′ 轴向南，y′ 轴向东',
+    rotating
+      ? '坐标轴转动中'
+      : degrees === 0
+        ? 'x 轴向东，y 轴向北'
+        : degrees === 90
+          ? 'x′ 轴向北，y′ 轴向西'
+          : degrees === 180
+            ? 'x′ 轴向西，y′ 轴向南'
+            : 'x′ 轴向南，y′ 轴向东',
   );
   const fmt = (value: number) => String(Number(value.toFixed(2)));
   const pair = (point: { x: number; y: number }) => `(${fmt(point.x)}, ${fmt(point.y)})`;
 
+  function stopAxes() {
+    if (axisFrame) cancelAnimationFrame(axisFrame);
+    axisFrame = 0;
+    rotating = false;
+    angle = degrees;
+  }
   function stop() {
+    stopAxes();
     if (frame) cancelAnimationFrame(frame);
     frame = 0;
     running = false;
@@ -56,11 +69,14 @@
     showComponents = false;
     stage = 'displacement';
     degrees = 0;
+    angle = 0;
   }
   function chooseStage(next: 'displacement' | 'frame') {
     if (running) rewind();
+    stopAxes();
     stage = next;
     degrees = 0;
+    angle = 0;
     prediction = null;
     observed = false;
     showDistance = false;
@@ -90,18 +106,44 @@
     frame = requestAnimationFrame(move);
   }
   function rotateAxes() {
-    if (!complete || running) return;
-    degrees = degrees === 180 ? -90 : degrees + 90;
-    observed = true;
+    if (!complete || running || rotating || document.hidden) return;
+    const start = degrees;
+    const target = degrees === 180 ? -90 : degrees + 90;
+    const finishRotation = () => {
+      axisFrame = 0;
+      rotating = false;
+      degrees = target;
+      angle = target;
+      observed = true;
+    };
+    observed = false;
     showComponents = true;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      finishRotation();
+      return;
+    }
+    rotating = true;
+    const started = performance.now();
+    const turn = (now: number) => {
+      const progress = Math.min(1, Math.max(0, (now - started) / 1000));
+      angle = start + 90 * progress;
+      if (progress === 1) finishRotation();
+      else axisFrame = requestAnimationFrame(turn);
+    };
+    axisFrame = requestAnimationFrame(turn);
   }
   onMount(() => {
     const preference = window.matchMedia?.('(prefers-reduced-motion: reduce)');
     const reduce = () => {
       if (preference?.matches && running) finish();
+      if (preference?.matches && rotating) {
+        stopAxes();
+        rotateAxes();
+      }
     };
     const visibility = () => {
       if (document.hidden && running) rewind();
+      if (document.hidden) stopAxes();
     };
     preference?.addEventListener('change', reduce);
     document.addEventListener('visibilitychange', visibility);
@@ -165,7 +207,7 @@
             orient="auto"><path d="M1 1L9 5L1 9" class="axis-head" /></marker
           >
         </defs>
-        <g transform={`translate(240 200) rotate(${-degrees})`} data-testid="intro-axes">
+        <g transform={`translate(240 200) rotate(${-angle})`} data-testid="intro-axes">
           {#each ticks as tick (tick)}
             <line class="grid-line" x1={tick * scale} y1="-180" x2={tick * scale} y2="180" />
             <line class="grid-line" x1="-180" y1={-tick * scale} x2="180" y2={-tick * scale} />
@@ -175,14 +217,14 @@
                 x={tick * scale}
                 y="18"
                 text-anchor="middle"
-                transform={`rotate(${degrees},${tick * scale},18)`}>{tick}</text
+                transform={`rotate(${angle},${tick * scale},18)`}>{tick}</text
               >
               <text
                 class="tick"
                 x="-12"
                 y={-tick * scale + 5}
                 text-anchor="end"
-                transform={`rotate(${degrees},-12,${-tick * scale + 5})`}>{tick}</text
+                transform={`rotate(${angle},-12,${-tick * scale + 5})`}>{tick}</text
               >
             {/if}
           {/each}
@@ -202,11 +244,11 @@
             y2="-180"
             marker-end={`url(#${uid}-axis)`}
           />
-          <text x="166" y="-12" transform={`rotate(${degrees},166,-12)`}
-            >{degrees === 0 ? 'x' : 'x′'}</text
+          <text x="166" y="-12" transform={`rotate(${angle},166,-12)`}
+            >{angle === 0 ? 'x' : 'x′'}</text
           >
-          <text x="12" y="-166" transform={`rotate(${degrees},12,-166)`}
-            >{degrees === 0 ? 'y' : 'y′'}</text
+          <text x="12" y="-166" transform={`rotate(${angle},12,-166)`}
+            >{angle === 0 ? 'y' : 'y′'}</text
           >
         </g>
         {#if complete && showDistance && result.length > 0}
@@ -295,7 +337,7 @@
       {#if stage === 'frame'}
         <div class="frame-controls">
           <h3>只改变读数坐标轴</h3>
-          <p>{axes} · 转角 {degrees}°</p>
+          <p>{axes} · 转角 {fmt(normalizedAngle)}°</p>
           {#if !observed}
             <p>转轴后，直线距离会变吗？可先预测再转。</p>
             <div class="predictions" role="group" aria-label="长度预测">
@@ -311,14 +353,16 @@
           <div class="axis-buttons">
             <button
               class="btn btn-outline btn-sm"
-              disabled={!complete || running}
+              disabled={!complete || running || rotating}
               onclick={rotateAxes}>坐标轴逆时针转 90°</button
             >
             <button
               class="btn btn-ghost btn-sm"
-              disabled={degrees === 0}
+              disabled={degrees === 0 && !rotating}
               onclick={() => {
+                stopAxes();
                 degrees = 0;
+                angle = 0;
                 prediction = null;
                 observed = false;
               }}>坐标轴回正</button
@@ -344,7 +388,7 @@
   <div class="workbench-result" data-testid="intro-result" aria-live="polite">
     <span>地图位置（东，北）：{pair(position)} m</span>
     <span data-testid="intro-components"
-      >{complete ? '已完成位移' : '指令位移'}的分量（{degrees === 0 ? 'x，y' : 'x′，y′'}）：{pair(
+      >{complete ? '已完成位移' : '指令位移'}的分量（{angle === 0 ? 'x，y' : 'x′，y′'}）：{pair(
         result.components,
       )} m</span
     >
