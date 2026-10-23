@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-010',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '转动导轨，两段行程怎样重新分配？' },
     { id: 'learning-path', title: '接上已有知识' },

@@ -17,7 +17,7 @@ async function audit(page: Page) {
 const selection: { lessons: typeof lessons; removed: typeof lessons } = JSON.parse(
   process.env.LESSON_SELECTION || '{"lessons":[],"removed":[]}',
 );
-test('选中课程深链接能加载，planned 不能完成', async ({ page }) => {
+test('选中课程深链接能加载，planned 与 draft 不能完成', async ({ page }) => {
   test.skip(selection.lessons.length + selection.removed.length === 0, '无课程变更');
   test.setTimeout(180000);
   const errors: string[] = [];
@@ -37,6 +37,13 @@ test('选中课程深链接能加载，planned 不能完成', async ({ page }) =
       ).default;
       await expect(page.locator(`#${definition.sections[0].id}`)).toBeVisible();
       await expect(page.getByRole('heading', { name: '课程暂时无法加载' })).toHaveCount(0);
+      if (definition.status === 'draft') {
+        await expect(page.locator('.status-badge[data-status="draft"]')).toBeVisible();
+        await expect(
+          page.getByText('这是一节草稿课，内容仍在验证中，暂不计入完成率。'),
+        ).toBeVisible();
+        await expect(page.getByRole('button', { name: '标记为已完成' })).toHaveCount(0);
+      }
     }
   }
   for (const lesson of selection.removed) {
@@ -79,7 +86,7 @@ test('搜索、模块、主题、横屏桌面和无障碍', async ({ page }) => 
 test('已缓存应用和示范课可以离线刷新，字体与 chunk 无错误 @smoke', async ({ page, context }) => {
   await page.goto('./#/lesson/math/linear-algebra/vector-addition');
   await page.getByRole('button', { name: '直接探索', exact: true }).click();
-  await expect(page.getByText('(1, 3) m')).toBeVisible();
+  await expect(page.getByTestId('movement-result')).toContainText('(1, 3) m');
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
     if (!navigator.serviceWorker.controller)
@@ -92,9 +99,9 @@ test('已缓存应用和示范课可以离线刷新，字体与 chunk 无错误 
   await context.setOffline(true);
   await page.reload();
   await page.getByRole('button', { name: '直接探索', exact: true }).click();
-  await expect(page.getByText('(1, 3) m')).toBeVisible();
-  await page.getByRole('button', { name: '场景二：完全抵消' }).click();
-  await expect(page.getByText('(0, 0) m')).toBeVisible();
+  await expect(page.getByTestId('movement-result')).toContainText('(1, 3) m');
+  await page.getByRole('button', { name: '原路返回', exact: true }).click();
+  await expect(page.getByTestId('movement-result')).toContainText('(0, 0) m');
   await page.goto('./#/lesson/math/optimization/gradient-descent');
   await expect(page.getByRole('heading', { name: '梯度下降', exact: true })).toBeVisible();
   await context.setOffline(false);
@@ -105,7 +112,7 @@ test('首页、示范课与进度页在亮暗主题下可访问', async ({ page 
     await page.goto(`./${route}`);
     if (route.includes('vector-addition')) {
       await page.getByRole('button', { name: '直接探索', exact: true }).click();
-      await expect(page.getByText('(1, 3) m')).toBeVisible();
+      await expect(page.getByTestId('movement-result')).toContainText('(1, 3) m');
     }
     for (const theme of ['light', 'dark']) {
       await page.getByLabel('主题', { exact: true }).selectOption(theme);

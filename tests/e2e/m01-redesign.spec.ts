@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { existsSync } from 'node:fs';
 import AxeBuilder from '@axe-core/playwright';
 import lessons from '../../curriculum/lessons.json' with { type: 'json' };
 
@@ -6,7 +7,12 @@ const selected: { lessons: { id: string }[] } = JSON.parse(
   process.env.LESSON_SELECTION || '{"lessons":[]}',
 );
 const selectedIds = new Set(selected.lessons.map((lesson) => lesson.id));
-for (const lesson of lessons.filter((l) => l.id.startsWith('M01-') && selectedIds.has(l.id))) {
+for (const lesson of lessons.filter(
+  (l) =>
+    l.id.startsWith('M01-') &&
+    selectedIds.has(l.id) &&
+    existsSync(`src/lessons/${l.id}/exploration.ts`),
+)) {
   test(`${lesson.id}：预测、全部预设、复位和横屏桌面`, async ({ page }, info) => {
     test.setTimeout(90000);
     const errors: string[] = [];

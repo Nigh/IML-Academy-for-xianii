@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-008',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '沿街送货与直达，哪条路线更短？' },
     { id: 'learning-path', title: '接上已有知识' },

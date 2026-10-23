@@ -53,9 +53,8 @@
     <nav class="lesson-toc" aria-label="本课目录">
       <span class="metadata">本课内容</span>
       {#each definition.sections as section (section.id)}
-        <a
-          href={`#${section.id}`}
-          onclick={(event) => navigateToSection(event, section.id)}>{section.title}</a
+        <a href={`#${section.id}`} onclick={(event) => navigateToSection(event, section.id)}
+          >{section.title}</a
         >
       {/each}
       {#if definition.quiz.length}

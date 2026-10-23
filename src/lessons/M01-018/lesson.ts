@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-018',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '没有实特征方向的旋转，还能拆成简单步骤吗？' },
     { id: 'learning-path', title: '接上已有知识' },

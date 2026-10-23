@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-004',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '两张合格的向量卡相加，输出卡还合格吗？' },
     { id: 'learning-path', title: '接上已有知识' },

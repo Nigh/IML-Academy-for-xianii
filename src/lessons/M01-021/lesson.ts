@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-021',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '给每个通道加偏置，程序怎么知道哪个轴是通道？' },
     { id: 'learning-path', title: '接上已有知识' },

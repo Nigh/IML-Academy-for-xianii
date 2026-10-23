@@ -597,6 +597,7 @@ main:focus {
 }
 .lesson-body {
   min-width: 0;
+  overflow-anchor: none;
 }
 .lesson-overview {
   margin-bottom: 1rem;

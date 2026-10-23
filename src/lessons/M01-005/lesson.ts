@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-005',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '两路驱动都能前进后退，平台就能到达任何目标吗？' },
     { id: 'learning-path', title: '接上已有知识' },

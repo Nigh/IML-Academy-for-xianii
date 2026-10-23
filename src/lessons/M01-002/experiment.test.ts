@@ -1,68 +1,60 @@
-import { describe, it, expect } from 'vitest';
-import {
-  add,
-  scale,
-  vector,
-  magnitude,
-  routePosition,
-  assessRoute,
-  routeTasks,
-} from './experiment.ts';
-it('两段直线按解析位置推进，检查路径而不仅是终点', () => {
-  const a = vector(2, 1),
-    b = vector(1, 2);
-  expect(routePosition(a, b, 0)).toEqual(vector(0, 0));
-  expect(routePosition(a, b, 5)).toEqual(vector(1, 0.5));
-  expect(routePosition(a, b, 10)).toEqual(a);
-  expect(routePosition(a, b, 15)).toEqual(vector(2.5, 2));
-  expect(routePosition(a, b, 20)).toEqual(vector(3, 3));
-  expect(assessRoute(a, b, routeTasks[0])).toMatchObject({ viaReached: true, endReached: true });
-  expect(assessRoute(b, a, routeTasks[0])).toMatchObject({ viaReached: false, endReached: true });
-  expect(assessRoute(a, vector(-1, 2), routeTasks[0])).toMatchObject({
-    viaReached: true,
-    endReached: false,
+import { expect, it } from 'vitest';
+import { vector } from '../../lib/math/vector.ts';
+import { twoMoves, speedMotion, sceneRange, predictionDistance } from './experiment.ts';
+
+it('连续移动逐分量合成，路程保留往返与直角路径', () => {
+  const normal = twoMoves(vector(2, 1), vector(-1, 2));
+  expect(normal.end).toEqual(vector(1, 3));
+  expect(normal.pathLength).toBeCloseTo(2 * Math.sqrt(5), 12);
+  expect(normal.displacementLength).toBeCloseTo(Math.sqrt(10), 12);
+  const back = twoMoves(vector(2, -1), vector(-2, 1));
+  expect(back.end).toEqual(vector(0, 0));
+  expect(back.pathLength).toBeCloseTo(2 * Math.sqrt(5), 12);
+  expect(back.displacementLength).toBe(0);
+  expect(twoMoves(vector(2, 0), vector(0, 1))).toMatchObject({
+    pathLength: 3,
+    displacementLength: Math.sqrt(5),
   });
-  expect(assessRoute(vector(2, -1), vector(-2, 1), routeTasks[1])).toMatchObject({
-    viaReached: true,
-    endReached: true,
-  });
-  expect(assessRoute(scale(a, -2), vector(-1, 2), routeTasks[2])).toMatchObject({
-    viaReached: true,
-    endReached: true,
-  });
-  expect(routePosition(vector(0, 0), vector(0, 0), 15)).toEqual(vector(0, 0));
-  expect(assessRoute(vector(2 + 1e-10, 1), b, routeTasks[0]).viaReached).toBe(true);
-  expect(assessRoute(vector(2 + 1e-6, 1), b, routeTasks[0]).viaReached).toBe(false);
-  for (const step of [-1, 21, 0.5, NaN, Infinity])
-    expect(() => routePosition(a, b, step)).toThrow(RangeError);
-  expect(() => routePosition(a, { x: NaN, y: 0 }, 0)).toThrow();
-  expect(() => assessRoute(a, b, { via: { x: Infinity, y: 0 }, end: a })).toThrow();
+  expect(twoMoves(vector(0.1, 0.2), vector(0.2, 0.1)).end.x).toBeCloseTo(0.3, 12);
 });
-describe('二维向量数学', () => {
-  it('逐分量相加并完全抵消', () => {
-    expect(add(vector(2, 1), vector(-1, 2))).toEqual({ x: 1, y: 3 });
-    expect(add(vector(2, -1), vector(-2, 1))).toEqual({ x: 0, y: 0 });
-  });
-  it('满足零向量、交换律与数乘', () => {
-    const a = vector(-2, 3),
-      b = vector(1, -4);
-    expect(add(a, vector(0, 0))).toEqual(a);
-    expect(add(a, b)).toEqual(add(b, a));
-    expect(scale(a, -2)).toEqual(vector(4, -6));
-  });
-  it('处理小数容差和路径长度区别', () => {
-    expect(add(vector(0.1, 0.2), vector(0.2, 0.1)).x).toBeCloseTo(0.3, 12);
-    expect(magnitude(vector(3, 4))).toBe(5);
-    expect(magnitude(add(vector(2, -1), vector(-2, 1)))).toBe(0);
-    expect(magnitude(vector(2, -1)) * 2).toBeCloseTo(2 * Math.sqrt(5));
-  });
-  it('拒绝非法参数和溢出', () => {
-    expect(() => magnitude(vector(Number.MAX_VALUE, Number.MAX_VALUE))).toThrow();
-    expect(() => scale(vector(0, 0), NaN)).toThrow();
-    expect(scale(vector(3, 4), 0)).toEqual({ x: 0, y: 0 });
-    expect(() => vector(NaN, 0)).toThrow(RangeError);
-    expect(() => add({ x: Infinity, y: 0 }, vector(0, 0))).toThrow();
-    expect(() => scale(vector(1, 2), Infinity)).toThrow();
-    expect(() => add(vector(Number.MAX_VALUE, 0), vector(Number.MAX_VALUE, 0))).toThrow();
-  });
+
+it('固定正的一秒，速度倍率同时缩放两个速度分量与位移', () => {
+  for (const [k, x, y, length] of [
+    [2, 4, 2, 2 * Math.sqrt(5)],
+    [-1, -2, -1, Math.sqrt(5)],
+    [0, 0, 0, 0],
+    [-2, -4, -2, 2 * Math.sqrt(5)],
+  ]) {
+    const result = speedMotion(vector(2, 1), k);
+    expect(result.velocity.x).toBe(x);
+    expect(result.velocity.y).toBe(y);
+    expect(result.displacement.x).toBe(x);
+    expect(result.displacement.y).toBe(y);
+    expect(result.pathLength).toBeCloseTo(length, 12);
+  }
+  const stationary = speedMotion(vector(0, 0), -2);
+  expect(stationary.pathLength).toBe(0);
+  expect(stationary.displacement.x === 0 && stationary.displacement.y === 0).toBe(true);
+});
+
+it('预测距离按真实数值计算，视域保留端点与等比例边界', () => {
+  expect(predictionDistance(vector(1, 3), vector(1, 3))).toBe(0);
+  expect(predictionDistance(vector(4, 7), vector(1, 3))).toBe(5);
+  expect(sceneRange([vector(2, 1), vector(1, 3)], false)).toEqual([-3, 4]);
+  expect(sceneRange([vector(0, 0)], true)).toEqual([-5, 5]);
+  expect(sceneRange([vector(-15, 15), vector(20, -20)], true)).toEqual([-21, 21]);
+});
+
+it('拒绝非有限数与溢出，不让错误结果进入图形', () => {
+  expect(() => twoMoves({ x: Infinity, y: 0 }, vector(0, 0))).toThrow(RangeError);
+  expect(() => twoMoves(vector(Number.MAX_VALUE, 0), vector(Number.MAX_VALUE, 0))).toThrow(
+    RangeError,
+  );
+  expect(() => twoMoves(vector(Number.MAX_VALUE, 0), vector(-Number.MAX_VALUE, 0))).toThrow(
+    RangeError,
+  );
+  expect(() => speedMotion(vector(2, 1), NaN)).toThrow(RangeError);
+  expect(() => speedMotion({ x: NaN, y: 1 }, 0)).toThrow(RangeError);
+  expect(() => sceneRange([{ x: Infinity, y: 0 }], false)).toThrow(RangeError);
+  expect(() => predictionDistance({ x: NaN, y: 0 }, vector(0, 0))).toThrow(RangeError);
 });

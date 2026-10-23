@@ -2,7 +2,7 @@
 
 实现接口以组件内 TypeScript props 为准；Svelte 5 snippets 与 callback attributes，不使用旧式事件 dispatcher。
 Phase 1 的共享层、三课和集成测试已分别通过 PR CI 与代理内容审阅，Interactive Component Contract v1 在本次验收后冻结。后续破坏性变更需显式迁移并验证现有课程。完整组合示例见 [INTERACTIVE_GUIDE](INTERACTIVE_GUIDE.md)。
-现有 M01-002 调用保持兼容。公共组件不包含课程目标函数或实验参数；参数归课程所有。
+共享组件的数学与交互接口沿用现有协议。M01-002 已迁移到新宽课程壳与课内机器人图，旧 RoutePlatform 已移除。公共组件不包含课程目标函数或实验参数；参数归课程所有。
 
 组件兼容性不证明教学布局合格。先按 LESSON_SPEC §4 设计桌面核心工作区，再组合控件；同状态的两张图不等于连续操作。图表默认实虚线不能决定课程对象的含义，需要课内呈现时在授权范围实现，不为复用强行保留误导样式。旧示范课不自动获得可信样板资格。
 
@@ -75,7 +75,7 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 
 ## 现有 Shell 协议（不变）
 
-- LessonShell：metadata、status、definition?、children；仅平台装配调用。
+- LessonShell：metadata、status、definition?、children；仅平台装配调用。章节使用横向链接，拦截锚点点击以保留 hash 路由，并定位及聚焦章节；目标/前置放入可展开区。实验使用可用正文宽度，普通讲解保留阅读行宽。站点课程导航在课程页默认收起，可显式展开；没有单课宽版式开关或旧壳兼容分支。完成、测验与进度协议不变，draft 仍无完成入口。
 - LessonHeader：metadata、status；仅 Shell 使用。
 - PrerequisiteLinks：id、prerequisites；直接/传递前置链接。
 - LessonNavigation：id；目录导航。
