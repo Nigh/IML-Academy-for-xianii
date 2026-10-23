@@ -1,5 +1,6 @@
 <script lang="ts">
-  import NumericInput from '../../components/interactive/NumericInput.svelte';
+  import { onMount } from 'svelte';
+  import IntegerStepper from './IntegerStepper.svelte';
   import ParameterSlider from '../../components/interactive/ParameterSlider.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
   import { mapping, unitGrid } from '../../lib/math/coordinates.ts';
@@ -26,6 +27,8 @@
     by = $state(2),
     k = $state(1);
   let step = $state(0);
+  let running = $state(false);
+  let frame = 0;
   let exploring = $state(false);
   let showSum = $state(true);
   let parallelogram = $state(false);
@@ -43,8 +46,8 @@
   const steps = $derived(speed ? 1 : 2);
   const complete = $derived(step === steps);
   const revealed = $derived(exploring || complete);
-  const firstVisible = $derived(exploring || step >= 1);
-  const position = $derived(step === 0 ? vector(0, 0) : step === 1 ? a : end);
+  const firstVisible = $derived(exploring || step >= 1 || running);
+  let position = $state({ x: 0, y: 0 });
   const cancelled = $derived(!speed && norm(a) > 0 && norm(end) === 0);
   const range = $derived(
     sceneRange([a, ...(speed ? [] : [b]), end, ...(prediction ? [prediction] : [])], speed),
@@ -58,20 +61,61 @@
   const pair = (point: Vector2) => `(${fmt(point.x)}, ${fmt(point.y)})`;
   const error = $derived(prediction && complete ? predictionDistance(prediction, end) : null);
 
+  function stopMovement() {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    running = false;
+  }
+  function rewind() {
+    stopMovement();
+    step = 0;
+    position.x = 0;
+    position.y = 0;
+    explanation = false;
+  }
+  function finishMovement() {
+    stopMovement();
+    const target = step === 0 ? a : end;
+    position.x = target.x;
+    position.y = target.y;
+    step += 1;
+  }
+  onMount(() => {
+    const preference = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const reduceMotion = () => {
+      if (preference?.matches && running) finishMovement();
+    };
+    const visibility = () => {
+      if (document.hidden && running) {
+        stopMovement();
+        const start = step === 0 ? origin : a;
+        position.x = start.x;
+        position.y = start.y;
+      }
+    };
+    preference?.addEventListener('change', reduceMotion);
+    document.addEventListener('visibilitychange', visibility);
+    return () => {
+      stopMovement();
+      preference?.removeEventListener('change', reduceMotion);
+      document.removeEventListener('visibilitychange', visibility);
+    };
+  });
+
   function changed() {
     if (step > 0) exploring = true;
-    step = 0;
+    rewind();
     explanation = false;
     hint = 0;
   }
   function reset(next: Stage = stage) {
+    rewind();
     stage = next;
     ax = 2;
     ay = next === 'return' ? -1 : 1;
     bx = next === 'return' ? -2 : -1;
     by = next === 'return' ? 1 : 2;
     k = 1;
-    step = 0;
     exploring = next !== 'addition';
     prediction = null;
     guessX = 0;
@@ -85,7 +129,7 @@
     prediction = vector(guessX, guessY);
   }
   function pickPrediction(event: MouseEvent) {
-    if (revealed || step > 0) return;
+    if (revealed || step > 0 || running) return;
     if (event.detail === 0) {
       markPrediction();
       return;
@@ -97,18 +141,42 @@
     const screen = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
     if (screen.x < 58 || screen.x > 394 || screen.y < 18 || screen.y > 354) return;
     const data = coordinates.toData(vector(screen.x - 58, screen.y - 18));
-    if (Math.abs(data.x) > 20 || Math.abs(data.y) > 20) return;
-    guessX = Number(data.x.toFixed(1));
-    guessY = Number(data.y.toFixed(1));
+    if (Math.abs(data.x) > 10 || Math.abs(data.y) > 10) return;
+    guessX = Math.round(data.x);
+    guessY = Math.round(data.y);
     markPrediction();
   }
   function execute() {
-    step = Math.min(steps, step + 1);
+    if (running || complete || document.hidden) return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      finishMovement();
+      return;
+    }
+    running = true;
+    const startX = position.x,
+      startY = position.y;
+    const target = step === 0 ? a : end;
+    const dx = target.x - startX,
+      dy = target.y - startY;
+    const started = performance.now();
+    const advance = (now: number) => {
+      const progress = Math.min(1, Math.max(0, (now - started) / 1000));
+      position.x = startX + dx * progress;
+      position.y = startY + dy * progress;
+      if (progress === 1) finishMovement();
+      else frame = requestAnimationFrame(advance);
+    };
+    frame = requestAnimationFrame(advance);
   }
   function swap() {
     [ax, ay, bx, by] = [bx, by, ax, ay];
-    exploring = true;
     changed();
+    exploring = false;
+    prediction = null;
+    guessX = 0;
+    guessY = 0;
+    parallelogram = false;
+    showSum = true;
   }
 </script>
 
@@ -133,13 +201,15 @@
     <div class="map-column">
       <div class="map-caption">
         <span
-          >{exploring && step === 0
-            ? '计划预览 · 尚未执行'
-            : step === 0
-              ? '等待指令'
-              : complete
-                ? '全部移动已完成'
-                : '第一段已完成'}</span
+          >{running
+            ? `第 ${step + 1} 段移动中 · 用时 1 秒`
+            : exploring && step === 0
+              ? '计划预览 · 尚未执行'
+              : step === 0
+                ? '等待指令'
+                : complete
+                  ? '全部移动已完成'
+                  : '第一段已完成'}</span
         >
         <span>东为 x 正向，北为 y 正向 · 米</span>
       </div>
@@ -203,7 +273,7 @@
               marker-end={`url(#${uid}-move)`}
             />
           {/if}
-          {#if revealed && !speed && norm(b) > 0}
+          {#if (revealed || (running && step === 1)) && !speed && norm(b) > 0}
             <line
               data-testid="second-route"
               class="move-line"
@@ -269,7 +339,7 @@
             />
           </g>
         </svg>
-        {#if !revealed && step === 0}
+        {#if !revealed && step === 0 && !running}
           <button
             class="prediction-surface"
             aria-label="在地图上标记预测，键盘也可用下方坐标输入和标记预测按钮"
@@ -290,24 +360,18 @@
       {#if speed}
         <h3>参考速度</h3>
         <div class="component-inputs">
-          <NumericInput
+          <IntegerStepper
             label="参考东西速度"
             value={ax}
-            min={-5}
-            max={5}
-            step={0.1}
             unit="m/s"
             onchange={(v) => {
               ax = v;
               changed();
             }}
           />
-          <NumericInput
+          <IntegerStepper
             label="参考南北速度"
             value={ay}
-            min={-5}
-            max={5}
-            step={0.1}
             unit="m/s"
             onchange={(v) => {
               ay = v;
@@ -350,24 +414,18 @@
       {:else}
         <h3>第一段 a</h3>
         <div class="component-inputs">
-          <NumericInput
+          <IntegerStepper
             label="第一段东西位移"
             value={ax}
-            min={-5}
-            max={5}
-            step={0.1}
             unit="m"
             onchange={(v) => {
               ax = v;
               changed();
             }}
           />
-          <NumericInput
+          <IntegerStepper
             label="第一段南北位移"
             value={ay}
-            min={-5}
-            max={5}
-            step={0.1}
             unit="m"
             onchange={(v) => {
               ay = v;
@@ -377,24 +435,18 @@
         </div>
         <h3>第二段 b</h3>
         <div class="component-inputs">
-          <NumericInput
+          <IntegerStepper
             label="第二段东西位移"
             value={bx}
-            min={-5}
-            max={5}
-            step={0.1}
             unit="m"
             onchange={(v) => {
               bx = v;
               changed();
             }}
           />
-          <NumericInput
+          <IntegerStepper
             label="第二段南北位移"
             value={by}
-            min={-5}
-            max={5}
-            step={0.1}
             unit="m"
             onchange={(v) => {
               by = v;
@@ -405,18 +457,19 @@
         <button class="swap-button" onclick={swap}>交换两段指令</button>
       {/if}
       <div class="execution-controls">
-        <button class="btn btn-primary btn-sm" disabled={complete} onclick={execute}
-          >{complete ? '移动已完成' : speed ? '执行 1 秒' : '执行下一段'}</button
+        <button class="btn btn-primary btn-sm" disabled={complete || running} onclick={execute}
+          >{running
+            ? '移动中…'
+            : complete
+              ? '移动已完成'
+              : speed
+                ? '执行 1 秒'
+                : '执行下一段'}</button
         >
-        <button
-          class="btn btn-ghost btn-sm"
-          onclick={() => {
-            step = 0;
-            explanation = false;
-          }}>回到起点</button
-        >
+        <button class="btn btn-ghost btn-sm" onclick={rewind}>回到起点</button>
         {#if !exploring}<button
             class="btn btn-ghost btn-sm"
+            disabled={running}
             onclick={() => {
               exploring = true;
               explanation = false;
@@ -427,7 +480,9 @@
         {speed ? '正倍率同向，负倍率反向；时间不变。' : '正数向东或向北，负数向西或向南。'}
       </p>
       <p class="range-note">
-        分量范围 −5 至 5 {speed ? 'm/s；k 范围 −3 至 3' : 'm'}；建议步长 0.1。
+        {speed
+          ? '参考速度分量为 −5 至 5 的整数 m/s；k 范围 −3 至 3，步长 0.1。'
+          : '每段位移分量为 −5 至 5 的整数米，每次加减 1 米；每段执行 1 秒。'}
       </p>
     </div>
   </div>
@@ -438,9 +493,11 @@
       {#if norm(end) === 0}<span>位移为零，方向未定义{cancelled ? '；终点与起点重合' : ''}。</span
         >{/if}
     {:else}<span
-        >当前位置：{pair(position)} m · {step === 0
-          ? '还没有执行移动。'
-          : '先执行第二段，再比较预测。'}</span
+        >当前位置：{pair(position)} m · {running
+          ? '正在匀速移动。'
+          : step === 0
+            ? '还没有执行移动。'
+            : '先执行第二段，再比较预测。'}</span
       >{/if}
   </div>
   {#if error !== null}
@@ -452,26 +509,22 @@
   {/if}
 </section>
 
-{#if !revealed && step === 0}
+{#if !revealed && step === 0 && !running}
   <div class="prediction-entry" aria-label="终点预测">
-    <p>在地图上点击预测位置，或输入坐标。此步可跳过。</p>
-    <NumericInput
+    <p>点击地图，预测位置会吸附到整数点；也可用加减按钮设置坐标。此步可跳过。</p>
+    <IntegerStepper
       label="预测 x"
       value={guessX}
-      min={-20}
-      max={20}
-      step={0.1}
+      limit={10}
       unit="m"
       onchange={(v) => {
         guessX = v;
       }}
     />
-    <NumericInput
+    <IntegerStepper
       label="预测 y"
       value={guessY}
-      min={-20}
-      max={20}
-      step={0.1}
+      limit={10}
       unit="m"
       onchange={(v) => {
         guessY = v;

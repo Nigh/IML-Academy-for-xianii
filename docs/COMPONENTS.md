@@ -75,7 +75,7 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 
 ## 现有 Shell 协议（不变）
 
-- LessonShell：metadata、status、definition?、children；仅平台装配调用。章节使用横向链接，拦截锚点点击以保留 hash 路由，并定位及聚焦章节；目标/前置放入可展开区。实验使用可用正文宽度，普通讲解保留阅读行宽。站点课程导航在课程页默认收起，可显式展开；没有单课宽版式开关或旧壳兼容分支。完成、测验与进度协议不变，draft 仍无完成入口。
+- LessonShell：metadata、status、definition?、children；仅平台装配调用。章节使用横向链接，拦截锚点点击以保留 hash 路由，并定位及聚焦章节；目标/前置放入可展开区。实验、正文段落、列表与公式块使用可用内容宽度，不再统一限制为 70ch。站点课程导航在课程页默认收起，可显式展开；没有单课宽版式开关或旧壳兼容分支。完成、测验与进度协议不变，draft 仍无完成入口。
 - LessonHeader：metadata、status；仅 Shell 使用。
 - PrerequisiteLinks：id、prerequisites；直接/传递前置链接。
 - LessonNavigation：id；目录导航。

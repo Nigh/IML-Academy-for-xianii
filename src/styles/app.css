@@ -643,9 +643,6 @@ main:focus {
 .lesson-body a:not(.btn) {
   color: var(--color-primary);
 }
-.theory-section > :is(p, ul, ol, .formula-block) {
-  max-width: 70ch;
-}
 .link-list {
   list-style: none;
   padding-left: 0 !important;
