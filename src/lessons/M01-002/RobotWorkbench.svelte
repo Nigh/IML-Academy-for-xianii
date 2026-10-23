@@ -28,6 +28,8 @@
     k = $state(1);
   let step = $state(0);
   let running = $state(false);
+  let movement = $state<'segments' | 'sum'>('segments');
+  let compared = $state(false);
   let frame = 0;
   let exploring = $state(false);
   let showSum = $state(true);
@@ -46,7 +48,7 @@
   const steps = $derived(speed ? 1 : 2);
   const complete = $derived(step === steps);
   const revealed = $derived(exploring || complete);
-  const firstVisible = $derived(exploring || step >= 1 || running);
+  const firstVisible = $derived(step >= 1);
   let position = $state({ x: 0, y: 0 });
   const cancelled = $derived(!speed && norm(a) > 0 && norm(end) === 0);
   const range = $derived(
@@ -69,16 +71,19 @@
   function rewind() {
     stopMovement();
     step = 0;
+    movement = 'segments';
+    compared = false;
     position.x = 0;
     position.y = 0;
     explanation = false;
   }
   function finishMovement() {
     stopMovement();
-    const target = step === 0 ? a : end;
+    const target = movement === 'sum' || step > 0 ? end : a;
     position.x = target.x;
     position.y = target.y;
-    step += 1;
+    if (movement === 'sum') compared = true;
+    else step += 1;
   }
   onMount(() => {
     const preference = window.matchMedia?.('(prefers-reduced-motion: reduce)');
@@ -88,7 +93,7 @@
     const visibility = () => {
       if (document.hidden && running) {
         stopMovement();
-        const start = step === 0 ? origin : a;
+        const start = movement === 'sum' || step === 0 ? origin : a;
         position.x = start.x;
         position.y = start.y;
       }
@@ -148,6 +153,18 @@
   }
   function execute() {
     if (running || complete || document.hidden) return;
+    animateMovement();
+  }
+  function compare() {
+    if (running || !complete || speed || document.hidden) return;
+    movement = 'sum';
+    compared = false;
+    showSum = true;
+    position.x = 0;
+    position.y = 0;
+    animateMovement();
+  }
+  function animateMovement() {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
       finishMovement();
       return;
@@ -155,7 +172,7 @@
     running = true;
     const startX = position.x,
       startY = position.y;
-    const target = step === 0 ? a : end;
+    const target = movement === 'sum' || step > 0 ? end : a;
     const dx = target.x - startX,
       dy = target.y - startY;
     const started = performance.now();
@@ -195,21 +212,27 @@
     {#if speed}固定运行 {RUN_SECONDS} 秒，改变速度倍率，比较方向与走过的距离。
     {:else if stage === 'return'}让第二段沿原路返回，比较走过的路程与总位移。
     {:else if !revealed && step === 0}两段指令都在右侧。先预测终点，再执行；也可以直接探索。
-    {:else}改动右侧指令，地图即时预览新路线；执行按钮用于观察先后顺序。{/if}
+    {:else}修改指令后重新执行；每段走完后，地图上才会留下对应的位移箭头。{/if}
   </p>
   <div class="workbench-main">
     <div class="map-column">
       <div class="map-caption">
         <span
           >{running
-            ? `第 ${step + 1} 段移动中 · 用时 1 秒`
-            : exploring && step === 0
-              ? '计划预览 · 尚未执行'
-              : step === 0
-                ? '等待指令'
-                : complete
-                  ? '全部移动已完成'
-                  : '第一段已完成'}</span
+            ? movement === 'sum'
+              ? '沿合向量移动中 · 用时 1 秒'
+              : `第 ${step + 1} 段移动中 · 用时 1 秒`
+            : compared
+              ? '合向量移动已完成 · 终点重合'
+              : movement === 'sum'
+                ? '合向量演示已停止，可重新执行'
+                : step === 0
+                  ? '等待指令'
+                  : complete
+                    ? speed
+                      ? '移动已完成'
+                      : '两段移动已完成'
+                    : '第一段已完成'}</span
         >
         <span>东为 x 正向，北为 y 正向 · 米</span>
       </div>
@@ -255,7 +278,7 @@
           <line class="axis-line" x1={px(origin)} y1="18" x2={px(origin)} y2="354" />
           <text class="axis-title" x="420" y={Math.min(342, py(origin) + 20)}>x</text>
           <text class="axis-title" x={px(origin) + 12} y="14">y</text>
-          {#if revealed && parallelogram && !speed}
+          {#if complete && parallelogram && !speed}
             <path
               data-testid="parallelogram"
               class="construction"
@@ -273,7 +296,7 @@
               marker-end={`url(#${uid}-move)`}
             />
           {/if}
-          {#if (revealed || (running && step === 1)) && !speed && norm(b) > 0}
+          {#if step >= 2 && !speed && norm(b) > 0}
             <line
               data-testid="second-route"
               class="move-line"
@@ -284,7 +307,7 @@
               marker-end={`url(#${uid}-move)`}
             />
           {/if}
-          {#if revealed && showSum && norm(end) > 0}
+          {#if complete && showSum && norm(end) > 0}
             <line
               data-testid="sum-route"
               class="sum-line"
@@ -294,6 +317,9 @@
               y2={py(end)}
               marker-end={`url(#${uid}-sum)`}
             />
+            <text x={(px(origin) + px(end)) / 2 + 12} y={(py(origin) + py(end)) / 2 - 12}
+              >合向量</text
+            >
           {/if}
           <circle cx={px(origin)} cy={py(origin)} r="5" class="start-point" />
           <text x={px(origin) - 12} y={py(origin) + 24} text-anchor="end">起点</text>
@@ -301,13 +327,13 @@
             <circle cx={px(a)} cy={py(a)} r="5" class="endpoint" />
             <text x={px(a) + 12} y={py(a) + 24}>1</text>
           {/if}
-          {#if revealed && norm(end) > 0}
+          {#if complete && norm(end) > 0}
             <rect x={px(end) - 6} y={py(end) - 6} width="12" height="12" class="endpoint" />
             <text
               x={px(end) + (end.x > (range[0] + range[1]) / 2 ? -15 : 15)}
               y={py(end) - 15}
               text-anchor={end.x > (range[0] + range[1]) / 2 ? 'end' : 'start'}
-              >{speed ? '终点' : '2 终点'}</text
+              >{speed ? '终点' : '共同终点'}</text
             >
           {/if}
           {#if prediction}
@@ -349,10 +375,10 @@
       </div>
       <div class="map-options">
         <label
-          ><input type="checkbox" bind:checked={showSum} disabled={!revealed} /> 显示总位移（虚线）</label
+          ><input type="checkbox" bind:checked={showSum} disabled={!complete} /> 显示总位移（虚线）</label
         >
         {#if !speed}<label
-            ><input type="checkbox" bind:checked={parallelogram} disabled={!revealed} /> 平行四边形辅助线</label
+            ><input type="checkbox" bind:checked={parallelogram} disabled={!complete} /> 平行四边形辅助线</label
           >{/if}
       </div>
     </div>
@@ -457,17 +483,23 @@
         <button class="swap-button" onclick={swap}>交换两段指令</button>
       {/if}
       <div class="execution-controls">
-        <button class="btn btn-primary btn-sm" disabled={complete || running} onclick={execute}
-          >{running
-            ? '移动中…'
-            : complete
-              ? '移动已完成'
-              : speed
-                ? '执行 1 秒'
-                : '执行下一段'}</button
-        >
+        {#if complete && !speed}
+          <button class="btn btn-primary btn-sm" disabled={running} onclick={compare}
+            >{running ? '移动中…' : '沿合向量走一次'}</button
+          >
+        {:else}
+          <button class="btn btn-primary btn-sm" disabled={complete || running} onclick={execute}
+            >{running
+              ? '移动中…'
+              : complete
+                ? '移动已完成'
+                : speed
+                  ? '执行 1 秒'
+                  : '执行下一段'}</button
+          >
+        {/if}
         <button class="btn btn-ghost btn-sm" onclick={rewind}>回到起点</button>
-        {#if !exploring}<button
+        {#if !exploring && !complete}<button
             class="btn btn-ghost btn-sm"
             disabled={running}
             onclick={() => {
@@ -489,7 +521,12 @@
   <div class="workbench-result" aria-live="polite" data-testid="movement-result">
     {#if revealed}
       <span><strong>{complete ? '执行终点' : '计划终点'}：{pair(end)} m</strong></span>
-      <span>总位移长度约 {fmt(route.displacementLength)} m · 路程约 {fmt(route.pathLength)} m</span>
+      <span
+        >总位移长度约 {fmt(route.displacementLength)} m · {speed ? '路程' : '两段路程'}约 {fmt(
+          route.pathLength,
+        )} m{#if complete && !speed}
+          · 直达路程约 {fmt(route.displacementLength)} m{/if}</span
+      >
       {#if norm(end) === 0}<span>位移为零，方向未定义{cancelled ? '；终点与起点重合' : ''}。</span
         >{/if}
     {:else}<span
@@ -499,6 +536,19 @@
             ? '还没有执行移动。'
             : '先执行第二段，再比较预测。'}</span
       >{/if}
+    {#if complete && !speed}
+      <span class="comparison-note" data-testid="comparison-feedback">
+        {#if running && movement === 'sum'}
+          机器人从起点沿虚线移动，方框保留两段移动的终点。
+        {:else if compared}
+          两次都到达 {pair(end)} m。先走 a 再走 b，与走一次合向量 a+b，终点相同。
+          {#if norm(end) === 0}合向量为零，所以这一次机器人停在起点。{/if}
+        {:else}
+          两段已走完。点击“沿合向量走一次”，比较两次到达的终点。
+        {/if}
+        这里只比较终点；路线、路程和用时可以不同。
+      </span>
+    {/if}
   </div>
   {#if error !== null}
     <p class="prediction-feedback" data-testid="prediction-feedback" aria-live="polite">
@@ -829,6 +879,9 @@
     padding-top: 0.65rem;
     font-size: var(--font-size-sm);
     font-variant-numeric: tabular-nums;
+  }
+  .comparison-note {
+    flex-basis: 100%;
   }
   .prediction-feedback {
     margin-top: 0.5rem;

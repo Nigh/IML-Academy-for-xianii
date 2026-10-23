@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 test('M01-002：同图控制与结果在横屏同屏，全部场景可复位', async ({ page }, info) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('./#/lesson/math/linear-algebra/vector-addition');
   const route = page.url();
   await page.getByRole('link', { name: '两段移动后的终点', exact: true }).click();
@@ -24,6 +25,13 @@ test('M01-002：同图控制与结果在横屏同屏，全部场景可复位', a
             await workbench.getByRole('button', { name: preset, exact: true }).click();
             await expect(page.getByTestId('velocity-reading')).toBeVisible();
           }
+        }
+        if (stage === '改变速度') {
+          await workbench.getByRole('button', { name: '执行 1 秒', exact: true }).click();
+        } else {
+          await workbench.getByRole('button', { name: '执行下一段', exact: true }).click();
+          await workbench.getByRole('button', { name: '执行下一段', exact: true }).click();
+          await workbench.getByRole('button', { name: '沿合向量走一次', exact: true }).click();
         }
         await workbench.evaluate((element) =>
           element.scrollIntoView({ block: 'start', behavior: 'instant' }),
@@ -119,7 +127,6 @@ test('M01-002：交换路线、键盘预测、缩放与课程导航保留可达�
   await page.getByRole('button', { name: '执行下一段', exact: true }).click();
   await page.getByRole('button', { name: '执行下一段', exact: true }).click();
   await expect(page.getByTestId('prediction-feedback')).toContainText('3.16 m');
-  await page.getByRole('button', { name: '直接探索', exact: true }).click();
   await page.getByRole('button', { name: '交换两段指令', exact: true }).click();
   await expect(page.getByTestId('movement-result')).not.toContainText('(1, 3) m');
   await expect(page.getByTestId('robot-position')).toHaveAttribute('aria-label', /位置 \(0, 0\)/);
@@ -213,26 +220,43 @@ test('M01-002：每段匀速移动一秒，复位和交换会中断旧动画', a
   const sample = () =>
     robot.evaluate((element) => {
       const coordinates = element.getAttribute('aria-label')!.match(/\(([-\d.]+), ([-\d.]+)\)/)!;
-      return { x: Number(coordinates[1]), y: Number(coordinates[2]), time: performance.now() };
+      return {
+        x: Number(coordinates[1]),
+        y: Number(coordinates[2]),
+        time: performance.now(),
+        firstArrow: !!document.querySelector('[data-testid="first-route"]'),
+        secondArrow: !!document.querySelector('[data-testid="second-route"]'),
+        sumArrow: !!document.querySelector('[data-testid="sum-route"]'),
+      };
     });
   const started = await page.evaluate(() => performance.now());
   await page.getByRole('button', { name: '执行下一段', exact: true }).click();
   await expect(page.getByRole('button', { name: '移动中…', exact: true })).toBeDisabled();
-  await expect.poll(async () => (await sample()).x).toBeGreaterThan(0.25);
+  await expect.poll(async () => (await sample()).x, { intervals: [20] }).toBeGreaterThan(0.25);
   const first = await sample();
-  await expect.poll(async () => (await sample()).x).toBeGreaterThan(1.25);
+  await expect.poll(async () => (await sample()).x, { intervals: [20] }).toBeGreaterThan(1.25);
   const second = await sample();
+  expect(second.x).toBeLessThan(2);
+  expect(second.firstArrow).toBe(false);
+  expect(second.secondArrow).toBe(false);
+  expect(second.sumArrow).toBe(false);
   expect(Math.abs(first.x - 2 * first.y)).toBeLessThan(0.03);
   expect(Math.abs(second.x - 2 * second.y)).toBeLessThan(0.03);
   expect(Math.abs((second.x - first.x) / ((second.time - first.time) / 1000) - 2)).toBeLessThan(
     0.4,
   );
   await expect(robot).toHaveAttribute('aria-label', /位置 \(2, 1\)/);
+  await expect(page.getByTestId('first-route')).toHaveCount(1);
+  await expect(page.getByTestId('second-route')).toHaveCount(0);
   expect((await page.evaluate(() => performance.now())) - started).toBeGreaterThanOrEqual(950);
   await page.getByRole('button', { name: '执行下一段', exact: true }).click();
-  await expect.poll(async () => (await sample()).y).toBeGreaterThan(1.2);
+  await expect.poll(async () => (await sample()).y, { intervals: [20] }).toBeGreaterThan(1.2);
+  expect((await sample()).secondArrow).toBe(false);
   await page.getByRole('button', { name: '复位实验', exact: true }).click();
   await expect(robot).toHaveAttribute('aria-label', /位置 \(0, 0\)/);
+  await expect(page.getByTestId('first-route')).toHaveCount(0);
+  await expect(page.getByTestId('second-route')).toHaveCount(0);
+  await expect(page.getByTestId('sum-route')).toHaveCount(0);
   await page.getByRole('button', { name: '执行下一段', exact: true }).click();
   await expect(robot).toHaveAttribute('aria-label', /位置 \(2, 1\)/);
   await page.getByRole('button', { name: '执行下一段', exact: true }).click();
@@ -241,4 +265,50 @@ test('M01-002：每段匀速移动一秒，复位和交换会中断旧动画', a
   await expect(page.getByTestId('movement-result')).not.toContainText('(1, 3)');
   await page.getByRole('button', { name: '执行下一段', exact: true }).click();
   await expect(robot).toHaveAttribute('aria-label', /位置 \(-1, 2\)/);
+});
+
+test('M01-002：两段位移与沿合向量直达重合，改参取消对照并清空旧箭头', async ({ page }, info) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('./#/lesson/math/linear-algebra/vector-addition');
+  const robot = page.getByTestId('robot-position');
+  await page.getByRole('button', { name: '执行下一段', exact: true }).click();
+  await expect(robot).toHaveAttribute('aria-label', /位置 \(2, 1\)/);
+  await page.getByRole('button', { name: '执行下一段', exact: true }).click();
+  await expect(robot).toHaveAttribute('aria-label', /位置 \(1, 3\)/);
+  const endpoint = await robot.getAttribute('aria-label');
+  await page.getByLabel('显示总位移（虚线）', { exact: true }).uncheck();
+  await page.getByRole('button', { name: '沿合向量走一次', exact: true }).click();
+  const sample = () =>
+    robot.evaluate((element) => {
+      const match = element.getAttribute('aria-label')!.match(/\(([-\d.]+), ([-\d.]+)\)/)!;
+      return { x: Number(match[1]), y: Number(match[2]) };
+    });
+  await expect.poll(async () => (await sample()).x).toBeGreaterThan(0.1);
+  const middle = await sample();
+  expect(middle.x).toBeLessThan(1);
+  expect(Math.abs(middle.y - 3 * middle.x)).toBeLessThan(0.04);
+  await expect(page.getByTestId('first-route')).toHaveCount(1);
+  await expect(page.getByTestId('second-route')).toHaveCount(1);
+  await expect(page.getByTestId('sum-route')).toHaveCount(1);
+  await expect(robot).toHaveAttribute('aria-label', endpoint!);
+  await expect(page.getByTestId('comparison-feedback')).toContainText('两次都到达 (1, 3) m');
+  await page
+    .getByTestId('robot-workbench')
+    .evaluate((element) => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
+  await page.screenshot({ path: info.outputPath('same-endpoint.png') });
+  const audit = await new AxeBuilder({ page }).include('.robot-workbench').analyze();
+  expect(audit.violations).toEqual([]);
+  await page.getByRole('button', { name: '沿合向量走一次', exact: true }).click();
+  await page.getByRole('button', { name: '增加第一段东西位移', exact: true }).click();
+  await expect(robot).toHaveAttribute('aria-label', /位置 \(0, 0\)/);
+  for (const id of ['first-route', 'second-route', 'sum-route', 'comparison-feedback']) {
+    await expect(page.getByTestId(id)).toHaveCount(0);
+  }
+  await expect(page.getByText('共同终点', { exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '执行下一段', exact: true }).click();
+  await expect(robot).toHaveAttribute('aria-label', /位置 \(3, 1\)/);
+  await page.getByRole('button', { name: '执行下一段', exact: true }).click();
+  await expect(robot).toHaveAttribute('aria-label', /位置 \(2, 3\)/);
+  await page.getByRole('button', { name: '沿合向量走一次', exact: true }).click();
+  await expect(page.getByTestId('comparison-feedback')).toContainText('两次都到达 (2, 3) m');
 });
