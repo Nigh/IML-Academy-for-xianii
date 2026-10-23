@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 520" role="img" aria-labelledby="title description">
+  <title id="title">M01-002 核心工作区线框</title>
+  <desc id="description">执行后的状态：左侧同一地图显示两段实线移动和细虚线总位移，右侧调整四个分量，下方同屏显示结果。此图不含站点导航，不是可操作原型。</desc>
+  <style>
+    text { fill: var(--fg, currentColor); font-family: sans-serif; font-size: 16px; }
+    .muted { fill: var(--muted, currentColor); font-size: 14px; }
+    .border { fill: none; stroke: var(--border, currentColor); }
+    .grid { fill: none; stroke: var(--border, currentColor); opacity: .2; }
+    .route { fill: none; stroke: var(--accent, currentColor); stroke-width: 4; }
+    .sum { fill: none; stroke: var(--fg, currentColor); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .marker { fill: none; stroke: var(--fg, currentColor); stroke-width: 2; }
+  </style>
+  <text x="24" y="30" style="font-size:22px;font-weight:600">两段移动后的终点</text>
+  <text x="24" y="56" class="muted">横屏工作区 · 执行后示例 · 右为东，上为北 · 位移单位：米</text>
+  <path d="M24 88H856" class="border"/>
+  <text x="24" y="80">1 两段移动</text>
+  <text x="218" y="80" class="muted">2 原路返回</text>
+  <text x="398" y="80" class="muted">3 放大或反向</text>
+  <rect x="24" y="104" width="500" height="326" rx="6" class="border"/>
+  <path d="M80 120V416 M152 120V416 M224 120V416 M296 120V416 M368 120V416 M440 120V416 M48 144H500 M48 216H500 M48 288H500 M48 360H500" class="grid"/>
+  <text x="42" y="132" class="muted">北 ↑</text>
+  <text x="444" y="410" class="muted">东 →</text>
+  <path d="M152 360L296 288L224 144" class="route"/>
+  <path d="M282 287L296 288L289 301 M224 158L224 144L235 153" class="route"/>
+  <path d="M152 360L224 144 M214 154L224 144L226 159" class="sum"/>
+  <circle cx="152" cy="360" r="6" class="marker"/>
+  <text x="112" y="387">起点</text>
+  <circle cx="296" cy="288" r="6" class="marker"/>
+  <text x="314" y="304">1</text>
+  <text x="206" y="347">第一段 a</text>
+  <text x="286" y="210">第二段 b</text>
+  <text x="120" y="231">总位移</text>
+  <path d="M188 235L196 237" class="sum"/>
+  <rect x="212" y="132" width="24" height="24" rx="5" class="marker"/>
+  <path d="M207 136V151 M241 136V151" class="marker"/>
+  <text x="250" y="148">2 终点</text>
+  <path d="M48 401H120 M48 396V406 M120 396V406" class="marker"/>
+  <text x="66" y="393" class="muted">1 米</text>
+  <rect x="548" y="104" width="308" height="326" rx="6" class="border"/>
+  <text x="568" y="132" style="font-weight:600">移动指令</text>
+  <text x="568" y="160">第一段 a</text>
+  <text x="568" y="187" class="muted">东西位移</text>
+  <text x="708" y="187" class="muted">南北位移</text>
+  <rect x="568" y="196" width="120" height="36" rx="4" class="border"/>
+  <rect x="708" y="196" width="120" height="36" rx="4" class="border"/>
+  <text x="582" y="220">2</text><text x="722" y="220">1</text>
+  <text x="568" y="260">第二段 b</text>
+  <text x="568" y="287" class="muted">东西位移</text>
+  <text x="708" y="287" class="muted">南北位移</text>
+  <rect x="568" y="296" width="120" height="36" rx="4" class="border"/>
+  <rect x="708" y="296" width="120" height="36" rx="4" class="border"/>
+  <text x="582" y="320">−1</text><text x="722" y="320">2</text>
+  <rect x="568" y="350" width="138" height="36" rx="4" class="border" opacity=".4"/>
+  <text x="581" y="374" class="muted">两段已执行</text>
+  <text x="720" y="374">重播</text><text x="784" y="374">复位</text>
+  <rect x="568" y="401" width="15" height="15" class="marker"/>
+  <path d="M570 408L575 413L581 403" class="marker"/>
+  <text x="596" y="414">显示总位移</text>
+  <path d="M24 446H856" class="border"/>
+  <text x="24" y="472">两段已完成 · 终点：东 1 米，北 3 米</text>
+  <text x="506" y="472">路程：4.47 米</text>
+  <text x="690" y="472">查看计算</text>
+  <text x="24" y="502" class="muted">改参即时预览计划；首次预测阶段隐藏终点与总位移，执行后才显示结果。</text>
+</svg>
