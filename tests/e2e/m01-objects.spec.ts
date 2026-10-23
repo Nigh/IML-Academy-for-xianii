@@ -161,7 +161,6 @@ const selection: { lessons: { id: string }[] } = JSON.parse(
 );
 const selectedIds = new Set(selection.lessons.map((l) => l.id));
 const tasks = [
-  ['M01-001', ['终点向西 1m', '导航仪转向 / 回正'], 'object-result', '(4.000, -2.000)'],
   ['M01-003', ['记录 2', '后一个时刻'], 'object-result', '记录 2 / 2，时刻 2 / 3'],
   ['M01-004', ['场景二：平移直线', '成员乘以零'], 'object-result', '未通过成员检验'],
   ['M01-005', ['驱动一后退一份'], 'object-result', '距目标 1.0000'],

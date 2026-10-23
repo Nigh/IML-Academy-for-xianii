@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import IntegerStepper from './IntegerStepper.svelte';
+  import IntegerStepper from '../../components/interactive/IntegerStepper.svelte';
   import ParameterSlider from '../../components/interactive/ParameterSlider.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
   import { mapping, unitGrid } from '../../lib/math/coordinates.ts';
