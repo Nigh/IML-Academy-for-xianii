@@ -6,7 +6,7 @@ const routes = [
   ['梯度下降', 'math/optimization/gradient-descent'],
 ] as const;
 for (const [title, slug] of routes) {
-  test(`${title}：从首页搜索进入、刷新、主题和移动布局`, async ({ page }, testInfo) => {
+  test(`${title}：从首页搜索进入、刷新、主题和横屏桌面布局`, async ({ page }, testInfo) => {
     await page.goto('./#/');
     await page.getByLabel('全站课程搜索').fill(title);
     await page.getByRole('button', { name: '搜索课程', exact: true }).click();
@@ -39,11 +39,11 @@ for (const [title, slug] of routes) {
         .analyze();
       expect(result.violations).toEqual([]);
     }
-    await page.setViewportSize({ width: 320, height: 850 });
+    await page.setViewportSize({ width: 1920, height: 1080 });
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
     ).toBe(true);
-    await page.screenshot({ path: testInfo.outputPath('mobile.png'), fullPage: true });
+    await page.screenshot({ path: testInfo.outputPath('desktop-1080p.png'), fullPage: true });
     await page.locator('.lesson-body').evaluate((el) => (el.style.fontSize = '200%'));
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),

@@ -60,8 +60,6 @@ test('品牌 logo 加载并链接回首页 @smoke', async ({ page }) => {
   expect(
     await logo.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0),
   ).toBe(true);
-  await page.setViewportSize({ width: 320, height: 850 });
-  await expect(logo).toBeVisible();
   await brand.click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('亲手理解机器学习');
 });

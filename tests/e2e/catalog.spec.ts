@@ -52,7 +52,7 @@ test('代表性 planned 页面仍可加载 @smoke', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '这一节已列入学习地图' })).toBeVisible();
   await expect(page.getByRole('button', { name: '标记为已完成' })).toHaveCount(0);
 });
-test('搜索、模块、主题、响应式和无障碍', async ({ page }) => {
+test('搜索、模块、主题、横屏桌面和无障碍', async ({ page }) => {
   await page.goto('./#/curriculum');
   await page.getByRole('searchbox', { name: '搜索课程', exact: true }).fill('M03-010');
   await expect(page.getByText('找到 1 节课程')).toBeVisible();
@@ -66,8 +66,11 @@ test('搜索、模块、主题、响应式和无障碍', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'xianii');
   results = await audit(page);
   expect(results.violations).toEqual([]);
-  for (const width of [320, 768, 1024, 1440]) {
-    await page.setViewportSize({ width, height: 900 });
+  for (const viewport of [
+    { width: 1280, height: 720 },
+    { width: 1920, height: 1080 },
+  ]) {
+    await page.setViewportSize(viewport);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
@@ -113,11 +116,6 @@ test('首页、示范课与进度页在亮暗主题下可访问', async ({ page 
       const result = await audit(page);
       expect(result.violations, `${route} ${theme}`).toEqual([]);
     }
-    await page.setViewportSize({ width: 320, height: 850 });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-      true,
-    );
-    await page.setViewportSize({ width: 1440, height: 1000 });
   }
 });
 

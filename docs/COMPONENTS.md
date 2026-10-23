@@ -4,6 +4,8 @@
 Phase 1 的共享层、三课和集成测试已分别通过 PR CI 与代理内容审阅，Interactive Component Contract v1 在本次验收后冻结。后续破坏性变更需显式迁移并验证现有课程。完整组合示例见 [INTERACTIVE_GUIDE](INTERACTIVE_GUIDE.md)。
 现有 M01-002 调用保持兼容。公共组件不包含课程目标函数或实验参数；参数归课程所有。
 
+组件兼容性不证明教学布局合格。先按 LESSON_SPEC §4 设计桌面核心工作区，再组合控件；同状态的两张图不等于连续操作。图表默认实虚线不能决定课程对象的含义，需要课内呈现时在授权范围实现，不为复用强行保留误导样式。旧示范课不自动获得可信样板资格。
+
 ## 数学与数据协议
 
 | 模块                              | 真实导出与行为                                                                                                                                                                                                                                                          |
@@ -43,7 +45,7 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 | HistogramPlot    | samples、bins=20、mode=count/frequency/density（默认 density）、theory=[]                                                                                        | 原始样本计算直方图。bin 1–200，空/退化样本有处理；density 柱面积总和为 1。理论叠加必须与纵轴同单位，组件不推断理论单位。非法数据进入空态，数学函数独立抛错。                                                           |
 | ContourPlot      | contours:PlotSeries[]、path、current、xRange、yRange、description；gradient?                                                                                     | 等高线由课程纯函数生成，叠加路径、当前点和负梯度方向线段；gradient 为课程已缩放的显示向量，坐标图不计算函数。                                                                                                          |
 
-图表最小逻辑宽度保持文字可读，移动端只在图内横向滚动；SVG 高 DPI 自适应，无外部字体/CDN。
+图表最小逻辑宽度保持文字可读，必要时局部横向滚动；SVG 高 DPI 自适应，无外部字体/CDN。项目不提供窄屏、竖屏适配或测试，使用范围按 LESSON_SPEC §4。
 关键结果必须另外放在正文或 aria-live output；图形标题不能替代所有数学解释。
 预设参数、视域与标签布局按 [LESSON_SPEC §4.1](LESSON_SPEC.md#41-预设图形的可读性验收) 逐项验收。共享组件不会自动保证所有输入组合的布局可读；课程应显式选择 `range` / `xRange` / `yRange`，避免内容挤在原点附近。该要求是使用与验收约束，不新增自动缩放、标签避让等组件能力或修改 v1 props。
 例：`<HistogramPlot samples={samples} bins={20} mode="density" />`；
@@ -88,7 +90,7 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 
 所有颜色引用既有主题语义 tokens，不复制品牌色；基础字号继承现有 app.css。
 输入须有 label、错误文本、可见焦点和键盘操作。图表提供单位、文字说明与非颜色区分。
-必须检查亮暗主题、320px、缩放、reduced motion、复位、卸载清理和非法值。
+必须检查 1280×720 与 1920×1080 横屏桌面、亮暗主题、桌面缩放、reduced motion、复位、卸载清理和非法值。窄屏、竖屏与手机触屏不在测试范围。
 新建课程一课一 PR，共享接口与规范文档通常独立提交；既有课程的授权批量修订可将直接相关变更放入同一个 PR；CI 与内容审阅完成前，不将本地通过写成正式发布。
 
 ## 单位网格与坐标旋转

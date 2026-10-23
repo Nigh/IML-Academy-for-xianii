@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 const base = process.env.VITE_BASE_PATH || '/';
+const viewport = { width: 1280, height: 720 };
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
@@ -14,8 +15,16 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', testMatch: /core\.spec\.ts/, use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', testMatch: /core\.spec\.ts/, use: { ...devices['Desktop Safari'] } },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'], viewport } },
+    {
+      name: 'firefox',
+      testMatch: /core\.spec\.ts/,
+      use: { ...devices['Desktop Firefox'], viewport },
+    },
+    {
+      name: 'webkit',
+      testMatch: /core\.spec\.ts/,
+      use: { ...devices['Desktop Safari'], viewport },
+    },
   ],
 });

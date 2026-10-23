@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('M01-002：全部目标在亮暗主题、320px 与放大视图可达', async ({ page }, info) => {
+test('M01-002：全部目标在亮暗主题、横屏桌面与放大视图可达', async ({ page }, info) => {
   await page.goto('./#/lesson/math/linear-algebra/vector-addition');
   await page.getByRole('button', { name: '直接探索', exact: true }).click();
   const workbench = page.getByTestId('object-workbench');
@@ -18,8 +18,11 @@ test('M01-002：全部目标在亮暗主题、320px 与放大视图可达', asyn
   ];
   for (const theme of ['light', 'dark']) {
     await page.getByLabel('主题', { exact: true }).selectOption(theme);
-    for (const width of [1280, 320]) {
-      await page.setViewportSize({ width, height: 900 });
+    for (const viewport of [
+      { width: 1280, height: 720 },
+      { width: 1920, height: 1080 },
+    ]) {
+      await page.setViewportSize(viewport);
       for (let task = 0; task < 3; task++) {
         await workbench.getByLabel('目标任务').selectOption(String(task));
         for (let i = 0; i < names.length; i++)
@@ -30,11 +33,13 @@ test('M01-002：全部目标在亮暗主题、320px 与放大视图可达', asyn
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
         ).toBe(true);
-        await workbench.screenshot({ path: info.outputPath(`${theme}-${width}-task-${task}.png`) });
+        await workbench.screenshot({
+          path: info.outputPath(`${theme}-${viewport.width}-task-${task}.png`),
+        });
         await workbench.locator('.scene').evaluate((el) => el.scrollIntoView({ block: 'center' }));
         await workbench
           .locator('.scene')
-          .screenshot({ path: info.outputPath(`${theme}-${width}-scene-${task}.png`) });
+          .screenshot({ path: info.outputPath(`${theme}-${viewport.width}-scene-${task}.png`) });
       }
       await page.getByRole('button', { name: '复位 ↺' }).click();
       await expect(workbench.getByLabel('目标任务')).toHaveValue('0');
