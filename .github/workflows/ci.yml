@@ -36,6 +36,7 @@ jobs:
       - run: pnpm docs:check
       - run: pnpm scope:check
       - run: pnpm test
+      - run: pnpm build
       - name: Select browser regression and changed courses
         id: selection
         env:
@@ -68,7 +69,7 @@ jobs:
       - if: matrix.path == 'root'
         run: pnpm test:e2e --project=chromium --grep @smoke
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: failure()
+        if: always()
         with:
           name: playwright-${{ matrix.path }}
           path: |

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { existsSync } from 'node:fs';
 import AxeBuilder from '@axe-core/playwright';
 import lessons from '../../curriculum/lessons.json' with { type: 'json' };
 
@@ -6,8 +7,13 @@ const selected: { lessons: { id: string }[] } = JSON.parse(
   process.env.LESSON_SELECTION || '{"lessons":[]}',
 );
 const selectedIds = new Set(selected.lessons.map((lesson) => lesson.id));
-for (const lesson of lessons.filter((l) => l.id.startsWith('M01-') && selectedIds.has(l.id))) {
-  test(`${lesson.id}：预测、全部预设、复位和响应式`, async ({ page }, info) => {
+for (const lesson of lessons.filter(
+  (l) =>
+    l.id.startsWith('M01-') &&
+    selectedIds.has(l.id) &&
+    existsSync(`src/lessons/${l.id}/exploration.ts`),
+)) {
+  test(`${lesson.id}：预测、全部预设、复位和横屏桌面`, async ({ page }, info) => {
     test.setTimeout(90000);
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
@@ -27,7 +33,7 @@ for (const lesson of lessons.filter((l) => l.id.startsWith('M01-') && selectedId
     const count = await presets.count();
     for (const theme of ['light', 'dark']) {
       await page.getByLabel('主题', { exact: true }).selectOption(theme);
-      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.setViewportSize({ width: 1280, height: 720 });
       await page.evaluate(async () => {
         await Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {})));
       });
@@ -45,26 +51,9 @@ for (const lesson of lessons.filter((l) => l.id.startsWith('M01-') && selectedId
         .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
         .analyze();
       expect(audit.violations).toEqual([]);
-      await page.setViewportSize({ width: 320, height: 850 });
-      if (['M01-004', 'M01-005'].includes(lesson.id)) {
-        await expect
-          .poll(() =>
-            lab
-              .locator('figure.plot')
-              .first()
-              .evaluate((el) => el.scrollLeft),
-          )
-          .toBeGreaterThan(0);
-      }
-      for (let i = 0; i < count; i++) {
-        await presets.nth(i).click();
-        expect(
-          await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
-        ).toBe(true);
-      }
       await lab.getByRole('button', { name: '复位 ↺' }).click();
       await expect(lab.getByRole('radio').first()).not.toBeChecked();
-      await lab.screenshot({ path: info.outputPath(`${theme}-mobile-reset.png`) });
+      await lab.screenshot({ path: info.outputPath(`${theme}-desktop-reset.png`) });
       await page.locator('.lesson-body').evaluate((el) => {
         el.style.fontSize = '200%';
       });

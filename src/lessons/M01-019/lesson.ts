@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-019',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '只保留一个方向时，删掉的信息能否从其他方向补回来？' },
     { id: 'learning-path', title: '接上已有知识' },

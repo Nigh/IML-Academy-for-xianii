@@ -14,16 +14,22 @@
   import ProgressPage from './pages/ProgressPage.svelte';
   import NotFoundPage from './pages/NotFoundPage.svelte';
   let hash = $state(location.hash);
-  let menuOpen = $state(false);
+  let menuOpen = $state(parseRoute(location.hash).type !== 'lesson');
   let search = $state('');
   let submittedSearch = $state('');
   const route = $derived(parseRoute(hash));
   let main: HTMLElement;
+  let menuButton: HTMLButtonElement;
+
+  function closeMenu() {
+    menuOpen = false;
+    menuButton?.focus();
+  }
   onMount(() => {
     const stopTheme = watchSystemTheme();
     const change = async () => {
       hash = location.hash;
-      menuOpen = false;
+      menuOpen = parseRoute(hash).type !== 'lesson';
       await tick();
       main?.focus();
       window.scrollTo(0, 0);
@@ -45,6 +51,21 @@
   });
 </script>
 
+<svelte:window
+  onkeydown={(event) => {
+    if (
+      event.key === 'Escape' &&
+      !event.defaultPrevented &&
+      menuOpen &&
+      event.target instanceof HTMLElement &&
+      (event.target === menuButton || event.target.closest('#sidebar'))
+    ) {
+      event.preventDefault();
+      closeMenu();
+    }
+  }}
+/>
+
 <a
   class="skip-link"
   href="#main-content"
@@ -63,10 +84,11 @@
       height="44"
     /><span id="brand-name"><strong>IML Academy</strong><small>FOR XIANII</small></span></a
   ><button
-    class="btn btn-sm btn-ghost mobile-menu"
+    class="btn btn-sm btn-ghost course-menu"
+    bind:this={menuButton}
     aria-expanded={menuOpen}
     aria-controls="sidebar"
-    onclick={() => (menuOpen = !menuOpen)}>课程导航 ☰</button
+    onclick={() => (menuOpen = !menuOpen)}>课程导航</button
   >
   <form
     class="header-search"
@@ -95,9 +117,9 @@
     ></label
   >
 </header>
-<div class="app-layout">
-  <aside id="sidebar" class="app-sidebar" class:menu-open={menuOpen}>
-    <Sidebar {route} onclose={() => (menuOpen = false)} />
+<div class="app-layout" class:menu-open={menuOpen}>
+  <aside id="sidebar" class="app-sidebar" hidden={!menuOpen}>
+    <Sidebar {route} onclose={closeMenu} />
   </aside>
   <div class="main-column">
     <main id="main-content" tabindex="-1" bind:this={main}>

@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-016',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '同样拟合得好的多个解，应该怎样选一个？' },
     { id: 'learning-path', title: '接上已有知识' },

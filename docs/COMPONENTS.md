@@ -2,7 +2,9 @@
 
 实现接口以组件内 TypeScript props 为准；Svelte 5 snippets 与 callback attributes，不使用旧式事件 dispatcher。
 Phase 1 的共享层、三课和集成测试已分别通过 PR CI 与代理内容审阅，Interactive Component Contract v1 在本次验收后冻结。后续破坏性变更需显式迁移并验证现有课程。完整组合示例见 [INTERACTIVE_GUIDE](INTERACTIVE_GUIDE.md)。
-现有 M01-002 调用保持兼容。公共组件不包含课程目标函数或实验参数；参数归课程所有。
+共享组件的数学与交互接口沿用现有协议。M01-002 已迁移到新宽课程壳与课内机器人图，旧 RoutePlatform 已移除。公共组件不包含课程目标函数或实验参数；参数归课程所有。
+
+组件兼容性不证明教学布局合格。先按 LESSON_SPEC §4 设计桌面核心工作区，再组合控件；同状态的两张图不等于连续操作。图表默认实虚线不能决定课程对象的含义，需要课内呈现时在授权范围实现，不为复用强行保留误导样式。旧示范课不自动获得可信样板资格。
 
 ## 数学与数据协议
 
@@ -25,6 +27,7 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | NumericInput       | label、value、min、max、step=1、unit=''、integer=false、onchange(number)                                                                              | 受控有限数。合法输入即时回调；负号/小数点中间态保留，blur/Enter 明确校验。错误关联 aria-describedby，非法值不传播。整数计数显式传 integer；step 是建议步长。                    |
 | ParameterSlider    | NumericInput 的原有 props；initialValue?、description?                                                                                                | 数值框和原生 range 同步；initialValue 提供局部重置按钮，完整实验 reset 在父层。step 不强制量化文本值（整数模式除外）。                                                          |
+| IntegerStepper     | label、value、unit='m'、limit=5、onchange(number)                                                                                                     | 原生减/加按钮与只读数值，范围 [−limit,limit]、每次变化 1，边界禁用；不接受自由文本，父层须传入整数。M01-001/002 共享同一实现，不能跨课程引用私有组件。                          |
 | PresetSelector     | presets: readonly `{id,name,description}[]`、value、defaultId、onchange(id)                                                                           | 按钮 aria-pressed 标示选中，父层应用参数；不匹配 id 显示“自定义参数”。默认 id 必须存在。                                                                                        |
 | InteractivePanel   | title、instructions、meaning、limitations、onreset、children；computationKind?: analytic/simulation/precomputed（默认 analytic）、seed?、sampleCount? | 统一标题、复位、说明、计算性质和边界。通过 children 自由组合参数/图/结果；不拥有数学状态。                                                                                      |
 | SimulationControls | index、maxSteps、finished=false、speed、onstep、onreset、onspeedchange                                                                                | 单步、播放/暂停、复位、1/2/5/10 步每秒。结束禁用推进；父层限制索引。隐藏暂停、不补帧、卸载清理 interval；reduced motion 禁用播放，仍可单步。修改模型时用 key 重建，见课程示例。 |
@@ -43,7 +46,7 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 | HistogramPlot    | samples、bins=20、mode=count/frequency/density（默认 density）、theory=[]                                                                                        | 原始样本计算直方图。bin 1–200，空/退化样本有处理；density 柱面积总和为 1。理论叠加必须与纵轴同单位，组件不推断理论单位。非法数据进入空态，数学函数独立抛错。                                                           |
 | ContourPlot      | contours:PlotSeries[]、path、current、xRange、yRange、description；gradient?                                                                                     | 等高线由课程纯函数生成，叠加路径、当前点和负梯度方向线段；gradient 为课程已缩放的显示向量，坐标图不计算函数。                                                                                                          |
 
-图表最小逻辑宽度保持文字可读，移动端只在图内横向滚动；SVG 高 DPI 自适应，无外部字体/CDN。
+图表最小逻辑宽度保持文字可读，必要时局部横向滚动；SVG 高 DPI 自适应，无外部字体/CDN。项目不提供窄屏、竖屏适配或测试，使用范围按 LESSON_SPEC §4。
 关键结果必须另外放在正文或 aria-live output；图形标题不能替代所有数学解释。
 预设参数、视域与标签布局按 [LESSON_SPEC §4.1](LESSON_SPEC.md#41-预设图形的可读性验收) 逐项验收。共享组件不会自动保证所有输入组合的布局可读；课程应显式选择 `range` / `xRange` / `yRange`，避免内容挤在原点附近。该要求是使用与验收约束，不新增自动缩放、标签避让等组件能力或修改 v1 props。
 例：`<HistogramPlot samples={samples} bins={20} mode="density" />`；
@@ -73,7 +76,7 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 
 ## 现有 Shell 协议（不变）
 
-- LessonShell：metadata、status、definition?、children；仅平台装配调用。
+- LessonShell：metadata、status、definition?、children；仅平台装配调用。章节使用横向链接，拦截锚点点击以保留 hash 路由，并定位及聚焦章节；目标/前置放入可展开区。实验、正文段落、列表与公式块使用可用内容宽度，不再统一限制为 70ch。站点课程导航在课程页默认收起，可显式展开；没有单课宽版式开关或旧壳兼容分支。完成、测验与进度协议不变，draft 仍无完成入口。
 - LessonHeader：metadata、status；仅 Shell 使用。
 - PrerequisiteLinks：id、prerequisites；直接/传递前置链接。
 - LessonNavigation：id；目录导航。
@@ -88,7 +91,7 @@ Normal CDF 使用 A&S 7.1.26 的 erf 近似，标准参考值误差测试 <8e-8�
 
 所有颜色引用既有主题语义 tokens，不复制品牌色；基础字号继承现有 app.css。
 输入须有 label、错误文本、可见焦点和键盘操作。图表提供单位、文字说明与非颜色区分。
-必须检查亮暗主题、320px、缩放、reduced motion、复位、卸载清理和非法值。
+必须检查 1280×720 与 1920×1080 横屏桌面、亮暗主题、桌面缩放、reduced motion、复位、卸载清理和非法值。窄屏、竖屏与手机触屏不在测试范围。
 新建课程一课一 PR，共享接口与规范文档通常独立提交；既有课程的授权批量修订可将直接相关变更放入同一个 PR；CI 与内容审阅完成前，不将本地通过写成正式发布。
 
 ## 单位网格与坐标旋转

@@ -88,4 +88,4 @@ Python、PyTorch、MuJoCo 和硬件实验由用户自行管理环境：[本地�
 
 Svelte 5 · TypeScript strict · Vite · Tailwind v4 · daisyUI v5 · Xianii Design Tokens · KaTeX · Vitest · Playwright。
 
-Phase 1 完成通用交互原语并冻结 v1 合同；Phase 2 按单课独立 PR 持续实现。不在 Phase 0 批量生成课程正文。
+通用交互原语与 v1 合同已建立。当前先重构 M01-002，再建立少量经人工设计确认、目标读者试用和最终验收的可信样板，用户批准后才推广生产。ready 或历史测试通过不代表样板资格。项目不为窄屏、竖屏提供适配或测试，建议在 720p（浏览器可用视口至少 1280×720 CSS px）及以上横屏中使用。详见 [教学规范](docs/TEACHING_DESIGN.md) 与 [贡献流程](docs/CONTRIBUTING.md)。

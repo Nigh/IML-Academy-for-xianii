@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-017',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '反复应用同一个变换，哪些输入方向最容易追踪？' },
     { id: 'learning-path', title: '接上已有知识' },

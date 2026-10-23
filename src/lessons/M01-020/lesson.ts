@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-020',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '三点不共线，怎样判断一条拟合线已经无法整体改善？' },
     { id: 'learning-path', title: '接上已有知识' },

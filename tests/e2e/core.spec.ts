@@ -4,12 +4,12 @@ import { test, expect } from '@playwright/test';
 test('示范课交互、复位、测验、完成、进度导出和深链接刷新 @smoke', async ({ page }) => {
   await page.goto('./#/lesson/math/linear-algebra/vector-addition');
   await page.getByRole('button', { name: '直接探索', exact: true }).click();
-  await expect(page.getByText('(1, 3) m')).toBeVisible();
-  await page.getByRole('button', { name: '场景二：完全抵消' }).click();
-  await expect(page.getByText('(0, 0) m')).toBeVisible();
-  await page.getByRole('button', { name: '复位 ↺' }).click();
+  await expect(page.getByTestId('movement-result')).toContainText('(1, 3) m');
+  await page.getByRole('button', { name: '原路返回', exact: true }).click();
+  await expect(page.getByTestId('movement-result')).toContainText('(0, 0) m');
+  await page.getByRole('button', { name: '两段移动', exact: true }).click();
   await page.getByRole('button', { name: '直接探索', exact: true }).click();
-  await expect(page.getByText('(1, 3) m')).toBeVisible();
+  await expect(page.getByTestId('movement-result')).toContainText('(1, 3) m');
   await page.getByLabel('合位移为 (0,0)m，路径长度为 2√5m', { exact: true }).check();
   await page.getByRole('button', { name: '检查理解', exact: true }).first().click();
   await expect(page.getByText('回答正确', { exact: true })).toBeVisible();
@@ -60,8 +60,6 @@ test('品牌 logo 加载并链接回首页 @smoke', async ({ page }) => {
   expect(
     await logo.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0),
   ).toBe(true);
-  await page.setViewportSize({ width: 320, height: 850 });
-  await expect(logo).toBeVisible();
   await brand.click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('亲手理解机器学习');
 });

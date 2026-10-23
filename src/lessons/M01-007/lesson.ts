@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-007',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '把候选卡的特征增强，检索分数就更可靠吗？' },
     { id: 'learning-path', title: '接上已有知识' },

@@ -1,31 +1,36 @@
-export {
-  vector,
-  add,
-  scale,
-  norm as magnitude,
-  type Vector2 as Vector,
-} from '../../lib/math/vector.ts';
+import { add, finite, norm, scale, subtract, type Vector2 } from '../../lib/math/vector.ts';
+import { validRange, type Range } from '../../lib/math/coordinates.ts';
 
-import { add, scale, subtract, norm, vector, type Vector2 } from '../../lib/math/vector.ts';
+export const RUN_SECONDS = 1;
 
-export const routeTasks = [
-  { id: 'turn', name: '转向到站', via: vector(2, 1), end: vector(3, 3) },
-  { id: 'return', name: '出发再返回', via: vector(2, -1), end: vector(0, 0) },
-  { id: 'reverse', name: '反向放大', via: vector(-4, -2), end: vector(-5, 0) },
-] as const;
-
-export function routePosition(a: Vector2, b: Vector2, step: number): Vector2 {
-  if (!Number.isInteger(step) || step < 0 || step > 20)
-    throw new RangeError('步号须为 0–20 的整数');
-  // Validate both commands even before the second segment starts.
+export function twoMoves(a: Vector2, b: Vector2) {
   const end = add(a, b);
-  if (step === 20) return end;
-  return step <= 10 ? scale(a, step / 10) : add(a, scale(b, (step - 10) / 10));
+  const pathLength = norm(a) + norm(b);
+  finite(pathLength);
+  return { end, displacementLength: norm(end), pathLength };
 }
 
-export function assessRoute(a: Vector2, b: Vector2, task: { via: Vector2; end: Vector2 }) {
-  const viaError = norm(subtract(a, task.via));
-  const endError = norm(subtract(add(a, b), task.end));
-  // Fixed metre-scale teaching tasks: 1e-8 m absorbs arithmetic roundoff, not machining error.
-  return { viaError, endError, viaReached: viaError <= 1e-8, endReached: endError <= 1e-8 };
+/** Constant velocity for one positive second; k changes velocity, never time. */
+export function speedMotion(referenceVelocity: Vector2, k: number) {
+  const velocity = scale(referenceVelocity, k);
+  const displacement = scale(velocity, RUN_SECONDS);
+  return { velocity, displacement, pathLength: norm(displacement) };
+}
+
+export function predictionDistance(prediction: Vector2, end: Vector2) {
+  return norm(subtract(prediction, end));
+}
+
+/** Same range on both axes preserves metres, including extreme and zero inputs. */
+export function sceneRange(points: readonly Vector2[], speed: boolean): Range {
+  let low = speed ? -5 : -3;
+  let high = speed ? 5 : 4;
+  for (const point of points) {
+    norm(point);
+    low = Math.min(low, Math.floor(point.x - 1), Math.floor(point.y - 1));
+    high = Math.max(high, Math.ceil(point.x + 1), Math.ceil(point.y + 1));
+  }
+  const range: Range = [low, high];
+  validRange(range);
+  return range;
 }

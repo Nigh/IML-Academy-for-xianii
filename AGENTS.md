@@ -13,6 +13,8 @@ LESSON_SPEC owns teaching acceptance; task cards add lesson-specific requirement
 
 For lesson creation or optimization, read `docs/TEACHING_DESIGN.md` and follow `docs/LESSON_OPTIMIZATION.md` within the authorized scope. Use `skills/math-storytelling/SKILL.md` for core questions, concept motivation and derivation paths; use `skills/interactive-pedagogy/SKILL.md` for active exploration, feedback and transfer challenges. Load only the relevant skill for a narrower review. These are versioned project skills; read their paths explicitly if the session has not discovered their names. Collaboration, portability and required external skills are documented in `docs/TEACHING_SKILLS.md`. Before writing or revising learner-facing course content (including prose, quizzes, teaching interactions and lab instructions), verify that math-storytelling, interactive-pedagogy, humanizer-zh and ui-ux-pro-max have readable SKILL.md entrypoints and the resources needed for this task. Use humanizer-zh for Chinese prose and ui-ux-pro-max for course UX review. If any required skill is missing, unreadable or incomplete, stop course-content authoring, identify the missing skill and ask the user to install or repair it before continuing; recheck after installation. Do not substitute another skill or silently fall back. This gate does not apply to non-content changes, including documentation, tooling, infrastructure or read-only review. Do not automatically install external skills.
 
+Current production policy: rebuild M01-002 first, then establish a few user-approved exemplars before scaling. Follow TEACHING_DESIGN for one-page design approval, target-reader trial and human acceptance; ready status and model self-review do not confer exemplar status. Do not start batch production without explicit user authorization of exemplars and scope.
+
 ## Ownership
 
 A new-lesson creation task may modify only `src/lessons/<LESSON_ID>/**` and `labs/lessons/<LESSON_ID>/**`.
@@ -52,7 +54,7 @@ Svelte 5 runes, strict TypeScript, typed props and callback attributes. Use the 
 Use @xianii/design-system semantic tokens; no business-component brand hex colors or external font/CDN dependency.
 Body uses base typography, compact UI uses sm, xs only metadata (never below 12px).
 Inputs need real labels, keyboard access and error text; charts need text descriptions, axes/units/legends and non-color distinctions.
-Support high DPI, zoom, mobile reading and bounded computation. Complex charts may scroll locally.
+Landscape desktop only: recommend 720p or higher; test 1280×720 and 1920×1080 CSS-pixel viewports per LESSON_SPEC §4. No narrow-screen, portrait or mobile adaptation or tests, including reading fallbacks. Retain desktop zoom, high DPI, keyboard access and bounded computation.
 Respect reduced motion. Reset experiments; stop animation on hidden tabs and dispose timers/subscriptions on unmount.
 Use native dialog with title, cancel and focus handling; do not use alert/confirm/prompt.
 

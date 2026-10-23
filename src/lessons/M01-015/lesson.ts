@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-015',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '相同测量规则，为什么能出现唯一解、无穷解和无解？' },
     { id: 'learning-path', title: '接上已有知识' },

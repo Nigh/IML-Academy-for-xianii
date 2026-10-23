@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-003',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '实验记录有24个数，怎样找到某一时刻的读数？' },
     { id: 'learning-path', title: '接上已有知识' },

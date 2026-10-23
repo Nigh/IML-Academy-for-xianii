@@ -2,7 +2,7 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-009',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
     { id: 'motivation', title: '小车只能沿直轨走，停在哪里离目标最近？' },
     { id: 'learning-path', title: '接上已有知识' },

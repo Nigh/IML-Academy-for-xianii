@@ -2,38 +2,39 @@ import type { LessonDefinition } from '../../lib/lesson/contract.ts';
 export default {
   id: 'M01-001',
   contractVersion: 1,
-  status: 'ready',
+  status: 'draft',
   sections: [
-    { id: 'motivation', title: '配送车没有移动，导航仪读数为什么变了？' },
-    { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '先设置配送终点，再转动导航仪' },
-    { id: 'intuition', title: '向量与它的坐标不是同一件事' },
-    { id: 'mathematics', title: '分量来自基向量' },
-    { id: 'pitfalls', title: '表示的边界' },
-    { id: 'engineering', title: '从位置记录到 ML 特征' },
-    { id: 'summary', title: '带走四个结论' },
+    { id: 'motivation', title: '给机器人指定终点' },
+    { id: 'experiment', title: '移动机器人，再换一套坐标轴' },
+    { id: 'intuition', title: '长度相同，终点也可以不同' },
+    { id: 'mathematics', title: '用两个分量记录位移' },
+    { id: 'frame', title: '只转坐标轴，机器人不动' },
+    { id: 'pitfalls', title: '零位移与负数怎么读' },
+    { id: 'engineering', title: '记录坐标时写清方向和单位' },
+    { id: 'summary', title: '记住位移的四个要点' },
   ],
   quiz: [
     {
       id: 'rotating-frame',
-      version: 1,
-      prompt: '位移在原坐标中为 (3,4)m。坐标轴逆时针旋转 90°、物理位移不动，新分量是什么？',
+      version: 2,
+      prompt: '机器人位移在地图中为 (2,1) 米。只把坐标轴逆时针转 90°，机器人不动，新分量是多少？',
       options: [
         {
           id: 'passive',
-          text: '(4,−3)m，长度仍为 5m',
+          text: '(1,−2) 米，长度仍为 √5 米',
           explanation:
-            '先区分位移本身与它的坐标表示。新 x 轴沿旧 y 轴，新 y 轴沿旧负 x 轴；被动坐标变换不改变物理长度。',
+            '新 x 轴向北，读到 1 米；新 y 轴向西，向东的 2 米沿其反向，所以读到 −2 米。位移没变，长度仍为 √5 米。',
         },
         {
           id: 'active',
-          text: '(−4,3)m，长度仍为 5m',
-          explanation: '这是保持坐标轴不动、主动旋转位移 90° 的结果，与题目的操作不同。',
+          text: '(−1,2) 米，长度仍为 √5 米',
+          explanation:
+            '这是把位移箭头逆时针转 90° 才会得到的分量；题目只转坐标轴，机器人没有移动。',
         },
         {
           id: 'same',
-          text: '(3,4)m，分量不会改变',
-          explanation: '物理向量不变不代表坐标不变；分量依赖选定的基。',
+          text: '(2,1) 米，分量不会改变',
+          explanation: '换了读数方向，同一位移的分量一般会改变。要沿新坐标轴读数。',
         },
       ],
       answerId: 'passive',

@@ -4,14 +4,14 @@ export default {
   contractVersion: 1,
   status: 'ready',
   sections: [
-    { id: 'motivation', title: '两段路都走了，为什么还能回到原点？' },
-    { id: 'learning-path', title: '接上已有知识' },
-    { id: 'experiment', title: '给移动平台安排两段路线' },
-    { id: 'intuition', title: '把箭头首尾相接' },
-    { id: 'mathematics', title: '回到数学定义' },
-    { id: 'pitfalls', title: '长度不能代替方向' },
-    { id: 'engineering', title: '工程中的同一条规则' },
-    { id: 'summary', title: '带走四个结论' },
+    { id: 'motivation', title: '给机器人安排两段移动' },
+    { id: 'experiment', title: '两段移动后的终点' },
+    { id: 'intuition', title: '把两段位移首尾相接' },
+    { id: 'pitfalls', title: '原路返回时，路程仍然大于零' },
+    { id: 'speed', title: '运行时间相同，改变速度' },
+    { id: 'mathematics', title: '用分量计算位移和长度' },
+    { id: 'engineering', title: '换一条路线，还能完成取货吗' },
+    { id: 'summary', title: '合并指令时记住四件事' },
   ],
   quiz: [
     {
@@ -40,11 +40,29 @@ export default {
     },
     {
       id: 'negative-scale',
-      version: 1,
-      prompt: 'a=(2,1)m，k=−2。k a 是什么？',
+      version: 2,
+      prompt: '参考速度 v₀=(2,1) 米/秒，速度倍率 k=−2，匀速运行 1 秒。位移和路程怎样变化？',
       options: [
-        { id: 'both', text: '(−4,−2)m', explanation: '每个分量都乘−2，长度变成2倍并反向。' },
-        { id: 'one', text: '(−4,1)m', explanation: '数乘同时作用于全部分量，不能只改变横分量。' },
+        {
+          id: 'both',
+          text: '位移为 (−4,−2) 米，路程为参考运动的两倍',
+          explanation: '固定正时长 T=1 秒，位移是 k v₀T。两个分量都乘 −2，方向反转，路程乘 |k|=2。',
+        },
+        {
+          id: 'one',
+          text: '位移为 (−4,1) 米，只改变东西方向',
+          explanation: '速度倍率作用于整个速度向量，南北分量也要乘 −2。',
+        },
+        {
+          id: 'same-distance',
+          text: '位移为 (−2,−1) 米，反向但路程不变',
+          explanation: '这对应 k=−1。k=−2 不仅反向，速率也变为两倍；运行时间相同，路程随之加倍。',
+        },
+        {
+          id: 'negative-time',
+          text: '需要运行 −2 秒，才能表示反向',
+          explanation: 'T 始终固定为正的 1 秒。负号属于速度倍率，表示运动方向反转，不表示负时间。',
+        },
       ],
       answerId: 'both',
     },
@@ -68,15 +86,15 @@ export default {
     },
     {
       id: 'route-order',
-      version: 1,
+      version: 2,
       prompt:
-        '绘图平台必须先到 P 再到 Q。交换两段非平行位移后，虽然仍到 Q，是否完成原任务？说明判断依据。',
+        '机器人从原点出发，先按 (2,1) 米到取货点，再按 (−1,2) 米到终点。交换这两段指令后，终点相同，取货任务完成了吗？',
       options: [
         {
           id: 'path',
-          text: '没有：第一段末端改变，原目标路线没有完成',
+          text: '没有：还需要经过原取货点，终点相同不够',
           explanation:
-            '向量加法交换律只保证终点相同。先到 P 是路径约束，必须另外检查第一段末端；可在任务台交换指令验证。',
+            '交换律只保证总位移不变。取货要求约束了中间路径，交换指令后还要检查是否经过原取货点。',
         },
         {
           id: 'end',

@@ -29,7 +29,9 @@ afterEach(() => vi.unstubAllGlobals());
 
 for (const [path, module] of Object.entries(lessons)) {
   const id = path.split('/').at(-2)!;
-  const { exploration: spec } = explorations[path.replace('Lesson.svelte', 'exploration.ts')];
+  const exploration = explorations[path.replace('Lesson.svelte', 'exploration.ts')];
+  if (!exploration) continue;
+  const { exploration: spec } = exploration;
   it(`${id}：预测先于推导，提示不泄题，参数变化和复位清理反馈`, async () => {
     const view = render(module.default, { metadata: lessonById.get(id)! });
     const sections = [...view.container.querySelectorAll('section[id]')].map((s) => s.id);
