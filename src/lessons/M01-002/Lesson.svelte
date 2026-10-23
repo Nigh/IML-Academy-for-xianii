@@ -1,279 +1,127 @@
 <script lang="ts">
-  import RoutePlatform from './RoutePlatform.svelte';
-  import PredictionLab from '../../components/lesson/PredictionLab.svelte';
-  import { exploration } from './exploration.ts';
-  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
-  import { lessonById, lessonHref } from '../../lib/curriculum/catalog.ts';
+  import RobotWorkbench from './RobotWorkbench.svelte';
   import type { LessonBodyProps } from '../../lib/lesson/contract.ts';
   import TheorySection from '../../components/lesson/TheorySection.svelte';
   import LessonSummary from '../../components/lesson/LessonSummary.svelte';
+  import KnowledgeCheck from '../../components/lesson/KnowledgeCheck.svelte';
   import FormulaBlock from '../../components/math/FormulaBlock.svelte';
-  import InteractivePanel from '../../components/interactive/InteractivePanel.svelte';
-  import ParameterSlider from '../../components/interactive/ParameterSlider.svelte';
-  import VectorDiagram from '../../components/charts/VectorDiagram.svelte';
-  import { add, magnitude, scale, vector } from './experiment.ts';
-  let resetVersion = $state(0);
-  let { metadata }: LessonBodyProps = $props();
-  let k = $state(1);
-  let ax = $state(2);
-  let ay = $state(1);
-  let bx = $state(-1);
-  let by = $state(2);
-  let mode = $state<'head-tail' | 'parallelogram'>('head-tail');
-  const a = $derived(scale(vector(ax, ay), k));
-  const b = $derived(vector(bx, by));
-  const sum = $derived(add(a, b));
-  const fmt = (n: number) => Number(n.toFixed(2));
-  const range = $derived(
-    Math.max(
-      5,
-      1.35 *
-        Math.max(
-          Math.abs(a.x),
-          Math.abs(a.y),
-          Math.abs(b.x),
-          Math.abs(b.y),
-          Math.abs(sum.x),
-          Math.abs(sum.y),
-        ),
-    ),
-  );
-  function reset() {
-    resetVersion += 1;
-    k = 1;
-    ax = 2;
-    ay = 1;
-    bx = -1;
-    by = 2;
-    mode = 'head-tail';
-  }
+
+  // Shell renders metadata; retain the typed lesson-body interface.
+  // eslint-disable-next-line no-empty-pattern
+  let {}: LessonBodyProps = $props();
 </script>
 
-<TheorySection id="motivation" title="两段路都走了，为什么还能回到原点？">
+<TheorySection id="motivation" title="给机器人安排两段移动">
   <p>
-    绘图平台的笔头要先经过一个指定点，再到终点。你能安排两段移动指令，让它画出目标路线吗？
-    如果最后回到了起点，能说笔头没有走过路吗？先操作平台，再用向量解释结果。
+    机器人从起点出发，第一段向东移动 2 米、向北移动 1 米，第二段向西移动 1 米、向北移动 2 米。
+    地图上东为 x 正向，北为 y 正向。下面可以先标记你预计的终点，再执行指令；也可以直接探索。
   </p>
-</TheorySection>
-<TheorySection id="learning-path" title="接上已有知识">
-  <p>
-    上一课已经区分了物理位移、坐标分量和长度。本课固定同一个坐标系，学习怎样合并位移和改变位移的大小；不再重复标量与向量的完整定义。
-  </p>
-  {#if metadata.prerequisites.length}<p>需要回顾时，按正式前置关系返回：</p>
-    <ul>
-      {#each metadata.prerequisites as id (id)}<li>
-          <a href={lessonHref(id)}>{id} · {lessonById.get(id)?.title}</a>
-        </li>{/each}
-    </ul>{/if}
+  <p>用东西、南北两个方向分别算，就能找到终点。向量把这两笔计算放在一起，方便记录和组合移动指令。</p>
 </TheorySection>
 
-<TheorySection id="experiment" title="给移动平台安排两段路线">
+<TheorySection id="experiment" title="两段移动后的终点">
+  <RobotWorkbench />
+</TheorySection>
+
+<TheorySection id="intuition" title="把两段位移首尾相接">
   <p>
-    比较转向和抵消；改变k的正负，观察第一段的方向与长度。再切换两种作图方式，检查合向量是否相同。
+    第一段位移记作 a，第二段记作 b。第二段从第一段的终点出发，所以把 b 的箭头平移到 a 的末端。
+    平移不改变箭头的方向和长度。从最初起点指向最终终点的箭头，就是总位移 a+b。
   </p>
-  <PredictionLab
-    {...exploration}
-    context={JSON.stringify([k, ax, ay, bx, by, mode])}
-    {resetVersion}
-  >
-    <InteractivePanel
-      title="方向会改变答案"
-      instructions="选择目标任务，修改下方两段指令与 k，单步或播放执行，再根据偏差重试。两个场景按钮只设置实验指令，不会更换目标。"
-      meaning="箭头 ka、虚线箭头 b 与合向量 ka+b 都由当前坐标解析计算；不是预录动画。"
-      limitations="二维欧氏空间、同一坐标系、同一单位；不描述旋转姿态的复合。"
-      onreset={reset}
-    >
-      {#key resetVersion}
-        <RoutePlatform {a} {b} {sum} context={JSON.stringify([k, ax, ay, bx, by])} />
-      {/key}
-      <ParameterSlider
-        label="数乘系数 k"
-        value={k}
-        min={-3}
-        max={3}
-        step={0.1}
-        unit="无量纲"
-        onchange={(n) => (k = n)}
-      />
+  <FormulaBlock
+    latex={String.raw`\mathbf a+\mathbf b=\begin{bmatrix}2\\1\end{bmatrix}+\begin{bmatrix}-1\\2\end{bmatrix}=\begin{bmatrix}1\\3\end{bmatrix}\,\mathrm m`}
+    description="本例两段位移的分量都以米计。东西方向合计向东 1 米，南北方向合计向北 3 米。"
+  />
+  <p>
+    在工作区打开“平行四边形”，把 a 和 b 的起点放在一起，再分别补上平行的辅助边。
+    从共同起点出发的对角线仍是 a+b。首尾相接表示实际移动的先后，平行四边形展示同一个和的几何构造；辅助边不代表多走了两段路。
+  </p>
+</TheorySection>
+
+<TheorySection id="pitfalls" title="原路返回时，路程仍然大于零">
+  <p>
+    在工作区选择“原路返回”。第一段是 (2,−1) 米，第二段是 (−2,1) 米。
+    第二段与第一段等长反向，记作 −a，也就是 (−1)a。机器人回到起点，总位移为零向量。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\mathbf a+(-\mathbf a)=\mathbf 0,\qquad L=\sqrt{2^2+(-1)^2}+\sqrt{(-2)^2+1^2}=2\sqrt5\,\mathrm m`}
+    description="L 表示实际路程，单位为米。零向量的两个分量都是零，长度为零，方向未定义。"
+  />
+  <p>两段路线在地图上重合，但机器人来回各走了一次。总位移只记录起点到终点的变化，路程要把走过的每段长度加起来。</p>
+</TheorySection>
+
+<TheorySection id="speed" title="运行时间相同，改变速度">
+  <p>
+    选择“改变速度”。参考速度的东西、南北分量为 (2,1) 米/秒，每次匀速运行 1 秒。
+    依次试试速度倍率 2、−1、0、−2，比较终点的方向和到起点的距离。
+  </p>
+  <p>
+    速度倍率记作 k，没有单位。正数表示沿参考运动方向，负数表示沿相反方向，绝对值表示速率的倍数。
+    这里反向指地面上的运动方向反转，不要求机器人转身。运行时间始终为正，负倍率不表示负时间。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\mathbf v_0=\begin{bmatrix}2\\1\end{bmatrix}\,\mathrm{m/s},\quad T=1\,\mathrm s,\quad \mathbf a=\mathbf v_0T,\quad \Delta\mathbf r=(k\mathbf v_0)T=k\mathbf a`}
+    description="参考速度 v₀ 和实际速度 kv₀ 都是 2×1 列向量，分量单位为米/秒。T 是固定正时长；a 是参考位移，Δr 是实际位移，分量单位为米。"
+  />
+  <p>
+    k=2 时，终点为 (4,2) 米；k=−1 时为 (−2,−1) 米；k=0 时停在起点；k=−2 时为 (−4,−2) 米。
+    两个速度分量一起乘 k。负倍率会反向，路程按倍率的绝对值变化。
+  </p>
+  <p>
+    这个模型假设每段匀速直线平移，忽略达到速度和停车的过程。屏幕播放快慢不代表速度倍率。
+    若把参考速度的两个分量都设为零，任意 k 的位移都为零，方向未定义。
+  </p>
+</TheorySection>
+
+<TheorySection id="mathematics" title="用分量计算位移和长度">
+  <p>
+    本课所有位移都在同一个二维正交坐标系中，用 2×1 列向量表示；上下两项分别是东西、南北分量，单位为米。
+    a、b 表示两段位移，k 是有限实数且无量纲。实验允许 k 在 −3 到 3 之间变化，数学定义不局限于这个范围。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\mathbf a+\mathbf b=\begin{bmatrix}a_x+b_x\\a_y+b_y\end{bmatrix},\qquad k\mathbf a=\begin{bmatrix}ka_x\\ka_y\end{bmatrix}`}
+    description="aₓ、aᵧ 是第一段的两个位移分量，bₓ、bᵧ 是第二段的两个位移分量。加法分别合计同一方向的变化，数乘同时作用于全部分量。"
+  />
+  <p>
+    这套位移模型不包含旋转、障碍、转弯半径或测量误差。第二段指令描述从当前点再移动多少，不能直接把最终位置坐标填成第二段位移。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\|\mathbf a+\mathbf b\|_2\leq\|\mathbf a\|_2+\|\mathbf b\|_2=L,\qquad \|k\mathbf a\|_2=|k|\,\|\mathbf a\|_2`}
+    description="‖·‖₂ 表示欧氏长度，L 为两段直线移动的路程，均以米计。第一式是三角不等式，第二式说明数乘怎样改变长度。"
+  />
+  <p>
+    三角形两边之和不小于第三边，因此绕经中间点的路程不会小于起终点的直线距离。
+    两个非零向量同向时等号成立；只要其中一个是零向量，等号也成立。其余情形严格小于，不能漏掉零向量这个边界。
+  </p>
+  <FormulaBlock
+    latex={String.raw`\begin{bmatrix}2\\0\end{bmatrix}+\begin{bmatrix}0\\1\end{bmatrix}=\begin{bmatrix}2\\1\end{bmatrix}\,\mathrm m,\qquad L=2+1=3\,\mathrm m,\qquad \|\mathbf a+\mathbf b\|_2=\sqrt{2^2+1^2}=\sqrt5\,\mathrm m`}
+    description="手算例：向东 2 米，再向北 1 米。两段垂直，路程 3 米大于总位移长度 √5 米。"
+  />
+</TheorySection>
+
+<TheorySection id="engineering" title="换一条路线，还能完成取货吗">
+  <p>
+    给默认两段移动加一个要求：机器人必须先到第一段终点取货，再到最终终点。
+    回到“两段移动”，把两段指令的分量交换，比较最终终点和中间点。终点相同，能说明取到货了吗？
+  </p>
+  <KnowledgeCheck prompt="交换两段非平行位移后，取货要求还能满足吗？先检查地图上的中间点。">
+    {#snippet answer()}
       <p>
-        默认 k=1。计算 k a + b；k 为负时 a 反向。分量均为 m，范围 −5 至
-        5；非法输入保留上次有效结果。视域随端点变化，比较长度时请读取数值。
+        默认路线先经过 (2,1) 米，交换后先经过 (−1,2) 米，之后仍到 (1,3) 米，但不经过原取货点。
+        逐分量相加满足交换律 a+b=b+a，只保证终点一致。取货要求约束了经过的位置和顺序，必须另外检查路径。
       </p>
-      <div class="vector-lab">
-        <div class="vector-controls">
-          <span class="vector-key primary-key">第一段移动指令 a · m</span>
-          <ParameterSlider
-            label="第一段东西位移"
-            unit="m"
-            value={ax}
-            min={-5}
-            max={5}
-            step={0.1}
-            onchange={(n) => (ax = n)}
-          />
-          <ParameterSlider
-            label="第一段南北位移"
-            unit="m"
-            value={ay}
-            min={-5}
-            max={5}
-            step={0.1}
-            onchange={(n) => (ay = n)}
-          />
-          <span class="vector-key secondary-key">第二段移动指令 b · m</span>
-          <ParameterSlider
-            label="第二段东西位移"
-            unit="m"
-            value={bx}
-            min={-5}
-            max={5}
-            step={0.1}
-            onchange={(n) => (bx = n)}
-          />
-          <ParameterSlider
-            label="第二段南北位移"
-            unit="m"
-            value={by}
-            min={-5}
-            max={5}
-            step={0.1}
-            onchange={(n) => (by = n)}
-          />
-        </div>
-        <div>
-          <VectorDiagram
-            {range}
-            vectors={[
-              { ...a, label: 'ka', role: 'primary' },
-              {
-                ...b,
-                label: mode === 'head-tail' ? '' : 'b',
-                role: 'secondary',
-                origin: mode === 'head-tail' ? a : undefined,
-              },
-              { ...sum, label: magnitude(sum) === 0 ? '' : '和', role: 'accent' },
-              ...(mode === 'parallelogram'
-                ? [
-                    { ...b, origin: a, label: '', role: 'secondary' as const },
-                    { ...a, origin: b, label: '', role: 'primary' as const },
-                  ]
-                : []),
-            ]}
-            description={`数乘后的向量 ka=(${fmt(a.x)},${fmt(a.y)}) 米，b=(${bx},${by}) 米，合向量=(${fmt(sum.x)},${fmt(sum.y)}) 米。`}
-          />
-          <label class="field"
-            >作图方式<select class="select select-bordered" bind:value={mode}
-              ><option value="head-tail">首尾相接</option><option value="parallelogram"
-                >平行四边形</option
-              ></select
-            ></label
-          >
-        </div>
-      </div>
-      <p>图例：ka 为实线，b 为虚线，和为标有“和”的实线；抵消时合向量落在原点，不画虚假箭头。</p>
-      <div class="experiment-result" aria-live="polite">
-        k a + b = <strong>({fmt(sum.x)}, {fmt(sum.y)}) m</strong><span
-          >合位移长度 {magnitude(sum).toFixed(2)} m · 路程 {(magnitude(a) + magnitude(b)).toFixed(
-            2,
-          )} m</span
-        >
-      </div>
-      <div class="scenario-buttons">
-        <button class="btn btn-sm btn-outline" onclick={reset}>场景一：转向后合成</button><button
-          class="btn btn-sm btn-outline"
-          onclick={() => {
-            k = 1;
-            mode = 'head-tail';
-            ax = 2;
-            ay = -1;
-            bx = -2;
-            by = 1;
-          }}>场景二：完全抵消</button
-        >
-      </div>
-    </InteractivePanel>
-  </PredictionLab>
-</TheorySection>
-<TheorySection id="intuition" title="把箭头首尾相接">
-  <p>
-    向量相加表示连续完成两段位移：先向右走2m，再向上走1m，总位移从最初起点指向最终终点。把第二根箭头平移到第一根末端，不改变它本身的方向和长度，这叫首尾相接。
-  </p>
-  <p>
-    也可以分别记账：横向贡献只与横向相加，纵向贡献只与纵向相加。两段位移必须使用同一组轴和同样单位；不能把不同坐标系的两列数字直接相加。
-  </p>
-  <FormulaBlock
-    latex={String.raw`(2,0)^\mathsf T+(0,1)^\mathsf T=(2,1)^\mathsf T,\qquad 2(2,1)^\mathsf T=(4,2)^\mathsf T`}
-    description="分量单位为m；系数2无量纲。数乘将每一个分量乘以同一个数。"
-  />
-  <p>
-    正系数保持方向，绝对值表示长度变为几倍；负系数还会反向，零系数得到零向量。数乘不是“只改变横分量”。
-  </p>
-  <p>
-    长度的相加是另一件事。向右2m再向上1m，实际路程为3m，但起点到终点的直线距离为平方根5m。只有两段非零位移同向共线时，合位移长度才等于两段长度之和。
-  </p>
-  <KnowledgeCheck prompt="迁移：一段记录用m，另一段用mm。可以直接逐分量相加吗？说明必须先做什么。">
-    {#snippet answer()}<p>
-        先统一单位并确认两段使用同一坐标系。数值能相加不代表含义匹配；位置记录还需先转成相对于同一起点的位移。
-      </p>{/snippet}
+    {/snippet}
   </KnowledgeCheck>
+  <p>继续组合更多移动时，加法的结合律允许先合计一部分位移；合计结果同样不会保留所有中间点。</p>
 </TheorySection>
 
-<TheorySection id="mathematics" title="回到数学定义">
-  <FormulaBlock
-    latex={String.raw`\mathbf a+\mathbf b=\begin{bmatrix}a_x+b_x\\a_y+b_y\end{bmatrix}`}
-    description="同一坐标系中的向量逐分量相加。a 和 b 均为二维位移向量，各分量单位为米。"
-  />
-  <p>
-    a、b 均为 2×1 列向量，k 为实数标量，无量纲；数乘后仍以 m
-    计。加法满足交换律与结合律。零向量不改变任何位移；一个向量与其相反向量相加得到零向量。
-  </p>
-  <FormulaBlock
-    latex={String.raw`k\mathbf a=\begin{bmatrix}ka_x\\ka_y\end{bmatrix}`}
-    description="无量纲实数 k 对所有分量同时缩放；k 为负时方向反转，k 为零时得到零向量。"
-  />
-</TheorySection>
-<TheorySection id="pitfalls" title="长度不能代替方向">
-  <p>
-    场景二里，机器人走了两段非零路程，却回到了原点。合位移长度是
-    0，路径长度是两段长度之和。这正是向量和标量的区别。
-  </p>
-  <FormulaBlock
-    latex={String.raw`\|\mathbf a+\mathbf b\|_2\le\|\mathbf a\|_2+\|\mathbf b\|_2`}
-    description="三角不等式。非零向量同向时等号成立，方向不同通常严格小于。零向量的方向未定义。"
-  />
-  <p>
-    另一个误区：把负数乘理解为只缩短长度。k=−1 会翻转方向、保持长度；k=0
-    得到零向量，方向未定义。位置也不能无条件相加当作新位置，应先区分位置与位移。
-  </p>
-</TheorySection>
-<TheorySection id="engineering" title="工程中的同一条规则">
-  <p>
-    多个力合成、传感器位移补偿、机器人轨迹段累加，都使用相同的分量规则。相加前先确认坐标系与量纲一致：米与毫米需要换算，机体坐标与世界坐标需要先变换。
-  </p>
-  <p>旋转的复合有自己的数学结构，不能直接套用本课的自由向量加法。</p>
-  <p>
-    绘图平台先到 P 再到 Q 时，第二段指令描述 P 到 Q 的变化，不是 Q 的坐标。
-    交换两段位移不会改变合向量，却可能改变笔头经过的路线；只检查终点不足以验收绘图任务。
-  </p>
-</TheorySection>
-<KnowledgeCheck prompt="a=(2,1)m，k=−2。k a 是什么，长度怎样变化？">
-  {#snippet answer()}<p>
-      结果 (−4,−2)m，长度乘 2、方向反转。每个分量都乘 −2；(−1,−0.5)m 是除法结果，(−4,1)m
-      则错误地只改变了一个分量。
-    </p>{/snippet}
-</KnowledgeCheck>
-<KnowledgeCheck prompt="两个非零向量何时满足合向量长度等于长度之和？">
-  {#snippet answer()}<p>
-      两者同向时成立。垂直时合长度由勾股定理计算，严格小于两个非零长度之和；反向时会抵消。只有长度相等不足以判断方向。
-    </p>{/snippet}
-</KnowledgeCheck>
-<TheorySection id="summary" title="带走四个结论">
+<TheorySection id="summary" title="合并指令时记住四件事">
   <LessonSummary
     points={[
-      '同坐标同单位的向量逐分量相加，几何上首尾相接。',
-      '数乘同时作用于全部分量，负数翻转方向，零系数消去向量。',
-      '合位移长度不超过两段长度之和；同向或含零向量时等号成立。',
-      '相加前统一坐标系与单位；同一终点不保证同一路线，位置、位移与路程要分清。',
+      '同坐标、同单位的位移逐分量相加；首尾相接和平行四边形给出同一个总位移。',
+      '固定正时长时，速度倍率 k 也缩放位移；全部分量一起变化，负值反向，零位移无方向。',
+      '路程累加每段长度，总位移长度不超过路程；两个非零向量同向或包含零向量时等号成立。',
+      '交换两段位移不改变终点，但可能改变路线；有取货等经过点要求时，还要检查路径。',
     ]}
     related={['M01-001', 'M01-005', 'M01-007']}
   />
